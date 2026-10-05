@@ -1,0 +1,86 @@
+\chapter{Catálogo de errores}
+\label{ap:errores}
+
+Esta es la lista de las cosas que salen mal, con el síntoma por el que se
+manifiestan. Está ordenada por el momento en que aparecen.
+
+\section{En el estado estacionario}
+
+\paragraph{La distribución no suma uno} Casi siempre es la lotería: masa que se
+escapa por el extremo de la grilla porque la política excede el último punto y no
+se trunca. Síntoma: la masa total deriva lentamente hacia abajo con las
+iteraciones.
+
+\paragraph{Hay masa apreciable en el último punto de la grilla} La grilla está
+atando. En un modelo de hogares suele bastar con extenderla. En un modelo con
+acumulación y retornos lineales puede indicar algo peor: que la condición de
+crecimiento $\beta\varsigma R<1$ está violada y la distribución verdaderamente
+diverge.
+
+\paragraph{El presupuesto agregado no cierra} Error de contabilidad en el paso
+hacia atrás. Hay que verificar punto por punto que
+$c + a' = (1+r)a_- + we$ sobre toda la grilla, no solo en el agregado.
+
+\paragraph{La iteración hacia atrás no converge} Revisar que la condición de
+transversalidad implícita se cumpla ($\beta R<1$ en el caso estándar), y que el
+valor inicial de la variable de continuación sea finito y positivo en todos los
+puntos.
+
+\section{En los jacobianos}
+
+\paragraph{No coinciden con el método directo} Las causas, por frecuencia:
+\begin{enumerate}[leftmargin=1.4em,itemsep=1pt]
+\item orden invertido de los operadores en el paso de expectativa (ver apéndice
+\ref{ap:codigo});
+\item la variable de continuación se reinicia dentro del bucle sobre $s$ en el
+paso 1, en lugar de arrastrarse;
+\item desfase de un índice en la recursión del paso 4;
+\item el estado estacionario no convergió lo suficiente;
+\item hay un rezago del insumo dentro del bloque heterogéneo (ver capítulo
+\ref{cap:extensiones}).
+\end{enumerate}
+
+\paragraph{La primera fila no es cero para una variable de acervo} Error de
+alineación temporal: en algún lado se está usando la distribución de $t+1$ donde
+corresponde la de $t$.
+
+\paragraph{El jacobiano empeora al reducir $h$} El estado estacionario está mal
+convergido y su ruido domina la señal de la derivada.
+
+\paragraph{El jacobiano tiene entradas enormes cerca de la diagonal} Puede ser
+real --- restricciones de liquidez fuertes --- o puede ser que la política tenga
+un salto sobre la grilla. Vale la pena graficar la política antes y después de
+perturbar.
+
+\section{En el equilibrio general}
+
+\paragraph{\texttt{LinAlgError: singular matrix}} Casi siempre un objetivo
+redundante: se impusieron todas las condiciones de vaciado y la ley de Walras
+hace a una de ellas combinación lineal de las demás. También puede ser un objetivo
+insensible a toda incógnita.
+
+\paragraph{La solución es enorme o cambia de signo al cambiar $T$} El sistema
+está casi singular. Mirar el número de condición de $\mathbf{H}_U$.
+
+\paragraph{La respuesta no decae hacia $T$} El horizonte es corto. La solución
+truncada impone implícitamente que todo vuelva al estado estacionario en $T$, y
+si no lo hace, el error se propaga hacia atrás.
+
+\paragraph{Una variable predeterminada responde en impacto} Error en el grafo:
+probablemente un rezago mal puesto en un bloque simple.
+
+\section{En el modelo}
+
+\paragraph{El estado estacionario está sobre un quiebre} Si una función $\min$ o
+$\max$ se evalúa exactamente en su punto de quiebre, la derivada no existe. Hay
+que recalibrar. Si está \emph{cerca} del quiebre, el modelo es formalmente
+diferenciable pero la linealización no es informativa, y conviene decirlo.
+
+\paragraph{La distribución no afecta a nada} Si todos los productos del bloque son
+lineales en el estado endógeno, el bloque colapsa a un conjunto de agentes
+representativos. Síntoma: los jacobianos no cambian al modificar la forma de la
+distribución manteniendo su media. Ver capítulo \ref{cap:macrofinanzas}.
+
+\paragraph{Los resultados cambian mucho con el número de puntos de la grilla}
+Error de discretización, no del método. Suele resolverse concentrando puntos
+donde la política tiene curvatura, no simplemente agregando más.

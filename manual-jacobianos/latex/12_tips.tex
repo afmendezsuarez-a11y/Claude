@@ -1,0 +1,137 @@
+\chapter{Oficio: cómo armar un modelo macro que funcione}
+\label{cap:tips}
+
+Este capítulo y el siguiente no tratan del algoritmo sino del oficio. Son las
+cosas que uno aprende perdiendo semanas y que nadie escribe en los artículos.
+Están ordenadas por el momento en que aparecen al trabajar.
+
+\section{Antes de escribir una ecuación}
+
+\paragraph{Escribe primero la pregunta, después el modelo} Suena obvio y casi
+nadie lo hace. La pregunta determina qué heterogeneidad hace falta. Si la
+pregunta es ``cuánto cae el producto'', probablemente baste con un agente
+representativo. Si es ``quién absorbe la caída'', hace falta heterogeneidad, y
+hace falta \emph{en la dimensión de la pregunta}. Un modelo con heterogeneidad
+en una dimensión irrelevante es más caro y no es más informativo.
+
+\paragraph{Construye por capas, y resuelve cada capa} La estrategia de empezar
+con un agente representativo, luego agregar una fuente de heterogeneidad, luego
+otra, es correcta --- y conviene \emph{resolver numéricamente} cada capa antes de
+agregar la siguiente, no solo escribirla. Cada capa nueva debe reproducir la
+anterior cuando se apaga el parámetro que la activa. Ese es el mejor test de
+regresión que existe.
+
+\paragraph{Decide qué es exógeno antes de calibrar} La tentación de endogeneizar
+todo es fuerte y casi siempre es un error en una tesis de pregrado. Cada variable
+endógena adicional es una incógnita, un objetivo, una condición de identificación
+y una fuente de problemas de determinación.
+
+\section{Al escribir el modelo}
+
+\paragraph{Convenciones de tiempo: elige una y escríbela} La fuente número uno de
+errores en modelos dinámicos es la ambigüedad sobre qué significa un subíndice.
+¿$k_t$ es el capital elegido en $t$ o el disponible en $t$? Las dos convenciones
+son defendibles; mezclarlas no. Conviene escribir en un comentario del código,
+en la primera línea, cuál se usa.
+
+\paragraph{Los rezagos van en los bloques simples} Como se vio en el capítulo
+\ref{cap:extensiones}, un bloque heterogéneo no admite rezagos del insumo. La
+disciplina es: el bloque heterogéneo recibe solo variables contemporáneas; los
+rezagos y adelantos se construyen fuera.
+
+\paragraph{Normaliza algo} En casi todo modelo hay una indeterminación de escala.
+Conviene fijarla explícitamente (la masa de agentes igual a uno, el producto de
+estado estacionario igual a uno, la productividad media igual a uno) y
+verificarlo numéricamente.
+
+\paragraph{Usa la ley de Walras como verificación, no como ecuación} Si se
+imponen todas las condiciones de vaciado, una es redundante y $\mathbf{H}_U$ es
+singular. La práctica correcta: omitir una condición del sistema y \emph{usarla
+como prueba}. Si el residuo de la condición omitida no es numéricamente cero, hay
+un error de contabilidad.
+
+\section{Al elegir incógnitas y objetivos}
+
+Esta es la decisión que más afecta la velocidad y la estabilidad, y la que menos
+se discute.
+
+\begin{receta}[Elegir el conjunto de incógnitas]
+\begin{enumerate}[leftmargin=1.4em,itemsep=2pt]
+\item Lista todas las variables endógenas.
+\item Marca las que puedas despejar explícitamente en función de otras. Esas
+salen del sistema: van a bloques simples.
+\item De las que quedan, identifica las que generan \emph{ciclos} en el grafo.
+Esas tienen que ser incógnitas, con su condición de consistencia como objetivo.
+\item Verifica que el número de incógnitas iguale el de objetivos, y que cada
+objetivo sea sensible a al menos una incógnita.
+\end{enumerate}
+\end{receta}
+
+Un DAG eficiente puede ser diez veces más rápido que uno ``plano'' donde todas
+las variables son incógnitas. En el modelo HANK de dos activos de \abrs, el DAG
+eficiente tiene 3 incógnitas frente a 18 del plano, y resuelve siete veces más
+rápido.
+
+\begin{trampa}
+Un objetivo insensible a toda incógnita produce una fila de ceros en
+$\mathbf{H}_U$ y una matriz singular. Suele pasar al copiar y pegar: uno declara
+un objetivo que en realidad ya está satisfecho por construcción. El síntoma es un
+error de álgebra lineal; la causa está en el planteo, no en el código numérico.
+\end{trampa}
+
+\section{Al calibrar}
+
+\paragraph{Calibra el estado estacionario con objetivos, no con parámetros} En
+lugar de fijar $\beta=0.98$ y ver qué sale, fija la relación
+capital--producto que quieres y resuelve por $\beta$. Es más transparente, más
+fácil de defender y hace el modelo comparable con otros.
+
+\paragraph{Verifica que el estado estacionario sea interior} Este punto es
+específico de este método y crítico. Antes de calcular ningún jacobiano, hay que
+verificar que ninguna función $\min$, $\max$ o restricción agregada esté
+\emph{exactamente} en su quiebre, y conviene reportar a qué distancia está. Si
+$\min(1, P/Q)$ se evalúa en $P/Q = 0.98$, el modelo es formalmente diferenciable
+pero un choque modesto lo cruza, y la linealización deja de ser informativa.
+
+\paragraph{Cuidado con las condiciones de crecimiento} En modelos con acumulación
+y retornos aproximadamente lineales, la existencia de una distribución
+estacionaria no trivial depende de una condición del tipo $\beta R < 1$ (o, con
+salida de agentes, $\beta\,\varsigma\,R<1$). Si la condición se viola, la
+distribución diverge y el código no converge o, peor, converge a una distribución
+con masa apilada en el extremo de la grilla. Hay que \emph{mirar} la masa en el
+último punto de la grilla: si no es del orden de $10^{-10}$ o menos, la grilla
+está restringiendo el modelo.
+
+\section{Al depurar}
+
+\begin{receta}[Orden de depuración cuando algo no cuadra]
+\begin{enumerate}[leftmargin=1.4em,itemsep=2pt]
+\item ¿Converge el estado estacionario a $10^{-14}$? ¿Suma uno la distribución?
+¿Se cumple el presupuesto agregado \emph{exactamente}?
+\item ¿Coinciden los jacobianos del bloque con el método directo a $T=30$?
+\item ¿Se cumplen las identidades analíticas que conoces (respuestas en impacto
+de variables predeterminadas, restricciones presupuestarias agregadas)?
+\item ¿Es razonable el número de condición de $\mathbf{H}_U$?
+\item ¿Cambia la solución si subes $T$ a $1.5T$?
+\item Recién ahora: ¿tiene sentido económico el resultado?
+\end{enumerate}
+\end{receta}
+
+El orden importa. Casi todo el mundo empieza por el paso 6 --- ``esta función
+impulso-respuesta se ve rara'' --- y se pasa días buscando economía donde hay un
+error de signo. Los pasos 1 a 5 son mecánicos y baratos.
+
+\section{Al escribir los resultados}
+
+\paragraph{Muestra los jacobianos} No solo las funciones impulso-respuesta. Un
+jacobiano dice mucho más sobre el mecanismo, y permite al lector comparar con
+otros modelos.
+
+\paragraph{Reporta las verificaciones} Que el método coincide con el directo,
+que el horizonte es suficiente, que el estado estacionario es interior. Son tres
+líneas y cambian por completo la credibilidad del trabajo numérico.
+
+\paragraph{Distingue lo que es resultado del modelo de lo que es calibración}
+Si un resultado depende de haber fijado $\tau_k$ en una grilla supuesta, eso no
+es un hallazgo, es una consecuencia del supuesto. Decirlo explícitamente protege
+el trabajo mucho más que esconderlo.

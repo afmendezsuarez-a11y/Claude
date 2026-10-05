@@ -1,0 +1,175 @@
+\chapter{Hoja de ruta de implementación}
+\label{cap:hoja-ruta}
+
+Este capítulo propone un orden de trabajo. Está pensado para alguien que tiene un
+modelo estático funcionando y un semestre por delante. Cada etapa termina con un
+criterio verificable: si no se cumple, no conviene pasar a la siguiente.
+
+\section{Etapa 0: el estado estacionario del modelo que ya tienes}
+
+\paragraph{Qué hacer} Escribir en código el modelo estático que ya existe, pero
+estructurado como el estado estacionario de un modelo dinámico: una función que,
+dados los parámetros y los precios, devuelva todas las cantidades agregadas.
+
+\paragraph{Criterio de salida} El código reproduce exactamente los números del
+modelo estático escrito en papel, y las identidades contables (el balance de cada
+banco, la identidad $X-G=\mu$, la suma de masas igual a uno) se cumplen a
+precisión de máquina.
+
+\paragraph{Cuánto toma} Una o dos semanas. Es tiempo bien gastado: el 80\% de los
+errores que aparecerían después se atrapan aquí.
+
+\section{Etapa 1: cerrar las decisiones pendientes}
+
+\paragraph{Qué hacer} Convertir en decisiones todo lo que ahora es parámetro
+impuesto. En el modelo de la parte V, eso significa derivar la liquidez
+voluntaria de una condición de primer orden en lugar de fijarla. Para cada
+decisión que se cierre, hay que escribir explícitamente el problema de
+optimización, su condición de primer orden, y verificar numéricamente que la
+solución la satisface.
+
+\paragraph{Criterio de salida} Ninguna variable de elección es un parámetro
+libre, y para cada una se puede decir qué fuerzas económicas la determinan y en
+qué dirección responde a cada precio.
+
+\section{Etapa 2: añadir el estado endógeno individual}
+
+\paragraph{Qué hacer} Introducir el estado que acumula --- el patrimonio, en el
+caso bancario --- con su ley de movimiento y su problema dinámico. Resolver el
+estado estacionario completo: iteración hacia atrás, distribución estacionaria,
+agregación.
+
+\paragraph{Criterio de salida}
+\begin{enumerate}[leftmargin=1.4em,itemsep=1pt]
+\item La distribución converge a $10^{-14}$ y suma uno.
+\item La masa en el último punto de la grilla es despreciable (digamos, menor
+que $10^{-8}$). Si no, la grilla está atando y hay que extenderla o revisar la
+condición de crecimiento.
+\item El modelo reproduce la versión sin estado endógeno cuando se apaga el
+mecanismo que lo hace relevante.
+\item Las magnitudes agregadas son plausibles: ratio de capital, rentabilidad,
+apalancamiento.
+\end{enumerate}
+
+\paragraph{Cuánto toma} Dos a cuatro semanas. Es la etapa con más trabajo
+conceptual nuevo.
+
+\section{Etapa 3: los jacobianos del bloque}
+
+\paragraph{Qué hacer} Implementar el algoritmo fake news para el bloque, y
+verificarlo.
+
+\paragraph{Criterio de salida} \emph{Este es el criterio innegociable del
+proyecto.} El jacobiano calculado con el algoritmo rápido coincide con el del
+método directo, a $T=30$ o $40$, con error relativo menor que $10^{-6}$ en
+\emph{todos} los pares insumo--producto. Además, todas las identidades
+analíticas que el modelo implique se verifican.
+
+\begin{trampa}
+La tentación de saltarse la verificación contra el método directo es enorme,
+porque el algoritmo rápido ``parece funcionar'': produce matrices con la forma
+correcta y signos razonables. Casi todos los errores de implementación de este
+método --- el orden invertido de los operadores, un índice desfasado en la
+recursión, una distribución mal alineada --- producen jacobianos que se ven bien
+y están mal. Escribir el método directo cuesta veinte líneas y es la única
+defensa real.
+\end{trampa}
+
+\section{Etapa 4: el equilibrio general}
+
+\paragraph{Qué hacer} Armar el grafo, elegir incógnitas y objetivos, resolver.
+
+\paragraph{Criterio de salida}
+\begin{enumerate}[leftmargin=1.4em,itemsep=1pt]
+\item El número de condición de $\mathbf{H}_U$ es razonable.
+\item Las respuestas en impacto de las variables predeterminadas son cero.
+\item La condición de vaciado omitida por la ley de Walras da residuo numérico
+nulo.
+\item La solución no cambia al pasar de $T$ a $1.5T$.
+\end{enumerate}
+
+\section{Etapa 5: disciplinar la calibración}
+
+Aquí es donde el proyecto deja de ser un ejercicio y empieza a decir algo. La
+pregunta que organiza esta etapa es: \emph{¿qué dato identifica a qué parámetro?}
+
+La tabla \ref{tab:identificacion} es un ejemplo de cómo organizarla para el
+modelo bancario de la parte V. El punto no son las entradas concretas sino el
+ejercicio: para cada parámetro, un momento, y para cada momento, una razón por la
+que es informativo sobre ese parámetro y no sobre otro.
+
+\begin{table}[htbp]
+\centering\small\setlength{\tabcolsep}{4pt}
+\caption{Qué dato disciplina a qué parámetro en el modelo bancario.}
+\label{tab:identificacion}
+\begin{tabular}{@{}p{0.19\textwidth}p{0.33\textwidth}p{0.40\textwidth}@{}}
+\toprule
+\textbf{Parámetro} & \textbf{Momento} & \textbf{Por qué es informativo}\\
+\midrule
+$a_e$ (exposición) & volatilidad del crecimiento de depósitos, por banco &
+es directamente la dispersión del choque de retiro, en el corte transversal\\
+$\tau_e$ (acceso) & saldos interbancarios sobre activos, por banco &
+un banco con mejor acceso opera más en el mercado\\
+$w_e$ (dolarización) & participación de depósitos en ME, por banco &
+observable directamente\\
+$\lambda$ (apalancamiento) & ratio de capital del sistema & contable\\
+$\eta$, $p$ (estado agregado) & frecuencia y magnitud de episodios de salida de
+depósitos en ME & serie agregada\\
+$v_F$, $\bar\iota^u$ (respaldo) & uso de las operaciones de liquidez del banco
+central en episodios de tensión & es la variable que el modelo llama $C^u$\\
+$\beta$, $\varsigma$ (banquero) & rentabilidad y tasa de salida de bancos &
+fijan el crecimiento y la escala\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{idea}
+Nótese que casi todos los momentos de la tabla son \emph{transversales}, no de
+series de tiempo. Eso no es casualidad: la heterogeneidad se identifica con
+variación entre unidades. Una estrategia de calibración que solo use agregados no
+puede separar parámetros que afectan a los agregados de la misma forma, como se
+advirtió en el capítulo \ref{cap:estimacion}.
+\end{idea}
+
+\section{Etapa 6: los ejercicios que valen la pena}
+
+Una vez que el modelo funciona, estos son los ejercicios que un modelo dinámico
+puede hacer y uno estático no. Están ordenados por relación entre valor y
+esfuerzo.
+
+\begin{enumerate}[leftmargin=1.4em]
+\item \textbf{Respuesta a un cambio de encaje, anticipado y no anticipado.}
+Comparar la columna $s=0$ con la columna $s=8$ del jacobiano de equilibrio
+general. Esto responde directamente a una pregunta de diseño de política: ¿sirve
+anunciar con antelación?
+\item \textbf{Incidencia dinámica por tipo.} Cómo se reparte el ajuste entre
+clases de banco, y cómo cambia ese reparto a lo largo de la transición.
+\item \textbf{Erosión del capital.} Cuánto del efecto de largo plazo de una
+política viene del canal de acumulación y cuánto del efecto contemporáneo. Se
+mide apagando el estado endógeno.
+\item \textbf{Transición entre regímenes de encaje.} Usar el método del capítulo
+\ref{cap:nolineal} para calcular la trayectoria completa de una reforma
+permanente.
+\item \textbf{A qué tamaño de choque se rompe la linealidad.} Encontrar el
+choque de escasez que agota la capacidad de respaldo, y mostrar cuánto se separa
+la respuesta no lineal de la lineal en ese punto.
+\end{enumerate}
+
+\section{Qué hacer si el tiempo se acaba}
+
+Un plan realista tiene que contemplar que no todo entre. Si hay que recortar, el
+orden de prioridad sugerido es:
+
+\begin{itemize}[leftmargin=1.4em]
+\item \textbf{Conservar siempre:} la etapa 3 completa, con su verificación. Un
+jacobiano verificado es un resultado defendible aunque no haya equilibrio general.
+\item \textbf{Recortar primero:} la estimación. Calibrar es perfectamente
+defendible en una tesis de pregrado, y la estimación bayesiana agrega mucho
+riesgo por poco contenido adicional.
+\item \textbf{Recortar segundo:} las transiciones no lineales. Son valiosas pero
+son un complemento.
+\item \textbf{Simplificar antes de abandonar:} si el modelo completo con dos
+monedas y tres tipos no converge a tiempo, un modelo con una moneda y dos tipos
+que \emph{funciona y está verificado} vale infinitamente más que uno completo que
+no corre.
+\end{itemize}

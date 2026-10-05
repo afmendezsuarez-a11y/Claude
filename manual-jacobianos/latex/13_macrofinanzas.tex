@@ -1,0 +1,139 @@
+\chapter{Macrofinanzas con agentes heterogéneos}
+\label{cap:macrofinanzas}
+
+Casi toda la literatura de jacobianos secuenciales está escrita con hogares como
+agentes heterogéneos. Pero nada del método lo exige: el ``agente'' puede ser una
+empresa, un intermediario o un banco. Este capítulo recorre lo que cambia
+cuando el agente es una institución financiera, porque hay varias diferencias
+sustantivas y no todas son obvias.
+
+\section{Qué cambia cuando el agente es un banco}
+
+\paragraph{El estado endógeno es el patrimonio, no la riqueza} Y su ley de
+movimiento es distinta: el patrimonio de un banco crece con beneficios retenidos
+y cae con dividendos y pérdidas. La restricción relevante no suele ser ``no
+puede endeudarse'' sino ``no puede apalancarse más allá de un múltiplo de su
+patrimonio''.
+
+\paragraph{Los retornos son aproximadamente lineales en el patrimonio} Un banco
+que duplica su capital duplica sus depósitos, sus créditos y sus beneficios. Esa
+homoteticidad tiene una consecuencia incómoda: si el modelo es exactamente
+homotético, la distribución de tamaños no afecta a los agregados, y el bloque
+heterogéneo colapsa a un conjunto de bancos representativos, uno por tipo.
+
+\begin{idea}
+Para que la distribución de tamaños \emph{haga trabajo} en un modelo bancario
+hace falta alguna no homoteticidad. Las tres habituales son: un costo operativo
+fijo, una restricción de apalancamiento que dependa del tamaño, o un acceso al
+mercado mayorista que dependa del tamaño. La tercera es la más defendible
+empíricamente --- los bancos pequeños tienen peor acceso al interbancario y al
+mercado de capitales --- y es la que usamos en la parte V.
+\end{idea}
+
+\paragraph{La entrada y la salida son de primer orden} En modelos de hogares, la
+entrada y salida suelen ser un detalle demográfico. En modelos bancarios son el
+mecanismo que fija la escala: sin salida, un banco con retornos superiores a la
+tasa de descuento crece sin límite. El dispositivo estándar --- los banqueros
+sobreviven con probabilidad $\varsigma$ y son reemplazados por entrantes de
+tamaño fijo --- viene de Gertler y Kiyotaki (2010) y Gertler y Karadi (2011), y
+encaja exactamente en la proposición \ref{prop:general}.
+
+\paragraph{Las fricciones de pago de dividendos sustituyen a la aversión al
+riesgo} Un banquero neutral al riesgo con retornos lineales pagaría todo o nada
+como dividendo. Para obtener una política interior hace falta alguna
+concavidad: utilidad cóncava sobre dividendos, costos de emisión de capital, o
+un valor de franquicia. Todas son formas reducidas de la misma fricción
+financiera, y conviene ser explícito sobre cuál se usa y qué se pierde.
+
+\section{Riesgo agregado dentro del período}
+
+Este es el punto técnico más importante del capítulo, y vale para cualquier
+modelo macrofinanciero.
+
+El método es de primer orden en los agregados: por equivalencia cierta, el riesgo
+agregado desaparece. Pero en macrofinanzas el riesgo agregado \emph{es} el
+objeto de estudio: una crisis de liquidez, una salida de capitales, un evento de
+cola. ¿Cómo se concilian?
+
+La respuesta es distinguir dos tipos de incertidumbre agregada.
+
+\begin{enumerate}[leftmargin=1.4em]
+\item \textbf{Incertidumbre entre períodos.} ``No sé si el año que viene habrá
+una crisis''. Esta desaparece a primer orden. No hay forma de recuperarla sin ir
+a orden superior o a métodos globales.
+\item \textbf{Incertidumbre dentro del período.} ``Sé que en cada período, con
+probabilidad $p$, ocurre un episodio de escasez de dólares, y conozco sus
+consecuencias''. Esta \textbf{sí} se puede conservar de forma completamente no
+lineal.
+\end{enumerate}
+
+La forma de conservar la segunda es tratar el estado agregado intraperiodo
+$A\in\{A_1,\dots,A_m\}$ como una dimensión adicional sobre la que se integra
+\emph{dentro} del paso hacia atrás, con probabilidades fijas. Las variables
+agregadas que dependen del estado --- un precio de mercado que se vacía, una
+capacidad de respaldo que se raciona --- se convierten en $m$ secuencias
+separadas, cada una con su propia condición de equilibrio.
+
+\begin{receta}[Incorporar un estado agregado intraperiodo]
+\begin{enumerate}[leftmargin=1.4em,itemsep=2pt]
+\item Define el conjunto finito de estados $A$ y sus probabilidades, que
+permanecen fijas (o son choques exógenos del modelo).
+\item Para cada variable agregada que se determine \emph{condicional} en $A$
+--- tasas de mercados que se vacían, fracciones racionadas, coberturas ---
+declara una secuencia por estado: $\Psi_t(A_1),\dots,\Psi_t(A_m)$.
+\item En el paso hacia atrás, el agente toma su decisión \emph{ex ante},
+integrando sobre $A$ con las probabilidades dadas. La condición de primer orden
+pondera los estados.
+\item En el DAG, cada $\Psi(A_j)$ es una incógnita y su condición de vaciado en
+el estado $j$ es un objetivo.
+\end{enumerate}
+\end{receta}
+
+El costo es que el número de incógnitas se multiplica por $m$. El beneficio es
+que el modelo conserva exactamente la no linealidad del evento de cola: la
+diferencia entre un estado normal y uno de crisis no está linealizada.
+
+\section{Quiebres, racionamiento y esquinas}
+
+Los modelos macrofinancieros están llenos de $\min$ y de $\max$: capacidad de
+respaldo limitada, racionamiento proporcional, restricciones de colateral que
+atan o no atan. La sección \ref{sec:quiebres} dio la regla general. Tres
+consecuencias prácticas:
+
+\begin{itemize}[leftmargin=1.4em]
+\item \textbf{Calibra lejos del quiebre, y reporta cuán lejos.} Si el racionamiento
+en el estado estacionario es $P/Q = 0.36$, hay mucho espacio antes de llegar a
+$1$. Si fuera $0.97$, el modelo lineal sería engañoso.
+\item \textbf{Las esquinas individuales son distintas de los quiebres
+agregados.} Que un banco esté en la esquina $u=0$ no es un problema: la
+derivada existe y vale cero localmente. Que el agregado esté en un quiebre sí lo
+es.
+\item \textbf{Usa el capítulo \ref{cap:nolineal} para medir el daño.} Si el
+quiebre está a dos desviaciones estándar, conviene calcular la transición no
+lineal a un choque de ese tamaño y mostrar cuánto se separa.
+\end{itemize}
+
+\section{Qué preguntas se vuelven contestables al pasar a dinámico}
+
+Vale la pena cerrar con esto, porque es la justificación del esfuerzo. Un modelo
+estático con heterogeneidad puede responder preguntas de \emph{incidencia en un
+punto}: quién usa más la cobertura, quién paga más del costo. Al pasar al espacio
+de secuencias se abren cuatro familias de preguntas nuevas:
+
+\begin{enumerate}[leftmargin=1.4em]
+\item \textbf{Transición versus estado estacionario.} Una reforma puede ser
+beneficiosa en el largo plazo y costosa durante la transición, y la transición
+puede durar décadas. El modelo estático no distingue.
+\item \textbf{Anticipación.} ¿Qué pasa cuando la política se \emph{anuncia} con
+antelación? Las columnas del jacobiano responden esto directamente, y en
+regulación financiera --- donde los períodos de implementación gradual son la
+norma --- es una pregunta de política de primer orden.
+\item \textbf{Acumulación y erosión de capital.} El costo de una política que
+reduce la rentabilidad bancaria no es solo el efecto de impacto: es la erosión
+acumulada del patrimonio, que reduce el crédito por años.
+\item \textbf{Retroalimentación entre heterogeneidad y agregados.} La
+composición del sistema cambia con el tiempo en respuesta a la política. Un
+encaje que castiga desproporcionadamente a cierto tipo de banco cambia la
+participación de ese tipo, y eso a su vez cambia la respuesta agregada futura.
+Esto es intrínsecamente dinámico.
+\end{enumerate}

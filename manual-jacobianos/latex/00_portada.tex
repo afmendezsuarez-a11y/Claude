@@ -1,0 +1,85 @@
+\thispagestyle{empty}
+\begin{center}
+\vspace*{2.2cm}
+{\sffamily\color{azul}\large MANUAL METODOLÓGICO}\\[1.6cm]
+{\sffamily\bfseries\fontsize{30}{36}\selectfont\color{tinta}
+Jacobianos en el\\[2pt] espacio de secuencias}\\[0.9cm]
+{\sffamily\large\color{tinta2}
+Cómo resolver, calibrar y estimar modelos macroeconómicos\\[2pt]
+y macrofinancieros con agentes heterogéneos}\\[2.4cm]
+
+{\color{gris}\rule{0.55\textwidth}{1.2pt}}\\[1.1cm]
+
+\begin{minipage}{0.80\textwidth}\centering\small\color{tinta2}
+Escrito para un estudiante de pregrado en economía que ya sabe optimización
+dinámica y programación básica, y que necesita llevar un modelo estático con
+heterogeneidad a una versión dinámica que pueda resolverse, calibrarse y
+estimarse de verdad.\\[0.7em]
+Incluye una implementación propia y verificada del algoritmo \emph{fake news},
+y una aplicación completa a un modelo de bancos heterogéneos con encaje,
+mercado interbancario y dolarización.
+\end{minipage}
+
+\vfill
+{\small\color{tinta2}\today}
+\end{center}
+\clearpage
+
+\thispagestyle{empty}
+\section*{Cómo usar este manual}
+\addcontentsline{toc}{chapter}{Cómo usar este manual}
+
+Este documento tiene tres niveles de lectura y conviene elegir uno antes de
+empezar, en lugar de leerlo de corrido.
+
+\paragraph{Ruta mínima (una tarde)} Capítulo \ref{cap:porque} (por qué existe
+el método), sección \ref{sec:jacobiano-def} (qué es exactamente un jacobiano
+secuencial), la receta del capítulo \ref{cap:fakenews} y el capítulo
+\ref{cap:dag}. Con eso ya se entiende qué hace el código de otra persona.
+
+\paragraph{Ruta de implementación (una o dos semanas)} Todo lo anterior más los
+capítulos \ref{cap:bloque}, \ref{cap:extensiones}, \ref{cap:precision} y el
+apéndice \ref{ap:codigo}. Al final de esa ruta uno puede escribir su propio
+bloque heterogéneo y verificarlo.
+
+\paragraph{Ruta de tesis} Todo, con énfasis en la parte V y el capítulo
+\ref{cap:aplicacion}, que traduce paso a paso un modelo estático de bancos
+heterogéneos --- con encaje, interbancario y dos monedas --- a un modelo
+dinámico resoluble.
+
+\vspace{1em}
+A lo largo del texto hay cuatro tipos de recuadro:
+
+\begin{idea}
+Lo que hay que recordar aunque se olvide todo lo demás de la sección.
+\end{idea}
+
+\begin{trampa}
+Errores que cuestan días de depuración y que casi todo el mundo comete al menos
+una vez. Vale la pena leerlos aunque uno crea que no los va a cometer.
+\end{trampa}
+
+\begin{receta}
+Pasos concretos, en orden, para hacer algo. Pensados para seguirse con el
+código al lado.
+\end{receta}
+
+\begin{tutesis}
+Conexiones explícitas con un plan de trabajo sobre heterogeneidad bancaria,
+seguro de liquidez y encaje en el Perú. Si ese no es tu tema, estos recuadros
+igual sirven como ejemplo de cómo aterrizar el método en un problema propio.
+\end{tutesis}
+
+\vspace{1em}
+\paragraph{Sobre el código} Todas las figuras de este manual se generaron con
+código que acompaña al documento. No hay ningún número inventado: las cifras que
+aparecen en el texto salen de ejecutar ese código. La implementación del
+algoritmo está escrita desde cero y verificada contra el método directo, que es
+lento pero transparente. El apéndice \ref{ap:codigo} explica cómo correrlo.
+
+\paragraph{Sobre la notación} Se sigue de cerca la de
+Auclert, Bardóczy, Rognlie y Straub (2021), para que el salto de este manual al artículo original y a su
+repositorio sea inmediato. El apéndice \ref{ap:glosario} tiene un glosario
+español--inglés de todos los términos técnicos, porque la literatura está en
+inglés y a veces la traducción oscurece más de lo que ayuda.
+\clearpage

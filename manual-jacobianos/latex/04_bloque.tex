@@ -1,0 +1,158 @@
+\chapter{El bloque de agentes heterogéneos}
+\label{cap:bloque}
+
+Para poder aplicar el algoritmo rápido hay que escribir el problema individual
+en una forma canónica. Este capítulo explica cuál es esa forma, por qué tiene
+esa estructura y cómo se construyen sus tres piezas en la práctica.
+
+\section{La forma canónica}
+
+\begin{definicion}[Bloque heterogéneo]
+Un bloque de agentes heterogéneos es un sistema de tres ecuaciones que mapea
+una trayectoria de insumos agregados $\{X_t\}$ a una trayectoria de productos
+agregados $\{Y_t\}$:
+\begin{align}
+v_t &= v(v_{t+1},\, X_t) \label{eq:canon-v}\\
+D_{t+1} &= \Lambda(v_{t+1},\, X_t)'\, D_t \label{eq:canon-D}\\
+Y_t &= y(v_{t+1},\, X_t)'\, D_t \label{eq:canon-Y}
+\end{align}
+donde $D_t$ es el vector $n_g\times 1$ que representa la distribución de agentes
+sobre la grilla al inicio de $t$, $v_t$ es la variable de continuación (una
+función de valor, su derivada, o cualquier representación equivalente),
+$\Lambda$ es la matriz de transición $n_g\times n_g$ y $y$ es la matriz de
+resultados individuales.
+\end{definicion}
+
+Las tres ecuaciones tienen una dirección temporal distinta y eso es esencial.
+
+\begin{itemize}[leftmargin=1.4em]
+\item \eqref{eq:canon-v} corre \textbf{hacia atrás}: para saber qué hace un
+agente hoy hay que saber qué valor le asigna al futuro. Se resuelve desde
+$T-1$ hacia $0$ partiendo de $v_T = v_\sst$.
+\item \eqref{eq:canon-D} corre \textbf{hacia adelante}: la distribución de
+mañana depende de la de hoy y de lo que la gente decida hoy. Se resuelve desde
+$0$ hacia $T-1$ partiendo de $D_0 = D_\sst$.
+\item \eqref{eq:canon-Y} es \textbf{instantánea}: agrega políticas individuales
+contra la distribución.
+\end{itemize}
+
+\begin{idea}
+Esta estructura hacia atrás/hacia adelante es el motivo por el que resolver estos
+modelos cuesta caro, y también el motivo por el que el algoritmo fake news
+funciona. El método directo tiene que hacer una pasada hacia atrás \emph{y} una
+hacia adelante por cada columna del jacobiano: $2T$ pasadas en total. El
+algoritmo fake news hace una sola pasada hacia atrás y una sola hacia adelante
+para todas las columnas.
+\end{idea}
+
+\section{Construir las tres piezas}
+
+\subsection{La iteración hacia atrás: el método del punto endógeno}
+
+Resolver \eqref{eq:canon-v} con iteración de la función de valor es lento y poco
+preciso. En la práctica se usa la ecuación de Euler y el \emph{método del punto
+endógeno} de Carroll (2006), que evita resolver una ecuación no lineal en cada
+punto de la grilla.
+
+La idea es invertir el orden del problema. En lugar de preguntar ``dado
+$a_-$, ¿cuánto consume el agente?'' --- que exige resolver una ecuación
+implícita --- se pregunta ``si el agente termina con $a'$ activos, ¿con cuántos
+tuvo que empezar?'', que es explícito. Concretamente, con $v_t \equiv \partial
+V_t/\partial a_-$:
+
+\begin{receta}
+\begin{enumerate}[leftmargin=1.4em,itemsep=1pt]
+\item Valor marginal esperado: $W_a(e,a') = \beta \sum_{e'} \Pi(e,e')\,v_{t+1}(e',a')$.
+\item Consumo implicado por la Euler: $c^{\text{endog}}(e,a') = (W_a)^{-\sigma}$,
+con $\sigma$ la elasticidad de sustitución intertemporal.
+\item Recursos que lo sostienen: $\mathrm{coh}^{\text{endog}} = c^{\text{endog}} + a'$.
+\item Interpolar la grilla $a'$ sobre $\mathrm{coh}^{\text{endog}}$, evaluada en
+los recursos efectivos $\mathrm{coh}(e,a_-) = (1+r_t)a_- + w_t e$. Eso da la
+política $a'(e,a_-)$ \emph{sobre la grilla de $a_-$}.
+\item Imponer la restricción: $a' \leftarrow \max\{a', \underline{a}\}$.
+\item Recuperar $c = \mathrm{coh} - a'$ y actualizar
+$v_t = (1+r_t)\,c^{-1/\sigma}$ por el teorema de la envolvente.
+\end{enumerate}
+\end{receta}
+
+El paso 5 es el que incorpora la no linealidad importante del modelo --- la
+restricción de endeudamiento --- y es por eso que el método resuelve el problema
+individual de forma \emph{global}, no perturbada. La linealización ocurre
+después, y solo en los agregados.
+
+\subsection{La matriz de transición}
+
+Dada la política $a'(e,a_-)$, la matriz $\Lambda$ se construye en dos piezas:
+la lotería de Young sobre el estado endógeno y la cadena de Markov sobre el
+exógeno. Si $L$ denota la primera y $\Pi$ la segunda,
+\begin{equation}
+\Lambda_{(e,a_-),(e',a)} = \Pi(e,e')\, L_{a_-,a}(e),
+\qquad\text{es decir}\qquad
+\Lambda = L\,\Pi, \quad \Lambda' = \Pi' L'.
+\end{equation}
+
+En el código nunca se forma $\Lambda$ explícitamente --- sería una matriz de
+$1\,400\times 1\,400$ o mucho peor --- sino que se aplican sus dos factores por
+separado. Esto importa: la iteración hacia adelante cuesta $O(n_g)$ en lugar de
+$O(n_g^2)$.
+
+\subsection{Los resultados individuales}
+
+$y_t$ es simplemente la colección de variables que uno quiere agregar: ahorro,
+consumo, horas, crédito, reservas, lo que sea. Un detalle útil: si uno quiere
+momentos de orden superior, basta definir el resultado individual como una
+potencia. El segundo momento no centrado del consumo es el agregado de $c^2$, y
+de ahí sale la varianza combinando dos bloques.
+
+\section{El estado estacionario}
+
+El estado estacionario es el punto fijo de \eqref{eq:canon-v}--\eqref{eq:canon-D}
+con $X_t = X_\sst$ constante. Se resuelve en dos etapas:
+
+\begin{enumerate}[leftmargin=1.4em]
+\item Iterar \eqref{eq:canon-v} hacia atrás hasta que $v$ deje de cambiar. Esto
+converge a tasa $\beta$, así que con $\beta=0.98$ hacen falta del orden de mil
+iteraciones para alcanzar $10^{-11}$.
+\item Iterar \eqref{eq:canon-D} hacia adelante hasta que $D$ deje de cambiar.
+Esto converge a la tasa del segundo autovalor de $\Lambda$, que puede ser muy
+cercana a uno si el proceso de ingreso es muy persistente. Conviene usar un
+criterio en norma del supremo y no en norma dos.
+\end{enumerate}
+
+Casi siempre hay además una etapa de \emph{calibración}: elegir $\beta$ para que
+la demanda agregada de activos iguale un objetivo (una relación capital--producto,
+una riqueza líquida sobre ingreso). Eso es una biyección monótona y se resuelve
+por bisección en pocas decenas de evaluaciones.
+
+\begin{trampa}
+Un estado estacionario mal convergido envenena todo lo que viene después, y lo
+hace de forma silenciosa. Si $D_\sst$ todavía se mueve en la undécima cifra, los
+jacobianos tendrán errores del orden de esa cifra dividida por el tamaño del
+paso de diferenciación $h$. Con $h=10^{-4}$, un error de $10^{-11}$ en el estado
+estacionario se convierte en un error de $10^{-7}$ en el jacobiano. Conviene
+exigir convergencia a $10^{-14}$ en la distribución, que no cuesta casi nada.
+\end{trampa}
+
+\section{Qué modelos entran en esta forma}
+
+Entran directamente: los modelos de ahorro precautorio con uno o varios activos;
+los modelos con oferta laboral endógena; los modelos donde los insumos agregados
+afectan la probabilidad de transición entre estados exógenos (por ejemplo, el
+riesgo de desempleo); las representaciones no basadas en grillas (polinomios de
+Chebyshev, splines); los modelos con elección discreta suavizada por choques de
+gusto de valor extremo; y --- punto importante para la parte V --- los modelos
+de \emph{empresas} o \emph{bancos} heterogéneos, donde el ``agente'' es una
+firma y el estado endógeno es su capital o su patrimonio.
+
+Entran con la generalización del capítulo \ref{cap:extensiones}: entrada y
+salida de agentes, distribuciones representadas por parámetros, momentos no
+polinómicos como cuantiles o índices de Gini, problemas con varias etapas dentro
+de un período.
+
+No entra, y conviene saberlo desde el principio: todo modelo en el que la
+función de valor $v_t$ dependa \emph{directamente} de la distribución $D_t$ de
+una forma que no pase por los agregados $X_t$. El ejemplo canónico son los
+modelos de búsqueda laboral con negociación individual o fijación de salarios,
+donde a cada trabajador le importa la distribución de ofertas que enfrentará.
+La ecuación \eqref{eq:canon-v} prohíbe esa dependencia, y no es una limitación
+técnica que se pueda sortear con un truco: es estructural.

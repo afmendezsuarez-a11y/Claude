@@ -1,0 +1,156 @@
+\chapter{Extensiones y límites del algoritmo}
+\label{cap:extensiones}
+
+La forma canónica \eqref{eq:canon-v}--\eqref{eq:canon-Y} parece restrictiva.
+En la práctica admite mucho más de lo que aparenta, con ajustes menores. Este
+capítulo recorre los casos que uno se encuentra al modelar y dice, para cada
+uno, si el algoritmo funciona tal cual, si hay que generalizarlo o si hay que
+buscar otro método.
+
+\section{Casos que entran sin modificar nada}
+
+\paragraph{Adelantos del insumo} Si en lugar de $X_t$ aparece $X_{t+1}$ en el
+paso hacia atrás, el algoritmo funciona sin cambios. El lema
+\ref{lema:politicas} sigue valiendo, porque la iteración hacia atrás ya
+incorpora el efecto de los insumos futuros a través de la continuación.
+
+\paragraph{Momentos de orden superior} Si uno define el resultado individual como
+$y^k$ en lugar de $y$, el agregado es el $k$-ésimo momento no centrado. Con dos
+bloques (uno para $y$, otro para $y^2$) y un bloque simple que los combine, se
+obtiene el jacobiano de la varianza. Lo mismo vale para un índice de precios CES
+o para el coeficiente de variación del consumo.
+
+\paragraph{Representaciones no basadas en grillas} Nada en el algoritmo exige
+que $v$ sea un vector de valores sobre una grilla. Puede ser un vector de
+coeficientes de Chebyshev o de un spline. Lo que sí tiene que ser una
+distribución sobre puntos es $D$ --- y aun eso se relaja en la sección
+siguiente.
+
+\paragraph{Elección discreta con choques de gusto} Un modelo con elección
+discreta (ajustar o no un bien durable, cambiar o no el precio) tiene políticas
+discontinuas, y la perturbación de primer orden sobre una grilla da cero: ningún
+punto de la grilla cruza el umbral ante un choque infinitesimal. La solución
+estándar es añadir choques de gusto iid --- típicamente de valor extremo, que dan
+probabilidades logit --- de modo que la probabilidad de cada opción varía de
+forma continua con el estado. Hecho eso, el bloque entra en la forma canónica
+tomando $D_t$ como la distribución \emph{antes} de la realización del choque de
+gusto, y $v$, $\Lambda$, $y$ como valores esperados sobre ese choque.
+
+\paragraph{Distribución endógena dentro del período} ¿Qué pasa si un choque en
+$t$ afecta la posición de los agentes en $t$ --- por ejemplo, una ganancia de
+capital sobre la riqueza, o una probabilidad de desempleo que se realiza en $t$?
+La regla es: mantener $D_t$ como la distribución \emph{previa} a cualquier evento
+de la fecha $t$, e incorporar esos eventos dentro de $v$, $\Lambda$ e $y$.
+
+\begin{trampa}
+\textbf{Rezagos del insumo.} Si en el paso hacia atrás aparece $X_{t-1}$, el
+lema \ref{lema:politicas} \textbf{falla}: ahora el comportamiento en $t$ depende
+del pasado y no solo de la distancia al choque futuro. La solución limpia no es
+parchear el algoritmo, sino sacar el rezago del bloque heterogéneo: definir una
+variable nueva $\tilde X_t \equiv X_{t-1}$ como producto de un bloque simple
+--- que sí admite rezagos sin problema --- y pasarle $\tilde X_t$
+contemporáneo al bloque heterogéneo. En el modelo de Krusell--Smith del
+capítulo \ref{cap:jacobiano}, el rezago del capital vive en el bloque de
+empresas por exactamente esta razón.
+\end{trampa}
+
+\section{La generalización: productos y transiciones no lineales}
+
+Algunos modelos necesitan reemplazar \eqref{eq:canon-D} y \eqref{eq:canon-Y} por
+funciones generales de la distribución:
+\begin{align}
+D_{t+1} &= \mathcal{D}(v_{t+1}, X_t, D_t),\\
+Y_t &= \mathcal{Y}(v_{t+1}, X_t, D_t).
+\end{align}
+
+\begin{proposicion}[\ABRS, proposición 2]
+\label{prop:general}
+Con esas dos ecuaciones generales, la proposición \ref{prop:principal} sigue
+valiendo si se redefine el vector de expectativa como
+\begin{equation}
+\E_t \equiv (\mathcal{D}_D')^{\,t}\,\mathcal{Y}_D',
+\label{eq:E-general}
+\end{equation}
+donde $\mathcal{D}_D$ es el jacobiano $n_g\times n_g$ de $\mathcal{D}$ respecto de
+$D$ y $\mathcal{Y}_D$ el gradiente de $\mathcal{Y}$ respecto de $D$, ambos
+evaluados en el estado estacionario.
+\end{proposicion}
+
+La demostración es la misma del lema \ref{lema:fake} reemplazando $\Lambda_\sst'$
+por $\mathcal{D}_D$ y $y_\sst'$ por $\mathcal{Y}_D$. El contenido económico es
+transparente: $\mathcal{D}_D$ es el ``operador de propagación'' de una
+perturbación distributiva y $\mathcal{Y}_D$ es el ``operador de lectura'' del
+agregado. En el caso lineal original, esos dos operadores son $\Lambda_\sst'$ e
+$y_\sst'$.
+
+Esto abre tres casos útiles.
+
+\paragraph{Entrada y salida de agentes} Si los agentes salen con probabilidad
+$1-\varsigma$ y entran con una distribución fija $\Psi$,
+\begin{equation}
+D_{t+1} = \varsigma\, \Lambda(v_{t+1},X_t)'\,D_t + (1-\varsigma)\,\Psi .
+\end{equation}
+Entonces $\mathcal{D}_D = \varsigma\,\Lambda'_\sst$ y $\mathcal{Y}_D = y_\sst'$. La
+única consecuencia práctica es que los vectores de expectativa se descuentan por
+la supervivencia: $\E_t = \varsigma^t \Lambda_\sst^t y_\sst$. Todo lo demás del
+algoritmo queda igual. Este es el caso de los modelos de dinámica de empresas y
+de los modelos bancarios tipo Gertler--Karadi, y es el que usamos en la parte V.
+
+\paragraph{Distribuciones paramétricas} Si $D_t$ es un vector de parámetros que
+describe una densidad en lugar de masas sobre puntos, basta con poder calcular
+$\mathcal{D}_D$ y $\mathcal{Y}_D$, típicamente por diferenciación numérica.
+
+\paragraph{Momentos no polinómicos} Un cuantil, un índice de Gini, una razón
+entre percentiles: todos son funciones no lineales de $D$, y el algoritmo los
+admite vía $\mathcal{Y}_D$. Con una distribución discretizada el cuantil es una
+función escalonada y su derivada no sirve; la solución es interpolarla
+linealmente entre puntos de masa, lo que da un gradiente analítico sencillo.
+
+\section{Lo que no entra}
+
+Hay una restricción que la generalización no levanta: la proposición
+\ref{prop:general} deja intacta la ecuación \eqref{eq:canon-v}. La variable de
+continuación $v_t$ \textbf{no puede depender de $D_t$}.
+
+Económicamente, eso excluye todo modelo en el que a un agente le importe
+directamente la distribución futura de otros agentes, de una forma que no pase
+por un precio o agregado $X_t$. Los ejemplos de la literatura son:
+
+\begin{itemize}[leftmargin=1.4em]
+\item modelos de generaciones superpuestas con herencias endógenas recibidas a
+mitad de la vida;
+\item modelos de búsqueda laboral con publicación de salarios o negociación
+individual, donde importa la distribución de ofertas;
+\item modelos de búsqueda monetaria donde importa la distribución de saldos
+de efectivo de las contrapartes.
+\end{itemize}
+
+\begin{tutesis}
+Vale la pena chequear esta condición en tu modelo, porque está más cerca de lo
+que parece. Si el mercado interbancario se modelara con \emph{búsqueda y
+negociación bilateral} al estilo de Afonso y Lagos (2015), a cada banco le
+importaría la distribución de posiciones de liquidez de sus contrapartes
+potenciales, y la condición fallaría. Tu plan de trabajo evita ese problema
+\emph{por construcción}: la regla proporcional $\psi_k = \tau_k \min(1, P/Q)$
+hace que toda la información del mercado llegue al banco a través de dos
+escalares agregados, $P$ y $Q$. Esa simplificación, que el plan justifica como
+``una aproximación reducida'', resulta ser además exactamente la condición que
+hace aplicable el método. Conviene decirlo explícitamente cuando defiendas esa
+elección de modelado: no es solo tratabilidad, es lo que mantiene el modelo
+dentro de la clase resoluble.
+\end{tutesis}
+
+\section{Varias etapas dentro de un período}
+
+Un caso frecuente en macrofinanzas: dentro del período $t$ pasan varias cosas en
+orden --- primero se eligen carteras, después se realiza un choque, después hay
+un mercado que redistribuye liquidez, después se paga. Modelar eso metiendo
+todo dentro de $v$, $\Lambda$, $y$ se vuelve rápidamente ilegible.
+
+La generalización natural es permitir varias \emph{etapas} por período, cada una
+con su propio operador de transición, y encadenarlas. El algoritmo se aplica
+tratando la composición de etapas como un único $\mathcal{D}$. En la práctica, si
+una de las etapas es un mercado cuyo precio se determina por vaciado, la forma
+más simple de proceder es la del capítulo \ref{cap:dag}: declarar ese precio
+como incógnita agregada y su condición de vaciado como objetivo, y dejar que el
+sistema de equilibrio general lo resuelva simultáneamente.

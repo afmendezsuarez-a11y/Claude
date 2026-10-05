@@ -1,0 +1,12 @@
+# auxiliares de LaTeX
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.synctex.gz
+# cache de calculos
+code/figures/_cache/
+__pycache__/
+*.pyc

@@ -1,0 +1,322 @@
+\chapter{El algoritmo \emph{fake news}}
+\label{cap:fakenews}
+
+Este es el capítulo central. Contiene el resultado técnico de \ABRS\ y la receta
+que se deriva de él. Vale la pena leerlo despacio: la demostración es corta y
+entenderla cambia por completo la sensación de estar usando una caja negra.
+
+\section{El punto de partida: el método directo}
+
+Supongamos que queremos la columna $s$ del jacobiano. El procedimiento obvio es:
+
+\begin{enumerate}[leftmargin=1.4em,itemsep=1pt]
+\item Perturbar el insumo en la fecha $s$: $X^s = X_\sst + e_s\, dx$.
+\item Iterar \eqref{eq:canon-v} hacia atrás desde $T-1$ hasta $0$, guardando
+$v^s_t$, $\Lambda^s_t$ y $y^s_t$ para cada $t$.
+\item Iterar \eqref{eq:canon-D} hacia adelante desde $D_0 = D_\sst$.
+\item Agregar: $Y^s_t = (y^s_t)' D^s_t$, y formar $\J_{t,s} = (Y^s_t - Y_\sst)/dx$.
+\end{enumerate}
+
+Hay que repetirlo $T$ veces, una por columna. Con $T=300$ eso son $300$ pasadas
+hacia atrás y $300$ hacia adelante, cada una de $300$ pasos: unos $180\,000$
+pasos en total. En el modelo HANK de dos activos de \abrs\ eso toma 956 segundos.
+El algoritmo fake news lo hace en 3.5 segundos.
+
+\section{Primer resultado: las políticas solo dependen de la distancia}
+
+\begin{lema}[Invariancia de las políticas]
+\label{lema:politicas}
+Sean $y^s_t$ y $\Lambda^s_t$ la función de resultados y la matriz de transición
+en la fecha $t$ ante un choque en la fecha $s$. Entonces
+\begin{equation}
+y^s_t = \begin{cases} y^{T-1}_{T-1-(s-t)} & s\ge t\\ y_\sst & s<t\end{cases}
+\qquad
+\Lambda^s_t = \begin{cases} \Lambda^{T-1}_{T-1-(s-t)} & s\ge t\\ \Lambda_\sst & s<t\end{cases}
+\label{eq:lema1}
+\end{equation}
+\end{lema}
+
+La demostración es inmediata a partir de la estructura recursiva de
+\eqref{eq:canon-v}: $v_t$ depende de $v_{t+1}$ y $X_t$, y nada más. Si el choque
+está $s-t$ períodos en el futuro, la solución hacia atrás es idéntica sea cual
+sea el valor de $t$ en el calendario. Y si el choque ya pasó ($s<t$), el agente
+se comporta como en el estado estacionario, porque \eqref{eq:canon-v} no tiene
+memoria del pasado.
+
+\begin{idea}
+El lema \ref{lema:politicas} vale \textbf{sin aproximación}: es cierto para
+choques de cualquier tamaño, no solo infinitesimales. Y ya basta por sí solo
+para eliminar $T-1$ de las $T$ pasadas hacia atrás: una sola iteración hacia
+atrás, a partir de un choque en la fecha $T-1$, entrega las políticas para todas
+las fechas de choque y todas las fechas de respuesta.
+\end{idea}
+
+Queda el problema de las $T$ pasadas hacia adelante. Para eso hace falta el
+segundo resultado, que sí requiere infinitesimalidad.
+
+\section{Segundo resultado: la noticia falsa}
+
+Definamos, para $s\ge1$ y $t\ge1$,
+\begin{equation}
+\F_{t,s}\cdot dx \;\equiv\; dY^s_t - dY^{s-1}_{t-1}.
+\label{eq:def-F}
+\end{equation}
+Esto compara la respuesta en $t$ a un choque en $s$ con la respuesta un período
+antes a un choque un período antes. Por el lema \ref{lema:politicas}, las
+políticas en ambos casos son idénticas. Uno podría conjeturar que la diferencia
+es cero. No lo es, porque la \emph{distribución} también cambió.
+
+\begin{lema}[Diferencia de respuestas]
+\label{lema:fake}
+Si $D_0 = D_\sst$, entonces para $dx$ infinitesimal y $s,t\ge1$,
+\begin{equation}
+\F_{t,s}\cdot dx = y_\sst'\,(\Lambda_\sst')^{\,t-1}\, dD^s_1 .
+\label{eq:lema2}
+\end{equation}
+\end{lema}
+
+\begin{proof}
+Linealizando \eqref{eq:canon-Y} alrededor del estado estacionario,
+$dY^s_t = y_\sst'\,dD^s_t + (dy^s_t)'\,D_\sst$. Restando la misma expresión en
+$(t-1,s-1)$ y usando $dy^s_t = dy^{s-1}_{t-1}$ del lema \ref{lema:politicas},
+el segundo término se cancela y queda
+\begin{equation}
+\F_{t,s}\cdot dx = y_\sst'\big(dD^s_t - dD^{s-1}_{t-1}\big).
+\end{equation}
+Ahora linealizamos \eqref{eq:canon-D}:
+$dD^s_t = \Lambda_\sst'\,dD^s_{t-1} + (d\Lambda^s_{t-1})'D_\sst$. Restando su
+análoga en $(t-1,s-1)$ y usando otra vez el lema \ref{lema:politicas}
+($d\Lambda^s_{t-1} = d\Lambda^{s-1}_{t-2}$), el segundo término se cancela y
+queda la recursión
+\begin{equation}
+dD^s_t - dD^{s-1}_{t-1} = \Lambda_\sst'\big(dD^s_{t-1} - dD^{s-1}_{t-2}\big).
+\end{equation}
+Iterando hasta la base, y usando $dD^{s-1}_0 = 0$ (porque $D_0 = D_\sst$ está
+dado), se obtiene $dD^s_t - dD^{s-1}_{t-1} = (\Lambda_\sst')^{t-1} dD^s_1$,
+que es \eqref{eq:lema2}.
+\end{proof}
+
+\paragraph{De dónde sale el nombre} La expresión \eqref{eq:lema2} tiene una
+lectura económica preciosa. $\F_{t,s}$ es la respuesta agregada a un choque
+particular: \emph{se anuncia en la fecha $0$ que el insumo cambiará en la fecha
+$s$, y en la fecha $1$ el anuncio se retracta}. Los agentes reaccionan al
+anuncio, lo que mueve la distribución de $D_\sst$ a $D^s_1$. Después, al saber
+que era falso, vuelven a comportarse como en el estado estacionario. Entonces el
+efecto sobre los agregados en toda fecha $t\ge1$ es simplemente el de haber
+partido de una distribución distinta, propagado con la dinámica estacionaria.
+De ahí: \emph{noticia falsa}.
+
+\section{Los vectores de expectativa}
+
+La expresión \eqref{eq:lema2} se simplifica con una definición.
+
+\begin{definicion}[Vector de expectativa]
+\label{def:expectativa}
+$\E_t \equiv (\Lambda_\sst)^t\, y_\sst$.
+\end{definicion}
+
+Para cada punto de la grilla, $\E_t$ dice cuál es el valor esperado del resultado
+$Y$ dentro de $t$ períodos para un agente que hoy está en ese punto, bajo
+comportamiento de estado estacionario. Con esto, $\F_{t,s}\cdot dx = \E_{t-1}'\,dD^s_1$,
+y los $\E_t$ se obtienen de una recursión trivial, $\E_t = \Lambda_\sst \E_{t-1}$
+con $\E_0 = y_\sst$, que no depende del choque en absoluto.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig04_vectores_expectativa.pdf}
+\caption{Izquierda: vectores de expectativa del ahorro agregado para el estado
+de ingreso intermedio. Un hogar con muchos activos hoy seguirá teniendo muchos
+activos dentro de cuatro trimestres, pero la relación se aplana a medida que
+$t$ crece. Derecha: la dispersión de $\E_t$ entre puntos de la grilla, que mide
+cuánta información sobre el agregado futuro contiene la posición actual en la
+distribución. Decae, pero despacio.}
+\label{fig:expectativa}
+\end{figure}
+
+El panel derecho de la figura \ref{fig:expectativa} tiene una lectura económica
+directa: cuantifica cuánto tiempo ``recuerda'' la economía una perturbación de
+la distribución. En esta calibración, después de 160 trimestres todavía queda
+cerca de un tercio de la dispersión inicial. Esa persistencia es exactamente la
+razón por la que $T$ tiene que ser grande.
+
+\section{El resultado principal}
+
+\begin{proposicion}[\ABRS, proposición 1]
+\label{prop:principal}
+Supóngase $D_0 = D_\sst$. Defínase la \emph{matriz fake news} $\F$ por
+\begin{equation}
+\F_{t,s}\cdot dx =
+\begin{cases}
+dY^s_0 & t=0\\[2pt]
+\E_{t-1}'\, dD^s_1 & t\ge1
+\end{cases}
+\label{eq:propF}
+\end{equation}
+donde $dY^s_0 = (dy^s_0)'D_\sst$ y $dD^s_1 = (d\Lambda^s_0)'D_\sst$. Entonces el
+jacobiano satisface la recursión
+\begin{equation}
+\J_{t,s} = \J_{t-1,s-1} + \F_{t,s},
+\qquad\text{es decir}\qquad
+\J_{t,s} = \sum_{k=0}^{\min\{s,t\}} \F_{t-k,\,s-k}.
+\label{eq:recursion}
+\end{equation}
+\end{proposicion}
+
+La recursión \eqref{eq:recursion} dice que cada entrada del jacobiano es la suma
+de la entrada correspondiente de $\F$ y de todas las entradas de $\F$ sobre la
+diagonal que va hacia arriba y a la izquierda. Por ejemplo,
+$\J_{2,2} = \F_{2,2} + \F_{1,1} + \F_{0,0}$.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig03_matriz_fakenews.pdf}
+\caption{La matriz fake news del ahorro agregado respecto de la tasa. La primera
+columna coincide con la del jacobiano. Las columnas posteriores son el efecto de
+una noticia anunciada y retractada: se desacumula desde el primer período,
+porque lo único que queda del anuncio es la distribución perturbada que dejó.}
+\label{fig:fakenews}
+\end{figure}
+
+Comparando la figura \ref{fig:fakenews} con la \ref{fig:columnas} se ve la
+economía de la descomposición. Las columnas de $\F$ son monótonas y decaen; las
+de $\J$ tienen forma de carpa. La carpa aparece porque \eqref{eq:recursion}
+acumula columnas desplazadas de $\F$: la acumulación previa al choque es la suma
+de muchos términos pequeños de ``noticias falsas'' sucesivas.
+
+\section{La receta}
+
+\begin{receta}[Algoritmo fake news: un insumo y un producto]
+\begin{enumerate}[leftmargin=1.4em,itemsep=3pt]
+\item \textbf{Una iteración hacia atrás.} Perturbar el insumo y resolver
+\eqref{eq:canon-v} hacia atrás una sola vez. De ahí salen, para cada
+$s=0,\dots,T-1$:
+\begin{itemize}[leftmargin=1.2em,topsep=2pt]
+\item los $T$ escalares $\mathcal{Y}_s\,dx \equiv dY^s_0 = (dy^s_0)'D_\sst$:
+el efecto sobre el producto \emph{hoy} de una noticia sobre la fecha $s$;
+\item los $T$ vectores $\mathcal{D}_s\,dx \equiv dD^s_1 = (d\Lambda^s_0)'D_\sst$:
+el efecto sobre la distribución \emph{de mañana} de esa misma noticia.
+\end{itemize}
+\item \textbf{Los vectores de expectativa.} $\E_0 = y_\sst$ y
+$\E_t = \Lambda_\sst \E_{t-1}$ para $t=1,\dots,T-2$. No dependen del choque.
+\item \textbf{Armar $\F$.} Primera fila: los $\mathcal{Y}_s$. Filas restantes:
+los productos internos $\E_{t-1}'\mathcal{D}_s$. En código es un único producto
+de matrices de tamaño $(T-1)\times n_g$ por $n_g \times T$.
+\item \textbf{Acumular.} $\J_{t,s} = \J_{t-1,s-1}+\F_{t,s}$, recorriendo filas.
+\end{enumerate}
+\end{receta}
+
+\paragraph{Varios insumos y productos} Los $\mathcal{D}_s$ dependen solo del
+insumo: se calculan una vez por insumo. Los $\E_t$ dependen solo del producto:
+una vez por producto. Solo los $\mathcal{Y}_s$ dependen de ambos. Por eso un
+bloque con cinco insumos y cuatro productos --- veinte jacobianos --- cuesta
+mucho menos que veinte veces un jacobiano.
+
+\paragraph{Por qué es tan rápido} El método directo hace $T$ pasadas hacia atrás
+y $T$ hacia adelante, cada una de $T$ pasos. El algoritmo fake news hace una
+pasada hacia atrás de $T$ pasos y $T$ aplicaciones de $\Lambda_\sst$. La mejora
+es de un factor $\approx T$, lo que con $T=300$ significa dos órdenes de
+magnitud.
+
+
+\section{El algoritmo con números: un recorrido completo}
+
+Nada aclara tanto como ver las matrices. Esta sección ejecuta el algoritmo sobre
+el bloque de hogares de Krusell--Smith con $T=6$, un horizonte absurdamente corto
+pero que cabe en la página. Todas las cifras salen del código del apéndice
+\ref{ap:codigo}.
+
+\paragraph{La matriz fake news} El paso 3 produce
+\begin{equation}
+\F^{A,r} =
+\begin{pmatrix}
+35.834 & 0.636 & 0.611 & 0.589 & 0.568 & 0.548 \\
+35.550 & 0.623 & 0.600 & 0.579 & 0.558 & 0.539 \\
+35.268 & 0.611 & 0.589 & 0.569 & 0.549 & 0.530 \\
+34.987 & 0.601 & 0.579 & 0.559 & 0.540 & 0.522 \\
+34.709 & 0.590 & 0.570 & 0.550 & 0.531 & 0.514 \\
+34.432 & 0.580 & 0.560 & 0.541 & 0.523 & 0.506
+\end{pmatrix}
+\end{equation}
+
+Vale la pena leer su estructura antes de seguir.
+
+\begin{itemize}[leftmargin=1.4em]
+\item \textbf{La primera columna es enorme} comparada con las demás (35.8 frente
+a 0.6). Es el efecto riqueza de un choque \emph{contemporáneo}: cuando la tasa
+sube hoy, los hogares reciben un retorno extra sobre todo el acervo de activos
+--- que es grande --- y lo ahorran casi todo.
+\item \textbf{Las demás columnas son pequeñas y muy parecidas entre sí}. Son el
+efecto de una noticia anunciada y retractada: los hogares ahorran un poco en el
+período 0 anticipando el choque, y eso es todo lo que queda.
+\item \textbf{Cada columna decae suavemente hacia abajo}. Ese decaimiento es la
+disipación de la perturbación distributiva, es decir, el factor
+$(\Lambda_\sst')^{t-1}$ del lema \ref{lema:fake}.
+\end{itemize}
+
+\paragraph{La acumulación} El paso 4 aplica $\J_{t,s}=\J_{t-1,s-1}+\F_{t,s}$ y da
+\begin{equation}
+\J^{A,r} =
+\begin{pmatrix}
+35.834 & 0.636 & 0.611 & 0.589 & 0.568 & 0.548 \\
+35.550 & 36.457 & 1.236 & 1.190 & 1.147 & 1.107 \\
+35.268 & 36.161 & 37.047 & 1.804 & 1.739 & 1.677 \\
+34.987 & 35.868 & 36.741 & 37.606 & 2.344 & 2.261 \\
+34.709 & 35.577 & 36.438 & 37.290 & 38.137 & 2.858 \\
+34.432 & 35.289 & 36.138 & 36.979 & 37.813 & 38.643
+\end{pmatrix}
+\end{equation}
+
+Ahora la matriz se ve completamente distinta, y la diferencia es instructiva.
+
+\begin{itemize}[leftmargin=1.4em]
+\item \textbf{La primera fila y la primera columna no cambiaron}: la recursión no
+tiene de dónde acumular en los bordes. Esto se verifica en el código.
+\item \textbf{Apareció una ``escalera'' en el triángulo inferior}, con valores
+alrededor de $35$--$38$, que no estaba en $\F$. Son las columnas de $\F$
+desplazadas y sumadas. Económicamente: una vez que el choque \emph{ocurrió}, el
+efecto riqueza se acumuló y persiste.
+\item \textbf{El triángulo superior sigue siendo pequeño} (de $0.5$ a $2.9$),
+pero ahora crece al alejarse de la diagonal hacia abajo. Es la rama ascendente de
+la ``carpa'' de la figura \ref{fig:columnas}: la acumulación previa al choque.
+\end{itemize}
+
+\paragraph{Verificar la recursión a mano} La proposición \ref{prop:principal}
+dice que $\J_{2,2} = \F_{2,2}+\F_{1,1}+\F_{0,0}$. Con los números de arriba:
+\begin{equation}
+0.5895 + 0.6231 + 35.8340 = 37.0466 = \J_{2,2}. \quad\checkmark
+\end{equation}
+Y para una entrada fuera de la diagonal,
+$\J_{4,2} = \F_{4,2}+\F_{3,1}+\F_{2,0} = 36.4377$, que es exactamente la entrada
+correspondiente. Hacer esta verificación a mano con una matriz pequeña, la
+primera vez que uno implementa el algoritmo, ahorra mucho tiempo después.
+
+\begin{trampa}
+Con $T=6$ el jacobiano es \emph{numéricamente} correcto pero
+\emph{económicamente} inservible: supone que la economía vuelve al estado
+estacionario en seis trimestres, lo que es falso. Las entradas de la esquina
+inferior derecha ($38.6$) no se parecen a las del jacobiano verdadero con
+$T=300$, porque allí el horizonte corto impone una condición terminal falsa. El
+ejemplo sirve para ver el mecanismo, no para hacer economía.
+\end{trampa}
+
+\section{Diferenciación numérica}
+
+En la práctica los pasos 1 y 2 se implementan con diferenciación numérica. Hay
+tres opciones, en orden creciente de precisión y de esfuerzo de implementación:
+
+\begin{enumerate}[leftmargin=1.4em]
+\item \textbf{Un lado:} $(f(x+h)-f(x))/h$. Simple, error $O(h)$.
+\item \textbf{Dos lados:} $(f(x+h)-f(x-h))/(2h)$. Cuesta el doble, error
+$O(h^2)$, gana entre uno y dos órdenes de magnitud. Es lo que usa el código de
+este manual.
+\item \textbf{Diferenciación automática:} error cero, pero exige escribir el
+paso hacia atrás con una librería de diferenciación automática.
+\end{enumerate}
+
+\begin{trampa}
+Con diferenciación de un lado conviene usar \emph{corridas fantasma}: en lugar de
+restar el valor de estado estacionario, correr el mismo código con $dx=0$ y
+restar \emph{ese} resultado. Si el estado estacionario no convergió del todo, la
+corrida fantasma arrastra el mismo sesgo que la perturbada y la resta lo cancela.
+Es una línea de código y elimina una familia entera de errores.
+\end{trampa}

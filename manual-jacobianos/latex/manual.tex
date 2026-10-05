@@ -1,0 +1,45 @@
+\documentclass[11pt,openany]{report}
+\input{preambulo}
+\graphicspath{{../figuras/}}
+
+\begin{document}
+\input{00_portada}
+\tableofcontents
+\input{00_prologo}
+
+\part{El problema y las herramientas}
+\input{01_porque}
+\input{02_herramientas}
+
+\part{El jacobiano secuencial}
+\input{03_jacobiano}
+\input{04_bloque}
+\input{05_fakenews}
+\input{06_extensiones}
+
+\part{Del bloque al equilibrio general}
+\input{07_dag}
+\input{08_precision}
+
+\part{Qué hacer con los jacobianos}
+\input{09_usos}
+\input{10_estimacion}
+\input{11_nolineal}
+
+\part{Modelamiento macroeconómico y macrofinanciero}
+\input{12_tips}
+\input{13_macrofinanzas}
+
+\part{Aplicación: bancos heterogéneos, encaje y dolarización}
+\input{14_aplicacion}
+\input{15_hoja_ruta}
+
+\appendix
+\part*{Apéndices}
+\addcontentsline{toc}{part}{Apéndices}
+\input{A_codigo}
+\input{B_ejercicios}
+\input{C_errores}
+\input{D_glosario}
+\input{Z_referencias}
+\end{document}

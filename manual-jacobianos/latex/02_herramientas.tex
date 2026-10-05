@@ -1,0 +1,165 @@
+\chapter{Caja de herramientas}
+\label{cap:herramientas}
+
+Este capítulo repasa las cinco ideas matemáticas que el método usa de forma
+intensiva. Si alguna ya resulta familiar, conviene saltarla; si todas resultan
+familiares, conviene saltar el capítulo entero y volver solo cuando el texto
+remita aquí.
+
+\section{Derivadas de funciones entre espacios de secuencias}
+
+Una \emph{secuencia} no es más que una lista de números indexada por el tiempo:
+$\mathbf{x} = (x_0, x_1, x_2, \dots)$. En la práctica siempre la truncamos en un
+horizonte $T$, de modo que $\mathbf{x} \in \R^T$ es un vector columna.
+
+Si una función $h$ toma una secuencia y devuelve otra secuencia,
+$\mathbf{y} = h(\mathbf{x})$ con $\mathbf{y}\in\R^T$, entonces su derivada en un
+punto es una matriz $T\times T$:
+\begin{equation}
+\J_{t,s} = \frac{\partial y_t}{\partial x_s}.
+\end{equation}
+Eso es todo lo que significa ``jacobiano secuencial''. No hay nada más profundo
+en el nombre. Lo único inusual es que estamos derivando respecto de una variable
+\emph{con fecha}: $\partial y_t/\partial x_s$ pregunta cuánto cambia el producto
+en la fecha $t$ si el insumo cambia en la fecha $s$, manteniendo fijo el insumo
+en todas las demás fechas.
+
+\begin{idea}
+Leer un jacobiano secuencial es leer dos cosas distintas según el eje.
+Una \textbf{columna} $s$ fija es una función impulso-respuesta: la trayectoria
+completa de $y$ ante un cambio en $x$ en la fecha $s$. Una \textbf{fila} $t$
+fija es una función de ponderación: cuánto pesa cada fecha del insumo en el
+valor del producto en $t$.
+\end{idea}
+
+Dos propiedades de estas matrices aparecerán una y otra vez.
+
+\paragraph{Causalidad y anticipación} Si $y_t$ no puede depender de lo que pasa
+después de $t$, entonces $\J_{t,s} = 0$ para $s > t$ y la matriz es triangular
+inferior. Eso ocurre en bloques donde no hay expectativas. Pero cuando los
+agentes son \emph{prospectivos} --- ahorran hoy porque anticipan una tasa más
+alta mañana --- el triángulo superior es distinto de cero, y de hecho es donde
+vive casi toda la economía interesante del modelo.
+
+\paragraph{Estructura de Toeplitz} Una matriz es de Toeplitz si solo depende de
+$t-s$: $\J_{t,s} = g(t-s)$, es decir, es constante a lo largo de las diagonales.
+Esto equivale a decir que la respuesta a una noticia solo depende de cuán lejana
+sea la noticia, no de en qué fecha del calendario estemos. Los jacobianos de los
+modelos heterogéneos \emph{no} son exactamente de Toeplitz --- justamente porque
+la distribución cambia --- pero sí lo son \emph{asintóticamente}: lejos del
+origen, $\J_{t,s}\approx \J_{t-1,s-1}$. La figura
+\ref{fig:estructura} lo muestra. Esa propiedad es la semilla de todo el
+algoritmo rápido.
+
+\section{El teorema de la función implícita}
+
+Es la pieza que convierte ``resolver el modelo'' en ``invertir una matriz''.
+
+Supongamos que el equilibrio está definido por un sistema
+\begin{equation}
+\mathbf{H}(\mathbf{U}, \mathbf{Z}) = \mathbf{0},
+\end{equation}
+donde $\mathbf{U}$ junta las trayectorias de las variables endógenas que
+buscamos (las \emph{incógnitas}) y $\mathbf{Z}$ las de los choques exógenos. Si
+$\mathbf{H}$ es diferenciable y su jacobiano respecto de $\mathbf{U}$ es
+invertible en el estado estacionario, entonces alrededor de ese punto existe una
+función implícita $\mathbf{U}(\mathbf{Z})$ y su derivada es
+\begin{equation}
+d\mathbf{U} = -\,\mathbf{H}_U^{-1}\,\mathbf{H}_Z\; d\mathbf{Z}.
+\label{eq:ift}
+\end{equation}
+
+Nada más. Toda la solución del equilibrio general es esa línea. El trabajo del
+método consiste, enteramente, en construir $\mathbf{H}_U$ y $\mathbf{H}_Z$.
+
+\begin{trampa}
+La invertibilidad de $\mathbf{H}_U$ no es un tecnicismo: es la condición de
+\emph{determinación local} del modelo. Si el sistema está mal planteado --- por
+ejemplo, si uno impone la ley de Walras y además todas las condiciones de
+vaciado, de modo que una ecuación es redundante --- entonces $\mathbf{H}_U$ es
+singular y el código falla con un error de álgebra lineal que no dice nada útil.
+Si está casi singular, el código no falla pero devuelve basura. La sección
+\ref{sec:diagnostico} explica cómo diagnosticarlo.
+\end{trampa}
+
+\section{Equivalencia cierta y la representación de medias móviles}
+
+Esta es la justificación formal de por qué calcular una trayectoria determinista
+alcanza para describir un modelo estocástico.
+
+Cuando se linealiza un modelo alrededor de su estado estacionario, la solución
+tiene la propiedad de \emph{equivalencia cierta}: las reglas de decisión óptimas
+no dependen de la varianza de los choques. Un agente que enfrenta un choque
+aleatorio se comporta exactamente igual que uno que enfrenta el valor esperado
+de ese choque con certeza.
+
+La consecuencia es poderosa. Sea $d\mathbf{X}_s$ la respuesta impulso de las
+variables endógenas a una innovación unitaria que ocurre $s$ períodos después.
+Entonces el proceso estocástico que sigue la economía es
+\begin{equation}
+d\tilde{X}_t = \sum_{s=0}^{T-1} d X_s\, \varepsilon_{t-s},
+\label{eq:ma}
+\end{equation}
+que es una representación $\mathrm{MA}(T-1)$. Es decir: \emph{la función
+impulso-respuesta es el modelo}. Con ella se puede simular, calcular momentos
+poblacionales exactos y evaluar la verosimilitud, sin volver a tocar la
+distribución ni el problema individual. El capítulo \ref{cap:estimacion}
+explota esto a fondo.
+
+\section{Choques MIT}
+
+Un \emph{choque MIT} es un choque de probabilidad cero: la economía está en su
+estado estacionario, los agentes creen que seguirá así para siempre, y en la
+fecha $0$ ocurre algo inesperado. A partir de ese instante los agentes tienen
+previsión perfecta sobre toda la trayectoria futura.
+
+Es un dispositivo lógicamente incoherente --- los agentes son sorprendidos por
+algo que asignaban probabilidad cero --- pero es exactamente la derivada que
+necesitamos. Y por equivalencia cierta, a primer orden esa derivada coincide con
+la solución del modelo genuinamente estocástico. La incoherencia no cuesta nada
+mientras uno se quede en primer orden.
+
+\section{Discretización: Markov, grillas y loterías}
+
+El último ingrediente es técnico pero decisivo para la precisión.
+
+\paragraph{Procesos exógenos} Un proceso AR(1) en logaritmos,
+$\log z_t = \rho \log z_{t-1} + \sigma\epsilon_t$, se aproxima por una cadena de
+Markov finita. El método de Rouwenhorst (1995) domina al de Tauchen cuando
+$\rho$ es alto --- que es el caso típico en calibraciones trimestrales, donde
+$\rho \approx 0.95$ o más --- porque replica exactamente la persistencia y la
+varianza incondicional del proceso continuo para cualquier número de estados.
+
+\paragraph{Grillas} El estado endógeno se discretiza sobre una grilla que debe
+ser \emph{densa donde la política tiene curvatura}. En modelos de mercados
+incompletos, eso es cerca de la restricción de endeudamiento. Una grilla
+doblemente exponencial es la elección estándar.
+
+\paragraph{La lotería de Young} Este es el punto que más errores silenciosos
+causa. La política $a'(e,a_-)$ devuelve un número real que casi nunca cae sobre
+un punto de la grilla. ¿Qué hacer? La respuesta ingenua --- redondear al punto
+más cercano --- introduce un sesgo de agregación de primer orden que contamina
+todos los jacobianos. La respuesta correcta (Young, 2010) es repartir la masa
+entre los dos puntos adyacentes con pesos que \emph{preserven exactamente la
+media}:
+\begin{equation}
+\text{si } a_i \le a' < a_{i+1}, \quad
+p = \frac{a_{i+1}-a'}{a_{i+1}-a_i}
+\;\Longrightarrow\;
+p\, a_i + (1-p)\, a_{i+1} = a'.
+\end{equation}
+Con esto, la matriz de transición $\Lambda$ es una matriz de Markov legítima y
+el ahorro agregado calculado sobre la grilla coincide con el ahorro agregado
+verdadero.
+
+\begin{trampa}
+Hay dos operadores que usan los mismos índices y pesos de la lotería, pero en
+\textbf{orden inverso}. El paso hacia adelante de la distribución aplica primero
+la lotería y después la matriz de Markov exógena; el paso de los vectores de
+expectativa aplica primero la matriz exógena y después la lotería. Formalmente,
+si $\Lambda' = \Pi' L'$ entonces $\Lambda = L\,\Pi$. Invertir ese orden produce
+jacobianos que se \emph{ven} razonables --- tienen la forma correcta, los signos
+correctos, las magnitudes aproximadamente correctas --- y están mal. Es el error
+más caro de depurar de todo el método. La única defensa confiable es la
+verificación contra el método directo del capítulo \ref{cap:precision}.
+\end{trampa}

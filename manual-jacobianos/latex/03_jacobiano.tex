@@ -1,0 +1,154 @@
+\chapter{Qué es, exactamente, un jacobiano secuencial}
+\label{cap:jacobiano}
+
+\section{Definición y lectura}
+\label{sec:jacobiano-def}
+
+\begin{definicion}[Jacobiano secuencial]
+Sea $h$ una función que mapea la trayectoria de un insumo agregado
+$\mathbf{X} = (X_0,\dots,X_{T-1})$ a la trayectoria de un producto agregado
+$\mathbf{Y} = (Y_0,\dots,Y_{T-1})$, y supongamos que $h$ es diferenciable en el
+estado estacionario $\mathbf{X}_\sst$. El \emph{jacobiano secuencial} de $h$ es
+la matriz $T\times T$
+\begin{equation}
+\J_{t,s} \;=\; \frac{\partial Y_t}{\partial X_s}\bigg|_{\mathbf{X}=\mathbf{X}_\sst}.
+\end{equation}
+\end{definicion}
+
+La interpretación que vuelve útil a este objeto es la de \emph{noticia}
+(\emph{news shock}). La columna $s$ de $\J$ es la respuesta de toda la
+trayectoria de $Y$ cuando, en la fecha $0$, los agentes se enteran de que $X$
+será una unidad más alto en la fecha $s$ y solo en esa fecha. Por eso cada
+columna se lee como una función impulso-respuesta, y por eso la matriz completa
+contiene las respuestas a \emph{todas} las trayectorias posibles de $X$: una
+trayectoria arbitraria $d\mathbf{X}$ es una combinación lineal de noticias, y
+\begin{equation}
+d\mathbf{Y} = \J\, d\mathbf{X}
+\end{equation}
+es un simple producto matriz--vector. Calcular una función impulso-respuesta
+adicional, una vez que se tiene $\J$, es gratis.
+
+\section{Un ejemplo que se puede hacer a mano}
+
+Antes de ir al caso heterogéneo, conviene ver un jacobiano que se puede derivar
+con lápiz. Tomemos un consumidor representativo con horizonte infinito,
+utilidad $\sum \beta^t u(c_t)$ con $u(c)=\log c$, que recibe un ingreso
+exógeno $y_t$ y puede ahorrar a una tasa constante $r$ con $\beta(1+r)=1$. Su
+restricción presupuestaria intertemporal es
+\begin{equation}
+\sum_{t\ge 0} \frac{c_t}{(1+r)^t} = (1+r)a_{-1} + \sum_{t\ge 0}\frac{y_t}{(1+r)^t}.
+\end{equation}
+Con utilidad logarítmica y $\beta(1+r)=1$ el consumo es constante e igual a la
+anualidad de la riqueza:
+\begin{equation}
+c_t = \frac{r}{1+r}\Big[(1+r)a_{-1} + \sum_{s\ge0}\frac{y_s}{(1+r)^s}\Big].
+\end{equation}
+Derivando,
+\begin{equation}
+\J^{C,y}_{t,s} = \frac{\partial c_t}{\partial y_s} = \frac{r}{1+r}\,\frac{1}{(1+r)^s}.
+\label{eq:jac-ri}
+\end{equation}
+
+Este jacobiano tiene todas sus filas iguales: el agente suaviza perfectamente,
+así que la fecha en que llega el ingreso no afecta en qué momento lo consume,
+solo cuánto vale en valor presente. La propensión marginal a consumir del
+ingreso contemporáneo es $r/(1+r)$, que con $r=1\%$ trimestral es $0.0099$: un
+céntimo por cada sol. Es el resultado clásico de la hipótesis de ingreso
+permanente, y es \emph{exactamente} lo que los datos rechazan.
+
+\begin{idea}
+El jacobiano $\J^{C,y}$ de un modelo de agentes heterogéneos es muy distinto del
+de \eqref{eq:jac-ri}: su diagonal es grande (propensiones marginales a consumir
+de 15 a 30 céntimos por sol, no uno), y decae rápido fuera de ella. Esa
+diferencia --- y no ninguna otra --- es la que hace que la política fiscal y
+monetaria funcionen distinto en un modelo HANK que en uno representativo
+(Auclert, Rognlie y Straub, 2018). Comparar jacobianos es la forma más limpia de
+comparar modelos.
+\end{idea}
+
+\section{El jacobiano de un modelo de mercados incompletos}
+
+La figura \ref{fig:columnas} muestra cuatro columnas del jacobiano del ahorro y
+del consumo agregados respecto de la tasa de interés, en el modelo de
+Krusell--Smith calibrado trimestralmente ($\alpha=0.36$, $\delta=0.025$,
+$K/Y=10$, elasticidad de sustitución intertemporal $0.5$, proceso de ingreso
+AR(1) con $\rho=0.966$). Todo lo que aparece en esta y en las demás figuras sale
+del código que acompaña al manual.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig01_columnas_jacobiano.pdf}
+\caption{Columnas del jacobiano del bloque de hogares respecto de la tasa de
+interés, en el modelo de Krusell--Smith. Cada curva es la respuesta de la
+variable agregada a la \emph{noticia}, recibida en la fecha $0$, de que la tasa
+será un punto más alta en la fecha $s$. El patrón de ``carpa'' --- acumulación
+previa al choque, pico en $s$, desacumulación posterior --- es la firma
+característica de estos modelos.}
+\label{fig:columnas}
+\end{figure}
+
+Vale la pena leer la figura con calma, porque contiene casi toda la economía del
+modelo.
+
+\paragraph{La columna $s=0$} Cuando la tasa sube hoy, sin aviso, los hogares
+reciben un retorno mayor sobre los activos que ya tenían. Es un efecto riqueza
+puro: ahorran parte de ese ingreso extra, y en los períodos siguientes lo van
+desacumulando lentamente. La curva arranca en su máximo y decae.
+
+\paragraph{Las columnas $s>0$} Aquí aparece la sustitución intertemporal. Si el
+hogar sabe que la tasa será alta dentro de 50 trimestres, le conviene llegar a
+esa fecha con más activos. Entonces ahorra desde hoy, acumulando
+progresivamente, llega al pico justo en $s$, y después desacumula. De ahí la
+``carpa''. La parte ascendente es anticipación; la descendente, el mismo efecto
+riqueza de antes.
+
+\paragraph{El consumo} El panel derecho muestra el espejo. Ante una noticia de
+tasa alta futura, el consumo \emph{cae} hoy (el agente está ahorrando para
+llegar con más activos) y salta en la fecha del choque. La caída inicial es
+pequeña en relación con el salto: los hogares restringidos no pueden sustituir
+intertemporalmente, y en esta calibración un 2.5\% de ellos están contra la
+restricción de endeudamiento en todo momento.
+
+\section{La estructura que hace posible el algoritmo rápido}
+
+La figura \ref{fig:estructura} muestra la misma matriz de dos maneras.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig02_estructura_jacobiano.pdf}
+\caption{Izquierda: mapa de calor de $\J^{A,r}$. Derecha: las columnas
+$s=40,70,100,130$ realineadas en $t-s$. Lejos del origen, las columnas son
+esencialmente traslados unas de otras: el jacobiano es asintóticamente
+invariante en el tiempo.}
+\label{fig:estructura}
+\end{figure}
+
+El panel derecho contiene la observación crucial. Si uno toma la columna $s=70$ y
+la desplaza 30 períodos hacia la izquierda, queda casi exactamente encima de la
+columna $s=100$. Formalmente,
+\begin{equation}
+\J_{t,s} \;\approx\; \J_{t-1,s-1} \qquad \text{para } t,s \text{ grandes}.
+\label{eq:asint}
+\end{equation}
+
+¿Por qué? Dos razones independientes.
+
+\begin{enumerate}[leftmargin=1.4em]
+\item \textbf{Hacia atrás:} el comportamiento de un agente ante una noticia
+depende solo de la \emph{distancia} a esa noticia, no de la fecha del
+calendario. Cómo reacciona hoy a algo que pasará en 50 trimestres es lo mismo
+que cómo reaccionará mañana a algo que pasará 50 trimestres después de mañana.
+Esto es exacto, no aproximado, y es el lema \ref{lema:politicas} del capítulo
+\ref{cap:fakenews}.
+\item \textbf{Hacia adelante:} el efecto de un cambio en la distribución se
+disipa. Si hoy la distribución se perturba un poco, dentro de 200 trimestres
+casi no queda rastro, porque el proceso de ingreso es ergódico y la mezcla
+elimina la información inicial. La figura \ref{fig:expectativa} cuantifica esa
+disipación.
+\end{enumerate}
+
+La relación \eqref{eq:asint} no es solo una curiosidad estética. Significa que
+la matriz $\J$, que tiene $T^2 = 90\,000$ entradas, está determinada por un
+número mucho menor de objetos independientes. El algoritmo fake news es,
+precisamente, el procedimiento que explota esa redundancia para calcular las
+$90\,000$ entradas al costo de calcular unas $2T$.

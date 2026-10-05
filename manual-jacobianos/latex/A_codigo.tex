@@ -1,0 +1,184 @@
+\chapter{El código}
+\label{ap:codigo}
+
+Todo el material numérico de este manual se produjo con una implementación
+propia, escrita desde cero y sin dependencias más allá de \texttt{numpy},
+\texttt{scipy} y \texttt{matplotlib}. La prioridad fue la legibilidad: el código
+está pensado para leerse junto con los capítulos \ref{cap:bloque} a
+\ref{cap:dag}.
+
+\section{Estructura}
+
+\begin{center}\small
+\begin{tabular}{@{}lp{0.62\textwidth}@{}}
+\toprule
+\texttt{ssj/grids.py} & grillas y discretización de Rouwenhorst\\
+\texttt{ssj/interpolate.py} & interpolación, lotería de Young, pasos hacia
+adelante y de expectativa\\
+\texttt{ssj/het.py} & el bloque heterogéneo y el algoritmo fake news\\
+\texttt{ssj/simple.py} & bloques simples, grafo acíclico, solución de equilibrio\\
+\texttt{models/krusell\_smith.py} & el modelo de referencia\\
+\texttt{models/banks.py} & el bloque bancario de la parte V\\
+\texttt{models/banks\_ge.py} & su equilibrio general\\
+\texttt{tests/test\_fakenews.py} & verificación contra el método directo\\
+\texttt{figures/} & generación de todas las figuras\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Cómo correrlo}
+
+\begin{lstlisting}[language=bash,numbers=none,basicstyle=\ttfamily\footnotesize]
+pip install numpy scipy matplotlib
+cd code
+python3 tests/test_fakenews.py     # verificacion (deberia decir TODO OK)
+python3 figures/fig_metodo.py      # figuras 1 a 8
+python3 figures/fig_bancos.py      # figuras 9 a 13
+\end{lstlisting}
+
+La verificación tarda unos segundos; las figuras del modelo bancario tardan unos
+minutos la primera vez, porque resuelven el punto fijo del estado estacionario, y
+después usan un caché en disco.
+
+\section{El núcleo del algoritmo}
+
+Vale la pena leer estas treinta líneas con la receta del capítulo
+\ref{cap:fakenews} al lado. Son la traducción literal de los cuatro pasos.
+
+\paragraph{Paso 1: una sola iteración hacia atrás}
+
+\begin{lstlisting}
+def _backward_fakenews(self, ss, shocked, T, h):
+    """Una sola iteracion hacia atras entrega TODAS las columnas."""
+    base = {k: ss[k] for k in self.inputs}
+    curlyY = {o: np.empty((2, T)) for o in self.outputs}
+    curlyD = np.empty((2, T, self.ne, self.na))
+
+    for sgn_idx, sgn in enumerate((+1.0, -1.0)):   # diferenciacion de dos lados
+        V_next = ss["V"]
+        for s in range(T):
+            args = dict(base)
+            if s == 0:
+                args[shocked] = base[shocked] + sgn * h
+            V_next, pol, out = self._step(V_next, **args)
+            for o in self.outputs:
+                curlyY[o][sgn_idx, s] = np.vdot(out[o], ss["D"])   # dY_0^s
+            i, p = lottery(pol, self.grid)
+            curlyD[sgn_idx, s] = self._forward(ss["D"], i, p)      # dD_1^s
+
+    dY = {o: (curlyY[o][0] - curlyY[o][1]) / (2 * h) for o in self.outputs}
+    dD = (curlyD[0] - curlyD[1]) / (2 * h)
+    return dY, dD
+\end{lstlisting}
+
+El punto que hay que ver: el bucle sobre \texttt{s} no reinicia nada. La
+variable \texttt{V\_next} se arrastra de una iteración a la siguiente, de modo
+que en la iteración $s$ la función de continuación ya incorpora el efecto de un
+choque que ocurre $s$ períodos en el futuro. Eso es el lema
+\ref{lema:politicas} hecho código.
+
+\paragraph{Pasos 2 a 4: expectativas, matriz $\F$ y acumulación}
+
+\begin{lstlisting}
+def _expectations(self, ss, T):
+    """E_t = Lambda^t y_ss: T-1 aplicaciones de una matriz fija."""
+    curlyE = {}
+    for o in self.outputs:
+        E = np.empty((T - 1, self.ne, self.na))
+        E[0] = ss["outcomes"][o]
+        for t in range(1, T - 1):
+            E[t] = self._expect(E[t - 1], ss["i"], ss["p"])
+        curlyE[o] = E
+    return curlyE
+
+def jacobians(self, ss, shocked_inputs=None, T=300, h=1e-4, return_F=False):
+    shocked_inputs = shocked_inputs or self.inputs
+    curlyE = self._expectations(ss, T)                       # paso 2
+    dY, dD = {}, {}
+    for i in shocked_inputs:
+        dY[i], dD[i] = self._backward_fakenews(ss, i, T, h)  # paso 1
+
+    Fs, Js = {}, {}
+    for o in self.outputs:
+        Emat = curlyE[o].reshape(T - 1, -1)
+        for i in shocked_inputs:
+            F = np.empty((T, T))                             # paso 3
+            F[0, :] = dY[i][o]
+            F[1:, :] = Emat @ dD[i].reshape(T, -1).T
+            Fs[(o, i)] = F
+            J = F.copy()                                     # paso 4
+            for t in range(1, T):
+                J[t, 1:] += J[t - 1, :-1]
+            Js[(o, i)] = J
+    return (Js, Fs) if return_F else Js
+\end{lstlisting}
+
+El paso 3 es una sola multiplicación de matrices de $(T-1)\times n_g$ por
+$n_g\times T$, y el paso 4 es una recursión de $T$ líneas sobre una matriz
+$T\times T$. Ahí está todo el algoritmo.
+
+\section{Los dos operadores que hay que no confundir}
+
+\begin{lstlisting}
+def forward_step(D, Pi, i, p):
+    """D_{t+1} = Lambda' D_t: primero la loteria, luego Markov exogeno."""
+    return Pi.T @ forward_policy(D, i, p)
+
+def expectation_step(E, Pi, i, p):
+    """E_t = Lambda E_{t-1}: primero Markov exogeno, luego la loteria.
+
+    Notese el orden INVERSO. Es la transpuesta del mismo operador: si
+    Lambda' = Pi' L'  entonces  Lambda = L Pi. Confundir este orden produce
+    jacobianos casi correctos, y diagnosticarlo cuesta horas.
+    """
+    Etilde = Pi @ E
+    out = np.empty_like(E)
+    for e in range(E.shape[0]):
+        out[e] = p[e] * Etilde[e, i[e]] + (1 - p[e]) * Etilde[e, i[e] + 1]
+    return out
+\end{lstlisting}
+
+\section{La verificación}
+
+\begin{lstlisting}
+def test_budget_and_signs():
+    het = make_household(n_a=100, amax=150)
+    ss = household_ss(het, r=0.01, w=1.0, eis=0.5, target_A=3.0)
+    J = het.jacobians(ss, ["r", "w"], T=30)
+
+    # restriccion presupuestaria agregada en la fecha 0:
+    #   dC_0 + dA_0 = dw_0 * E[e]
+    lhs = J[("C", "w")][0, 0] + J[("A", "w")][0, 0]
+    assert abs(lhs - 1.0) < 1e-5
+
+    # una NOTICIA sobre el futuro no cambia los recursos de hoy:
+    #   dC_0 + dA_0 = 0  para s >= 1
+    for s in (1, 5, 10):
+        assert abs(J[("C", "w")][0, s] + J[("A", "w")][0, s]) < 1e-6
+\end{lstlisting}
+
+Esta prueba no mira ninguna magnitud económica: solo verifica contabilidad. Por
+eso es tan útil. Un error de alineación temporal, de orden de operadores o de
+índices rompe la contabilidad mucho antes de volver implausible el resultado
+económico.
+
+\section{Resultados de la verificación}
+
+Al correr \texttt{tests/test\_fakenews.py} sobre el bloque de hogares de
+Krusell--Smith con $T=40$ y 100 puntos de activos:
+
+\begin{center}\small
+\begin{tabular}{@{}lrr@{}}
+\toprule
+& \textbf{error absoluto} & \textbf{error relativo}\\
+\midrule
+$\J^{A,r}$ & $3.3\times10^{-8}$ & $5.5\times10^{-9}$\\
+$\J^{A,w}$ & $1.5\times10^{-8}$ & $1.7\times10^{-8}$\\
+$\J^{C,r}$ & $1.2\times10^{-9}$ & $3.6\times10^{-9}$\\
+$\J^{C,w}$ & $1.4\times10^{-8}$ & $9.7\times10^{-8}$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Y sobre el bloque bancario de la parte V, con 78 pares insumo--producto, el peor
+error relativo es $2.9\times10^{-8}$.

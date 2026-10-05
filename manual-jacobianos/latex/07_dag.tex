@@ -1,0 +1,174 @@
+\chapter{Del bloque al equilibrio general}
+\label{cap:dag}
+
+Tener el jacobiano del bloque heterogéneo no es tener el modelo. Falta
+combinarlo con las empresas, el gobierno, los mercados y las reglas de política.
+Este capítulo explica cómo, y cómo hacerlo de manera que escale.
+
+\section{El equilibrio como un sistema de ecuaciones}
+
+Todo modelo de equilibrio general en el espacio de secuencias se escribe
+\begin{equation}
+\mathbf{F}(\mathbf{X}, \mathbf{Z}) = \mathbf{0},
+\label{eq:F}
+\end{equation}
+con tantas ecuaciones como variables endógenas. Truncado en $T$, es un sistema
+de $n_x \times T$ ecuaciones. La solución a primer orden es
+$d\mathbf{X} = -\mathbf{F}_X^{-1}\mathbf{F}_Z\,d\mathbf{Z}$.
+
+El problema es el tamaño. Un modelo DSGE cuantitativo tiene fácilmente veinte o
+treinta variables endógenas; con $T=300$, la matriz $\mathbf{F}_X$ es de
+$9\,000\times 9\,000$ y su inversión empieza a dominar el costo total. Peor: el
+sistema es innecesariamente grande, porque muchas de esas ecuaciones son
+definiciones que se pueden sustituir.
+
+\section{Sustitución de variables y el grafo}
+
+La solución es separar las ecuaciones en dos grupos. Las que se pueden resolver
+explícitamente --- la función de producción, las condiciones de primer orden de
+la empresa, la restricción presupuestaria del gobierno --- se usan para expresar
+variables en función de otras. Lo que queda es un sistema reducido
+\begin{equation}
+\mathbf{H}(\mathbf{U}, \mathbf{Z}) = \mathbf{0},
+\label{eq:H}
+\end{equation}
+con $n_u \ll n_x$ \emph{incógnitas} y el mismo número de \emph{objetivos}.
+La solución es entonces
+\begin{equation}
+d\mathbf{U} = -\mathbf{H}_U^{-1}\mathbf{H}_Z\,d\mathbf{Z},
+\qquad
+d\mathbf{X} = \mathbf{M}_U\,d\mathbf{U} + \mathbf{M}_Z\,d\mathbf{Z},
+\end{equation}
+donde $\mathbf{M}$ recupera el resto de las variables.
+
+La forma sistemática de organizar esas sustituciones es un \emph{grafo acíclico
+dirigido} (DAG). Cada pieza del modelo es un \emph{bloque} con insumos y
+productos; se dibuja una flecha de un bloque a otro cuando un producto del
+primero es insumo del segundo.
+
+\begin{definicion}[Modelo en el espacio de secuencias]
+Un modelo consta de: un conjunto de choques exógenos $\mathcal{Z}$, un conjunto
+de incógnitas $\mathcal{U}$, un conjunto de productos $\mathcal{O}$ de los cuales
+un subconjunto $\mathcal{H}$ son objetivos, y una colección de bloques --- simples
+o heterogéneos --- tales que cada producto pertenece a exactamente un bloque, el
+número de incógnitas iguala el de objetivos, y el grafo resultante es acíclico.
+Un equilibrio es una asignación de secuencias tal que cada bloque se satisface y
+todos los objetivos valen cero.
+\end{definicion}
+
+\paragraph{Bloques simples} Un bloque simple es cualquier mapeo
+$Y_t = h(X_{t-k},\dots,X_{t+l})$ entre secuencias. Sus jacobianos son matrices
+de banda y se obtienen por diferenciación numérica a costo despreciable: $T$
+evaluaciones de una función vectorizada por insumo.
+
+\paragraph{Por qué acíclico} La aciclicidad permite ordenar los bloques
+(\emph{orden topológico}) de modo que al evaluar cada uno todos sus insumos ya
+están calculados. Eso vuelve mecánica la aplicación de la regla de la cadena.
+
+\begin{idea}
+La aciclicidad \textbf{no} restringe el modelo económico, solo su representación.
+Si hay simultaneidad genuina --- el bloque $b_1$ necesita un producto de $b_3$ y
+$b_3$ necesita uno de $b_1$ --- siempre se puede romper el ciclo declarando esa
+variable como \emph{incógnita} adicional y su condición de consistencia como
+\emph{objetivo} adicional. No se itera: el sistema lineal la resuelve junto con
+todo lo demás.
+\end{idea}
+
+\section{Acumulación hacia adelante}
+
+Con el grafo ordenado, los jacobianos totales se construyen por
+\emph{acumulación hacia adelante}, que es la aplicación sistemática de la regla
+de la cadena. Sea $\mathbf{J}^{o,i}$ el jacobiano \emph{total} del producto $o$
+respecto del choque o incógnita $i$, y $\J^{o,m}$ el jacobiano \emph{parcial} del
+bloque que produce $o$ respecto de su insumo directo $m$. Se inicializa
+$\mathbf{J}^{i,i} = I$ para cada $i \in \mathcal{Z}\cup\mathcal{U}$ y se recorren
+los bloques en orden topológico aplicando
+\begin{equation}
+\mathbf{J}^{o,i} = \sum_{m\,\in\, \text{insumos del bloque}} \J^{o,m}\,\mathbf{J}^{m,i}.
+\label{eq:forward}
+\end{equation}
+
+Al terminar, $\mathbf{H}_U$ y $\mathbf{H}_Z$ son los jacobianos totales de los
+objetivos respecto de las incógnitas y de los choques. Se apilan, se invierte, y
+el modelo está resuelto.
+
+\begin{trampa}
+La distinción entre jacobiano \emph{parcial} y \emph{total} es sutil y causa
+errores conceptuales serios. En un modelo HANK, $\J^{N,w}$ (parcial) es cuánto
+cambia la oferta laboral ante un cambio del salario manteniendo todo lo demás
+fijo; $\mathbf{J}^{N,w}$ (total) incluye además que un salario mayor reduce los
+beneficios de las empresas, lo que reduce los dividendos que reciben los hogares,
+lo que a su vez mueve la oferta laboral. Son objetos distintos y el que entra en
+$\mathbf{H}_U$ es el total.
+\end{trampa}
+
+\section{Un ejemplo completo: Krusell--Smith}
+
+El modelo del capítulo \ref{cap:jacobiano} tiene tres bloques:
+
+\begin{enumerate}[leftmargin=1.4em,itemsep=1pt]
+\item \textbf{empresas} (simple): toma $(K, Z)$ y devuelve $(r, w, Y)$ usando
+$r_t = \alpha Z_t (K_{t-1}/N)^{\alpha-1} - \delta$ y
+$w_t = (1-\alpha)Z_t(K_{t-1}/N)^{\alpha}$.
+\item \textbf{hogares} (heterogéneo): toma $(r,w)$ y devuelve $(A, C)$. Sus
+jacobianos son los de la figura \ref{fig:columnas}.
+\item \textbf{vaciado} (simple): toma $(A,K)$ y devuelve el residuo $A - K$.
+\end{enumerate}
+
+Hay un choque ($Z$), una incógnita ($K$) y un objetivo (el vaciado del mercado de
+activos). Las variables $r$ y $w$ quedan sustituidas: no son incógnitas. El
+sistema completo es de $300\times300$, se invierte en milisegundos, y entrega la
+matriz $\mathbf{G}$ que mapea cualquier trayectoria de productividad a la
+respuesta de cualquier variable.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig07_irf_krusell_smith.pdf}
+\caption{Funciones impulso-respuesta del capital en el modelo de Krusell--Smith.
+Izquierda: choques AR(1) de productividad del 1\%, con distinta persistencia.
+Derecha: noticias de que la productividad será 1\% mayor en la fecha $s$.
+Ambos paneles usan la \emph{misma} matriz $\mathbf{G}$; calcular una respuesta
+adicional cuesta un producto matriz--vector.}
+\label{fig:irf-ks}
+\end{figure}
+
+Dos verificaciones que conviene hacer siempre, y que esta solución pasa. Primero,
+en impacto el producto responde exactamente 1\% ante un choque de 1\% de
+productividad, porque el capital está predeterminado: $dY_0/Y = dZ_0/Z$ sin
+importar la persistencia. Segundo, la tasa de interés sube exactamente
+$\alpha\,dZ_0\,(K_\sst/N)^{\alpha-1} = 3.60$ puntos básicos en impacto, también
+independiente de $\rho$. Que el código reproduzca estas dos identidades analíticas
+es una señal fuerte de que el grafo está bien armado.
+
+\section{Determinación y diagnóstico}
+\label{sec:diagnostico}
+
+El modelo tiene solución local única si $\mathbf{H}_U$ es invertible. En la
+práctica conviene no confiar en que la inversión ``funcione'' y mirar tres cosas:
+
+\begin{receta}[Diagnóstico del sistema de equilibrio]
+\begin{enumerate}[leftmargin=1.4em,itemsep=2pt]
+\item \textbf{Número de condición de $\mathbf{H}_U$.} Si está por encima de
+$10^{10}$, el sistema está casi singular y la solución es ruido. Causa habitual:
+una ecuación redundante (haber impuesto la ley de Walras \emph{y} todas las
+condiciones de vaciado).
+\item \textbf{Sensibilidad a $T$.} Resolver con $T$ y con $1.5T$ y comparar. Si
+la respuesta cambia, $T$ es demasiado corto (capítulo \ref{cap:precision}).
+\item \textbf{Identidades analíticas conocidas.} Casi todo modelo tiene alguna
+respuesta que se puede calcular a mano: la respuesta en impacto de una variable
+predeterminada, una restricción presupuestaria agregada, la suma de dos
+jacobianos que debe dar cero. Verificarlas atrapa la mayoría de los errores de
+armado.
+\end{enumerate}
+\end{receta}
+
+\begin{trampa}
+En el bloque de hogares del modelo de Krusell--Smith se cumple, exactamente, que
+$\J^{C,w}_{0,0} + \J^{A,w}_{0,0} = \Ex[e] = 1$: un sol más de salario hoy se
+consume o se ahorra, no se evapora. Y para toda noticia sobre el futuro,
+$\J^{C,w}_{0,s} + \J^{A,w}_{0,s} = 0$: una noticia no cambia los recursos de hoy,
+solo cómo se reparten. El código de este manual verifica ambas identidades como
+parte de sus pruebas, y se cumplen hasta $10^{-6}$. Si en tu modelo no se
+cumplen, hay un error de contabilidad en el paso hacia atrás, no un problema
+numérico.
+\end{trampa}

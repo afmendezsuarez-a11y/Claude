@@ -1,0 +1,93 @@
+\chapter{Transiciones no lineales}
+\label{cap:nolineal}
+
+Hasta aquí todo fue de primer orden. Pero los mismos jacobianos sirven para
+calcular transiciones \emph{no lineales} de previsión perfecta, y de hecho son
+la mejor herramienta disponible para hacerlo.
+
+\section{El problema}
+
+Queremos resolver el sistema completo $\mathbf{H}(\mathbf{U},\mathbf{Z}) = 0$
+sin linealizar, dado un choque $\mathbf{Z}$ que puede ser grande. Las
+aplicaciones típicas son:
+
+\begin{itemize}[leftmargin=1.4em]
+\item \textbf{Dependencia del tamaño.} ¿La respuesta a un choque del 5\% es cinco
+veces la respuesta a uno del 1\%? Si no, hay no linealidades que importan.
+\item \textbf{Asimetrías de signo.} ¿Una contracción del crédito tiene el mismo
+efecto en magnitud que una expansión?
+\item \textbf{Transiciones entre estados estacionarios.} Un cambio permanente de
+política --- una reforma del encaje, un cambio demográfico --- lleva la economía
+de un estado estacionario a otro, y la trayectoria no es una desviación pequeña.
+\end{itemize}
+
+\section{El método de cuasi-Newton}
+
+La idea es sencilla y eficaz: aplicar el método de Newton usando el jacobiano
+\emph{del estado estacionario} en lugar del jacobiano verdadero en cada iteración.
+
+\begin{receta}[Transición no lineal]
+\begin{enumerate}[leftmargin=1.4em,itemsep=2pt]
+\item Adivinar una trayectoria inicial $\mathbf{U}^0$, típicamente el estado
+estacionario.
+\item Evaluar el sistema completo, \emph{sin linealizar}:
+$\mathbf{H}(\mathbf{U}^j, \mathbf{Z})$. Esto requiere resolver la iteración
+hacia atrás y hacia adelante del bloque heterogéneo con la trayectoria
+$\mathbf{U}^j$.
+\item Actualizar:
+\begin{equation}
+\mathbf{U}^{j+1} = \mathbf{U}^j - \big[\mathbf{H}_U(\mathbf{U}_\sst,\mathbf{Z}_\sst)\big]^{-1}
+\mathbf{H}(\mathbf{U}^j,\mathbf{Z}).
+\label{eq:quasinewton}
+\end{equation}
+\item Repetir hasta que $\norm{\mathbf{H}}$ sea menor que la tolerancia.
+\end{enumerate}
+\end{receta}
+
+Lo que hace eficiente a \eqref{eq:quasinewton} es que $\mathbf{H}_U$ se calcula e
+invierte \emph{una sola vez}, en el estado estacionario. Cada iteración cuesta
+una evaluación del modelo no lineal más un producto matriz--vector. En los
+modelos de \abrs\ esto converge a $\norm{\mathbf{H}}<10^{-8}$ en entre 5 y 13
+iteraciones. Los métodos que ajustan la trayectoria con reglas \emph{ad hoc}
+--- promediar la adivinanza vieja y la nueva con un factor de relajación ---
+suelen necesitar cientos.
+
+\begin{trampa}
+Para una transición hacia un estado estacionario \textbf{distinto}, el jacobiano
+que hay que usar en \eqref{eq:quasinewton} es el del estado estacionario
+\textbf{terminal}, no el inicial. Es el punto alrededor del cual la trayectoria
+pasa la mayor parte del tiempo, y usar el inicial hace que el método converja
+mucho más despacio o no converja.
+\end{trampa}
+
+\section{Para qué sirve, además de para calcular}
+
+El método de esta sección tiene un uso de diagnóstico que vale tanto como su uso
+computacional: \emph{medir cuánto importa la no linealidad}.
+
+El procedimiento es comparar tres trayectorias: la respuesta lineal a un choque
+grande, la respuesta no lineal a ese mismo choque, y la respuesta no lineal a un
+choque pequeño escalada proporcionalmente. Si las tres coinciden, la
+linealización es inocua y uno puede trabajar con ella con tranquilidad. Si la
+respuesta no lineal al choque grande se separa, hay que decirlo y cuantificarlo.
+
+En el modelo HANK de dos activos de \abrs, un choque de política monetaria de
+$-5$ puntos porcentuales --- enorme --- produce una respuesta del consumo de
+0.81\% frente a 0.86\% en la versión lineal. Es decir, aun para choques
+implausiblemente grandes, la aproximación lineal es buena. Eso no es un teorema
+general, pero sí sugiere que en modelos de este tipo las no linealidades del
+lado de los hogares (agentes que se alejan de la restricción de endeudamiento)
+no son de primer orden.
+
+\begin{tutesis}
+En tu modelo hay razones para esperar lo contrario, y eso lo vuelve un ejercicio
+obligatorio y no opcional. Las funciones $\min(1, F^u/\Delta^u)$ y
+$\min(1, P^u/Q^u)$ son suaves \emph{localmente} pero tienen un quiebre a una
+distancia finita del estado estacionario: si un choque de escasez de dólares es
+lo bastante grande como para agotar la capacidad de respaldo ($\phi$ llega a
+cero) o para dejar el interbancario sin oferta, la respuesta no lineal se
+separará de la lineal de forma brusca. Medir a qué tamaño de choque ocurre eso
+es, probablemente, uno de los resultados más interesantes que el modelo dinámico
+puede ofrecer, y es justamente el tipo de pregunta que el modelo estático no
+puede ni formular.
+\end{tutesis}

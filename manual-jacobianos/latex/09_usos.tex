@@ -1,0 +1,101 @@
+\chapter{Qué se puede leer en un jacobiano}
+\label{cap:usos}
+
+Los jacobianos no son solo un paso intermedio para llegar a las funciones
+impulso-respuesta. Son objetos económicos con contenido propio, y aprender a
+leerlos es una de las habilidades más transferibles que da este método.
+
+\section{Funciones impulso-respuesta y descomposiciones}
+
+Lo básico ya está dicho: $d\mathbf{X} = \mathbf{G}\,d\mathbf{Z}$, y calcular una
+respuesta adicional cuesta un producto matriz--vector. Dos usos menos obvios:
+
+\paragraph{Descomponer una respuesta en canales} Supongamos que el consumo
+responde a una política monetaria a través de tres canales: el efecto directo de
+la tasa, el efecto ingreso vía salarios, y el efecto vía dividendos. Como la
+respuesta total es
+$d\mathbf{C} = \J^{C,r}d\mathbf{r} + \J^{C,w}d\mathbf{w} + \J^{C,d}d\mathbf{d}$,
+basta con evaluar cada término por separado usando las respuestas de equilibrio
+general $d\mathbf{r}$, $d\mathbf{w}$, $d\mathbf{d}$. La suma es exacta, no
+aproximada, porque el modelo es lineal.
+
+\paragraph{Contrafactuales de ``apagar un canal''} ¿Qué pasaría si los hogares no
+respondieran a la tasa de interés? Se resuelve el equilibrio general reemplazando
+$\J^{C,r}$ por cero y dejando todo lo demás igual. Esto es un experimento
+coherente y barato, y es muchísimo más informativo que comparar dos
+calibraciones distintas.
+
+\section{Los jacobianos como estadísticos suficientes}
+
+El resultado conceptual más importante de esta literatura es que, para una clase
+amplia de preguntas, lo único que hace falta saber del lado de los hogares es un
+jacobiano. Auclert, Rognlie y Straub (2018) muestran que en una clase de modelos
+keynesianos la respuesta del producto a la política fiscal depende del modelo de
+hogares \emph{solo} a través de $\J^{C,y}$, la matriz de propensiones marginales
+a consumir intertemporales (las ``iMPC'').
+
+Esto tiene dos consecuencias prácticas.
+
+\begin{enumerate}[leftmargin=1.4em]
+\item \textbf{Se puede disciplinar el modelo con microdatos.} La primera columna
+de $\J^{C,y}$ es el perfil de respuesta del consumo a una transferencia
+inesperada: exactamente lo que estiman los estudios de reembolsos tributarios y
+loterías. Un modelo cuyo $\J^{C,y}$ no reproduce esos perfiles está mal
+calibrado, aunque reproduzca la distribución de riqueza.
+\item \textbf{Se pueden comparar modelos sin resolverlos.} Dos modelos con el
+mismo $\J^{C,y}$ dan las mismas respuestas agregadas. Si un modelo con dos
+activos y uno con un activo tienen jacobianos parecidos, la complejidad adicional
+no está comprando nada para esa pregunta.
+\end{enumerate}
+
+\begin{idea}
+Cuando leas un artículo con un modelo HANK complicado, la primera pregunta útil
+no es ``¿cómo calibraron el proceso de ingreso?'' sino ``¿cómo se ve
+$\J^{C,y}$?''. Si el artículo no lo muestra, pedirlo es la mejor pregunta que
+puedes hacer en un seminario.
+\end{idea}
+
+\section{Leer la forma de un jacobiano}
+
+Con algo de práctica, la forma de la matriz dice qué mecanismo domina. Un
+catálogo breve:
+
+\begin{itemize}[leftmargin=1.4em]
+\item \textbf{Filas constantes} (como en \eqref{eq:jac-ri}): suavizamiento
+perfecto, el agente solo mira valores presentes. Es el caso de ingreso
+permanente.
+\item \textbf{Diagonal dominante}: restricciones de liquidez. El agente responde
+a lo que pasa hoy mucho más que a lo que pasa mañana, porque no puede trasladar
+recursos. Cuanto más alta la fracción de restringidos, más dominante la diagonal.
+\item \textbf{Columnas en forma de carpa}: sustitución intertemporal con
+anticipación, como en la figura \ref{fig:columnas}.
+\item \textbf{Triangular inferior}: no hay anticipación. Si esto aparece en un
+bloque donde debería haber agentes prospectivos, es un error de programación.
+\item \textbf{Primera fila igual a cero salvo en $s=0$}: los agregados de hoy
+dependen solo de los insumos de hoy y de la distribución predeterminada. Es la
+firma de una variable de acervo.
+\end{itemize}
+
+El último caso aparece en la parte V y conviene retenerlo, porque es una
+verificación gratuita: si una variable agregada está determinada por el acervo
+heredado, ninguna noticia sobre el futuro puede moverla hoy.
+
+\section{La matriz de equilibrio general $\mathbf{G}$}
+
+Después de resolver, $\mathbf{G}^{o,z}$ es una matriz $T\times T$ cuya columna
+$s$ es la respuesta de equilibrio general de la variable $o$ a una noticia de que
+el choque $z$ ocurrirá en $s$. Es útil pensarla como ``todas las funciones
+impulso-respuesta del modelo, a la vez''.
+
+Dos diferencias importantes respecto del jacobiano parcial $\J$:
+
+\begin{itemize}[leftmargin=1.4em]
+\item $\mathbf{G}$ incorpora la retroalimentación de precios. $\J^{C,r}$ dice
+cómo responde el consumo si la tasa cambia; $\mathbf{G}^{C,Z}$ dice cómo responde
+el consumo cuando la productividad cambia \emph{y} la tasa se ajusta en
+equilibrio.
+\item $\mathbf{G}$ depende de todo el modelo; $\J$ solo del bloque. Si cambia la
+regla de política monetaria, $\mathbf{G}$ cambia y $\J$ no. Es exactamente la
+distinción que la crítica de Lucas vuelve relevante, y el método la hace
+operativa: los objetos invariantes a la política son los jacobianos de bloque.
+\end{itemize}

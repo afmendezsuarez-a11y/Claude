@@ -1,0 +1,58 @@
+\chapter*{Prólogo}
+\addcontentsline{toc}{chapter}{Prólogo}
+\markboth{PRÓLOGO}{}
+
+Hay un momento, en casi toda tesis de pregrado que toca macroeconomía con
+heterogeneidad, en que el asesor dice: ``esto está bien, pero es estático;
+habría que hacerlo dinámico''. Y ahí se abre un abismo. El modelo estático se
+resolvía con cuatro ecuaciones y un poco de álgebra. La versión dinámica, en
+cambio, parece exigir dominar una literatura entera --- Krusell y Smith, Reiter,
+proyección, perturbación, reducción de dimensionalidad --- antes de poder
+escribir la primera línea de código.
+
+Este manual existe porque ese abismo es más estrecho de lo que parece, siempre
+que uno entre por la puerta correcta. La puerta correcta se llama \emph{jacobiano
+en el espacio de secuencias}, y la idea que la sostiene cabe en un párrafo:
+
+\begin{idea}
+Todo lo que la heterogeneidad hace por el equilibrio general, a primer orden,
+se resume en un conjunto de matrices. Cada matriz dice cuánto cambia una
+variable agregada en la fecha $t$ cuando una variable agregada distinta cambia
+en la fecha $s$. Una vez que uno tiene esas matrices, la distribución de agentes
+--- que puede tener cientos de miles de puntos --- deja de aparecer en el
+problema. El equilibrio general se vuelve álgebra lineal con matrices de tamaño
+$T\times T$, donde $T$ es el horizonte, no el tamaño del espacio de estados.
+\end{idea}
+
+El aporte técnico de \ABRS\ fue encontrar una forma de calcular esas matrices
+unas doscientas veces más rápido de lo que costaría hacerlo a la fuerza bruta.
+A ese procedimiento lo llamaron \emph{algoritmo fake news}, por una razón que
+quedará clara en el capítulo \ref{cap:fakenews} y que es, además, una de las
+intuiciones más bonitas de la macroeconomía computacional reciente.
+
+\paragraph{Qué supone este manual que el lector ya sabe}
+Optimización dinámica a nivel de un curso intermedio: qué es una ecuación de
+Bellman, qué es una ecuación de Euler, qué es un estado estacionario. Álgebra
+lineal: matrices, inversas, autovalores, aunque los repasamos. Programación
+básica en Python o en cualquier lenguaje con arreglos. \emph{No} supone haber
+visto antes métodos numéricos para modelos de agentes heterogéneos; todo eso se
+construye desde cero en el capítulo \ref{cap:bloque}.
+
+\paragraph{Qué no es este manual}
+No es un sustituto del artículo original, que es breve y está muy bien escrito;
+es una rampa de acceso a él. Tampoco es un manual de programación: el código que
+aparece está pensado para ser leído, no para competir en velocidad con
+implementaciones profesionales. Y no cubre métodos globales ni perturbaciones de
+orden superior, que es a donde hay que ir si uno necesita primas de riesgo,
+elección de cartera o política óptima de Ramsey. En la sección
+\ref{sec:limites-perturbacion} se explica por qué.
+
+\paragraph{Una advertencia honesta sobre el modelo de bancos}
+La parte V de este manual construye una extensión dinámica de un plan de trabajo
+de tesis sobre encaje y heterogeneidad bancaria en el Perú. Esa extensión es un
+\emph{prototipo pedagógico}: sirve para mostrar cómo se traduce un modelo
+estático al espacio de secuencias y qué preguntas nuevas aparecen al hacerlo.
+No es una calibración del sistema bancario peruano, y varios de sus supuestos
+--- en particular la forma reducida de la fricción de pago de dividendos ---
+tendrían que reemplazarse antes de usar sus números para decir algo cuantitativo.
+Dónde exactamente, y con qué, está dicho en la sección \ref{sec:limitaciones-prototipo}.

@@ -1,0 +1,146 @@
+\chapter{Ejercicios}
+\label{ap:ejercicios}
+
+Los ejercicios están ordenados por dificultad. Los marcados con $\star$ requieren
+código; los demás son de lápiz. Las soluciones de los primeros están al final.
+
+\section{Entender el objeto}
+
+\paragraph{B.1} Un consumidor con utilidad logarítmica, horizonte infinito y
+$\beta(1+r)=1$ tiene el jacobiano $\J^{C,y}_{t,s} = \frac{r}{1+r}(1+r)^{-s}$ de
+la ecuación \eqref{eq:jac-ri}. (a) Verifica que todas las filas son iguales.
+(b) ¿Cuánto suma cada fila cuando $T\to\infty$, y qué significa económicamente?
+(c) Dibuja cómo cambiaría la matriz si el agente estuviera restringido en
+liquidez.
+
+\paragraph{B.2} Explica, sin fórmulas, por qué la primera fila del jacobiano de
+una variable de acervo tiene ceros en todas las columnas $s\ge1$. Da un ejemplo
+de una variable del mismo modelo cuya primera fila \emph{no} tenga ceros ahí.
+
+\paragraph{B.3} El jacobiano de un bloque es triangular inferior. ¿Qué dice eso
+sobre el comportamiento de los agentes del bloque? Si ese bloque modela hogares
+que optimizan, ¿es un resultado o un error?
+
+\section{El algoritmo}
+
+\paragraph{B.4} Usando la proposición \ref{prop:principal}, escribe $\J_{3,2}$
+como suma de entradas de $\F$. Verifica que la cantidad de términos coincide con
+$\min\{s,t\}+1$.
+
+\paragraph{B.5} El lema \ref{lema:politicas} vale sin aproximación; el lema
+\ref{lema:fake} requiere $dx$ infinitesimal. ¿En qué paso exacto de la
+demostración del lema \ref{lema:fake} se usa que el choque es infinitesimal?
+
+\paragraph{B.6} Supón que $D_0 \neq D_\sst$. ¿Qué parte de la proposición
+\ref{prop:principal} se rompe? ¿Por qué el método sigue sirviendo para calcular
+transiciones desde una distribución arbitraria (capítulo \ref{cap:nolineal})?
+
+\paragraph{B.7 $\star$} En el código, cambia el orden de los operadores en
+\texttt{expectation\_step} (aplica primero la lotería y después $\Pi$). Calcula
+los jacobianos y compáralos con el método directo. ¿Cuánto cambian? ¿Lo habrías
+notado mirando solo la figura?
+
+\section{Equilibrio general}
+
+\paragraph{B.8} En el modelo de Krusell--Smith del capítulo \ref{cap:dag}, ¿por
+qué $r$ y $w$ no son incógnitas? ¿Qué pasaría con el tamaño del sistema si lo
+fueran?
+
+\paragraph{B.9} Un modelo tiene tres bloques con un ciclo: $b_1\to b_2 \to b_3
+\to b_1$. Describe cómo convertirlo en acíclico, y cuántas incógnitas y objetivos
+nuevos hacen falta.
+
+\paragraph{B.10 $\star$} Resuelve el modelo de Krusell--Smith con $T=50$ y con
+$T=300$ para un choque AR(1) con $\rho=0.99$. Compara las respuestas en los
+primeros 20 trimestres. Explica la diferencia.
+
+\section{Macrofinanzas}
+
+\paragraph{B.11} Demuestra la identidad $X(\mu;a) - G(\mu;a) = \mu$ usada en el
+capítulo \ref{cap:aplicacion}, donde $X=\Ex[(\varepsilon+\mu)^+]$ y
+$G=\Ex[(-(\varepsilon+\mu))^+]$ con $\Ex[\varepsilon]=0$. ¿Por qué es útil como
+prueba del código?
+
+\paragraph{B.12} Con $\varepsilon\sim U[-a,a]$, deriva \eqref{eq:G} integrando
+directamente. Verifica que $G$ es continua y derivable en $\mu=\pm a$, y que
+$G'$ \emph{no} es derivable ahí. ¿Importa para el método?
+
+\paragraph{B.13} En el régimen de encaje utilizable, el colchón voluntario es
+$u = \max\{\mu^*-\rho, 0\}$. Calcula $\partial u/\partial\rho$ a cada lado del
+umbral. ¿Qué pasa con el jacobiano agregado si distintos bancos tienen umbrales
+distintos?
+
+\paragraph{B.14} Explica por qué, en un modelo bancario con retornos exactamente
+lineales en el patrimonio y sin costos fijos, la distribución de tamaños no
+afecta a ningún agregado. Propón tres modificaciones que rompan esa propiedad y
+di cuál te parece más defendible empíricamente.
+
+\paragraph{B.15 $\star$} En el modelo bancario, calcula $\partial u^u/\partial\eta$
+por tipo con diferenciación numérica directa sobre la condición de primer orden.
+Verifica que vale exactamente $1$ para el tipo de menor dispersión y explica por
+qué.
+
+\section{Soluciones seleccionadas}
+
+\paragraph{B.1} (a) Porque $\partial c_t/\partial y_s$ no depende de $t$: el
+agente consume la anualidad de la riqueza, y la fecha en que llega el ingreso solo
+afecta su valor presente, no el perfil de consumo. (b) Cada fila suma
+$\frac{r}{1+r}\sum_s (1+r)^{-s} = \frac{r}{1+r}\cdot\frac{1+r}{r} = 1$: un sol
+adicional de valor presente se consume íntegramente, repartido en el tiempo.
+(c) La diagonal se vuelve mucho mayor y las entradas lejanas caen: el agente
+restringido consume hoy lo que recibe hoy y no puede adelantar ingreso futuro.
+
+\paragraph{B.2} Porque un acervo en la fecha $0$ está determinado por la
+distribución heredada $D_0=D_\sst$ y por los insumos de la fecha $0$; una noticia
+sobre $s\ge1$ no puede alterar ninguno de los dos. Un ejemplo de variable cuya
+primera fila sí es distinta de cero: cualquier \emph{flujo} de elección ---
+consumo, dividendos, el colchón voluntario --- que el agente ajusta hoy
+anticipando el futuro.
+
+\paragraph{B.3} Dice que los agentes no son prospectivos: su decisión en $t$ no
+responde a nada posterior a $t$. Si el bloque modela agentes que optimizan con
+expectativas, es un error: casi seguro la iteración hacia atrás no está
+propagando la variable de continuación.
+
+\paragraph{B.4} $\J_{3,2} = \F_{3,2} + \F_{2,1} + \F_{1,0}$, que son
+$\min\{2,3\}+1 = 3$ términos.
+
+\paragraph{B.5} En el paso donde se linealiza \eqref{eq:canon-Y} y
+\eqref{eq:canon-D}, es decir al escribir $dY^s_t = y_\sst'dD^s_t + (dy^s_t)'D_\sst$
+y $dD^s_t = \Lambda_\sst' dD^s_{t-1} + (d\Lambda^s_{t-1})'D_\sst$. Ambas son
+expansiones de primer orden: con $dx$ finito habría términos cruzados
+$(dy^s_t)'dD^s_t$ que no se cancelan.
+
+\paragraph{B.6} Se rompe el último paso de la demostración del lema
+\ref{lema:fake}, donde se usa $dD^{s-1}_0=0$ para cerrar la recursión. El método
+del capítulo \ref{cap:nolineal} sigue sirviendo porque ahí los jacobianos se usan
+solo como \emph{aproximación del jacobiano verdadero} en una iteración de
+cuasi-Newton: el sistema que se resuelve es el no lineal exacto, y la calidad de
+la aproximación solo afecta la velocidad de convergencia, no el punto al que se
+converge.
+
+\paragraph{B.8} Porque las condiciones de primer orden de la empresa permiten
+despejarlos explícitamente en función de $K_{t-1}$ y $Z_t$. Si fueran incógnitas,
+el sistema pasaría de $300\times300$ a $900\times900$ y la inversión costaría
+unas 27 veces más, sin ganar nada.
+
+\paragraph{B.11} $X - G = \Ex[(\varepsilon+\mu)^+] - \Ex[(-(\varepsilon+\mu))^+]
+= \Ex[(\varepsilon+\mu)] = \mu$, usando $z^+ - (-z)^+ = z$ para todo $z$ real.
+Es útil porque se cumple para \emph{cualquier} distribución con media cero: si el
+código la viola, hay un error en la implementación de los momentos parciales, sin
+importar la calibración.
+
+\paragraph{B.13} $\partial u/\partial\rho = -1$ si $\rho<\mu^*$ y $0$ si
+$\rho>\mu^*$. Si los bancos tienen umbrales distintos, el agregado
+$U = \sum_k \mu_k \max\{\mu^*_k-\rho,0\}$ tiene derivada
+$-\sum_k \mu_k \mathbf{1}\{\rho<\mu^*_k\}$, que es una función escalonada de
+$\rho$ con un escalón por tipo. Con un continuo de tipos sería continua: la
+agregación vuelve a suavizar, igual que en la sección \ref{sec:quiebres}.
+
+\paragraph{B.14} Porque todos los productos del bloque serían de la forma
+$Y = \gamma(e)\cdot n_-$, de modo que el agregado es $\sum_e \gamma(e) N_e$ y solo
+depende del patrimonio total por tipo, no de cómo esté repartido dentro del tipo.
+Tres modificaciones: un costo operativo fijo, una restricción de apalancamiento
+decreciente en el tamaño, o un acceso a mercados mayoristas creciente en el
+tamaño. La tercera es la más defendible empíricamente y es la que se usa en la
+parte V.

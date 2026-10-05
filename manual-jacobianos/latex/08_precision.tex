@@ -1,0 +1,186 @@
+\chapter{Precisión numérica y verificación}
+\label{cap:precision}
+
+Un método rápido que da el número equivocado no sirve de nada. Este capítulo
+trata de cómo saber que el resultado es correcto, que es la parte del trabajo
+que más se omite y la que más caro sale omitir.
+
+\section{Las tres fuentes de error}
+
+\begin{enumerate}[leftmargin=1.4em]
+\item \textbf{Discretización.} La grilla y la cadena de Markov aproximan un
+modelo continuo. Este error existe antes de aplicar ningún método de solución y
+es compartido con cualquier alternativa.
+\item \textbf{Diferenciación.} Si se usa diferenciación numérica en lugar de
+automática, hay un error de orden $h$ (un lado) o $h^2$ (dos lados).
+\item \textbf{Truncamiento.} Se resuelve un sistema de horizonte $T$ en lugar de
+infinito.
+\end{enumerate}
+
+Solo la segunda y la tercera son propias del método. Vale la pena tratarlas por
+separado, porque los remedios son distintos.
+
+\section{Verificar contra el método directo}
+
+La prueba más importante, y la que hay que correr siempre que se escribe un
+bloque nuevo, es comparar el algoritmo fake news contra el método directo. El
+método directo es lento pero no depende de la proposición \ref{prop:principal}:
+simplemente perturba y resuelve la transición completa. Si ambos coinciden, el
+bloque está bien escrito.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig05_verificacion.pdf}
+\caption{Izquierda: tiempo de cómputo de los dos métodos en el bloque de hogares
+de Krusell--Smith con 100 puntos de activos. El método directo escala como $T^2$
+y el algoritmo fake news esencialmente como $T$. Derecha: discrepancia máxima
+relativa entre ambos. El error se mantiene en el orden de $5\times10^{-9}$, que
+es el límite de la diferenciación numérica de dos lados, no un error del
+algoritmo.}
+\label{fig:verificacion}
+\end{figure}
+
+La figura \ref{fig:verificacion} muestra el resultado para el modelo de este
+manual. Con diferenciación de dos lados y $h=10^{-4}$, la discrepancia relativa
+máxima sobre los cuatro jacobianos ($\J^{A,r}$, $\J^{A,w}$, $\J^{C,r}$,
+$\J^{C,w}$) es de $5.5\times 10^{-9}$. El artículo original, usando
+diferenciación automática, obtiene coincidencia a precisión de máquina; es decir,
+la proposición \ref{prop:principal} es exacta y toda la discrepancia residual
+viene de las derivadas numéricas.
+
+\begin{receta}[Verificación mínima de un bloque nuevo]
+\begin{enumerate}[leftmargin=1.4em,itemsep=2pt]
+\item Resolver el estado estacionario y chequear que las restricciones
+contables se cumplan \emph{exactamente} (el presupuesto agregado, la suma de la
+distribución igual a uno).
+\item Calcular los jacobianos con fake news y con el método directo a un
+horizonte corto ($T=30$ o $T=40$, donde el directo todavía es barato) y comparar.
+Exigir error relativo menor que $10^{-6}$.
+\item Verificar las identidades analíticas que el modelo implique.
+\item Recién entonces subir a $T=300$ y resolver el equilibrio general.
+\end{enumerate}
+\end{receta}
+
+El paso 2 es barato: a $T=40$ el método directo tarda menos de un segundo. No
+hay excusa para saltárselo, y saltárselo es la razón número uno por la que la
+gente publica resultados equivocados con este método.
+
+\section{Elegir el horizonte de truncamiento}
+
+El horizonte $T$ tiene que ser lo bastante largo para que \emph{tanto el choque
+como la respuesta endógena} hayan vuelto esencialmente al estado estacionario.
+Son dos condiciones distintas y la segunda es la que se olvida.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.52\textwidth]{fig06_truncamiento.pdf}
+\caption{Error de la respuesta del capital en los primeros 60 trimestres,
+medido contra una solución de referencia con $T=600$, en función del horizonte
+de truncamiento. Con un choque de persistencia $\rho=0.9$ bastan unos 150
+trimestres para alcanzar precisión de doce cifras; con $\rho=0.99$ hace falta
+bastante más.}
+\label{fig:truncamiento}
+\end{figure}
+
+La figura \ref{fig:truncamiento} cuantifica el punto. Con $\rho=0.9$ el choque
+mismo ya es despreciable hacia el trimestre 100, y el error cae muy rápido. Con
+$\rho=0.99$ el choque conserva el 5\% de su magnitud inicial en el trimestre
+300, y el error cae mucho más despacio. Modelos con alta persistencia
+\emph{interna} --- como los HANK de dos activos, donde la cartera ilíquida se
+ajusta lentamente --- son más exigentes todavía.
+
+\begin{receta}[Elegir $T$]
+\begin{enumerate}[leftmargin=1.4em,itemsep=1pt]
+\item Verificar que el choque mismo sea numéricamente cero en $T$.
+\item Verificar que la respuesta endógena de interés sea numéricamente cero en
+$T$.
+\item Resolver con $T$ y con $1.5T$; si la respuesta en los primeros períodos
+cambia de forma apreciable, $T$ es corto.
+\end{enumerate}
+\end{receta}
+
+\section{Elegir el paso de diferenciación}
+
+Con diferenciación numérica hay un compromiso clásico: $h$ demasiado grande
+introduce error de truncamiento de Taylor; $h$ demasiado pequeño amplifica el
+error de redondeo. Para diferenciación de dos lados, el óptimo está alrededor de
+$h \approx \epsilon^{1/3}\approx 6\times10^{-6}$ en aritmética de doble
+precisión, pero en la práctica conviene algo mayor, del orden de $10^{-4}$,
+porque el ``ruido'' de la función no es el épsilon de máquina sino la tolerancia
+con que convergió el estado estacionario.
+
+\begin{trampa}
+Si uno baja $h$ y el jacobiano \emph{empeora} en lugar de mejorar, el
+diagnóstico casi seguro es que el estado estacionario está mal convergido: el
+ruido del punto base domina la señal de la derivada. La respuesta no es ajustar
+$h$ sino converger mejor el estado estacionario.
+\end{trampa}
+
+\section{Quiebres, esquinas y lo que la linealización no ve}
+\label{sec:quiebres}
+
+Hay una condición que se verifica poco y que invalida el método cuando falla: el
+modelo tiene que ser \emph{diferenciable en el estado estacionario}. Las
+funciones $\max$, $\min$ y $(\cdot)^+$ son omnipresentes en macrofinanzas y no
+son diferenciables en su quiebre.
+
+Hay dos situaciones y conviene no confundirlas.
+
+\paragraph{El estado estacionario está estrictamente dentro de una rama} Si
+$\min(1, P/Q)$ se evalúa en un estado estacionario donde $P/Q = 0.36$, la función
+es localmente idéntica a $P/Q$ y es suave. No hay problema: basta verificarlo.
+
+\paragraph{El estado estacionario está exactamente en el quiebre} Entonces la
+derivada no existe y el método no es aplicable. Hay que recalibrar para salir del
+quiebre, o cambiar de método.
+
+Pero hay un tercer caso, más interesante, que es la razón por la que estos
+modelos funcionan mucho mejor de lo que uno temería.
+
+\begin{idea}
+\textbf{La integración suaviza los quiebres.} Si $x$ es una variable aleatoria
+con densidad continua, entonces $\Ex[(x+\mu)^+]$ es una función \emph{derivable
+con continuidad} de $\mu$, aunque $(\cdot)^+$ no lo sea. En efecto,
+\begin{equation}
+\frac{\partial}{\partial\mu}\,\Ex\big[(x+\mu)^+\big] = \Pr(x+\mu > 0),
+\end{equation}
+que es continua si la densidad lo es. El quiebre individual no sobrevive a la
+agregación sobre un continuo.
+\end{idea}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig08_quiebre_esperanza.pdf}
+\caption{El faltante de liquidez esperado por unidad de depósitos, con un choque
+uniforme en $[-a,a]$. La línea punteada es el caso individual $(-\mu)^+$, con su
+quiebre en cero. Las curvas sólidas son la esperanza, que es suave; su derivada
+(panel derecho) es la probabilidad de faltante, continua y decreciente. Cuanto
+mayor la dispersión $a$, más suave la función.}
+\label{fig:quiebre}
+\end{figure}
+
+La figura \ref{fig:quiebre} ilustra el punto con la función que aparece en la
+parte V. Dos lecturas adicionales que conviene extraer:
+
+\begin{itemize}[leftmargin=1.4em]
+\item La función \emph{límite} cuando $a\to 0$ es el caso individual con su
+quiebre. Es decir, la suavidad se compra con dispersión: un modelo con muy poca
+heterogeneidad idiosincrática está numéricamente cerca de un quiebre, aunque
+formalmente sea suave.
+\item La agregación suaviza \emph{dos veces}: sobre el choque idiosincrático y
+sobre la distribución de agentes. Un agregado sobre bancos con distintos
+umbrales es suave aunque cada banco individual tenga un umbral neto.
+\end{itemize}
+
+\begin{tutesis}
+Esto responde una objeción que seguramente te van a hacer al pasar a dinámico:
+``tu modelo está lleno de $\max\{x,0\}$, ¿cómo lo linealizas?''. La respuesta
+corta: lo que entra en el modelo no es $\max\{x,0\}$ sino
+$\Ex[\max\{x,0\}]$, y esa función es $C^1$ siempre que $F_k$ sea continua ---
+que es exactamente el supuesto que tu Anexo IV ya hace. La respuesta larga tiene
+una advertencia: la decisión de \emph{colchón voluntario} sí puede estar en una
+esquina ($u^c = 0$), y ahí la derivada es cero por un lado y distinta de cero
+por el otro. Hay que verificar en qué lado está cada tipo de banco en el estado
+estacionario, y reportarlo. La sección \ref{sec:regimenes} lo hace para el
+prototipo.
+\end{tutesis}

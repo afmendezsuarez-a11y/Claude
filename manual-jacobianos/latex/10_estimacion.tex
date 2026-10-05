@@ -1,0 +1,126 @@
+\chapter{Estimación}
+\label{cap:estimacion}
+
+Aquí es donde el método paga su inversión. Estimar un modelo de agentes
+heterogéneos sobre series de tiempo era, hasta hace poco, prohibitivo. Con
+jacobianos secuenciales es cuestión de minutos.
+
+\section{Del jacobiano a la representación de medias móviles}
+
+El punto de partida es \eqref{eq:ma}. Si los choques exógenos siguen procesos de
+medias móviles independientes,
+\begin{equation}
+d\tilde{Z}_t = \sum_{s\ge0} dZ_s\,\epsilon_{t-s},
+\end{equation}
+con $\epsilon_t$ innovaciones normales iid, entonces por equivalencia cierta las
+variables endógenas siguen
+\begin{equation}
+d\tilde{X}_t = \sum_{s=0}^{T-1} dX_s\,\epsilon_{t-s},
+\qquad dX = \mathbf{G}\,dZ.
+\end{equation}
+Es decir, \emph{las funciones impulso-respuesta son los coeficientes de la
+representación MA}. No hace falta ningún paso adicional.
+
+\section{Momentos analíticos}
+
+De la representación MA salen las autocovarianzas en forma cerrada:
+\begin{equation}
+\mathrm{Cov}(d\tilde{X}_t, d\tilde{X}_{t'}) = \sum_{s=0}^{T-1-(t'-t)} (dX_s)(dX_{s+t'-t})'.
+\label{eq:autocov}
+\end{equation}
+Nótese que solo dependen de $t'-t$: el proceso es estacionario. La expresión
+\eqref{eq:autocov} es una convolución y se evalúa muy rápido con la transformada
+rápida de Fourier.
+
+Esto ya permite estimar por el método de momentos simulados --- pero \emph{sin}
+simular, que es la gracia: los momentos poblacionales del modelo se calculan
+exactamente en milisegundos.
+
+\section{La verosimilitud}
+
+El enfoque estándar en la literatura DSGE es aplicar el filtro de Kalman a la
+representación de espacio de estados. Con modelos de agentes heterogéneos ese
+espacio de estados es enorme y el filtro se vuelve prohibitivo.
+
+La alternativa es usar directamente la normalidad conjunta. Sea
+\begin{equation}
+d\tilde{X}^{\text{obs}}_t = \mathbf{B}\, d\tilde{X}_t + u_t
+\end{equation}
+el vector de $n_{\text{obs}}$ observables, con $u_t$ error de medición normal iid.
+Como todo es combinación lineal de normales, el vector apilado de todas las
+observaciones es normal multivariado con matriz de covarianzas
+\begin{equation}
+\mathbf{V} = \mathbb{I}\otimes\Sigma_u + \mathbf{B}\,\mathrm{Cov}(d\tilde{X})\,\mathbf{B}',
+\end{equation}
+construida a partir de \eqref{eq:autocov}. La log-verosimilitud es la densidad
+normal usual:
+\begin{equation}
+\mathcal{L} = -\tfrac12 \log\det \mathbf{V}
+-\tfrac12\,(d\tilde{X}^{\text{obs}})'\,\mathbf{V}^{-1}(d\tilde{X}^{\text{obs}}),
+\end{equation}
+que se evalúa con una descomposición de Cholesky.
+
+\paragraph{El costo} La descomposición de Cholesky escala como
+$n_{\text{obs}}^3 T_{\text{obs}}^3$, lo que empieza a doler cuando la muestra es
+larga. Para muestras grandes conviene la aproximación de Whittle, que se calcula
+con transformada de Fourier, o construir un espacio de estados a partir de la
+representación MA y filtrar con Kalman --- cuyo costo escala linealmente en
+$T_{\text{obs}}$ y además permite hacer inferencia sobre los choques con el
+suavizador.
+
+\section{Reutilizar jacobianos: la razón de que esto sea viable}
+
+Una estimación bayesiana evalúa la verosimilitud decenas de miles de veces. Lo
+que la vuelve factible es que casi nada hay que recalcular.
+
+\begin{receta}[Qué hay que recalcular en cada evaluación]
+\begin{enumerate}[leftmargin=1.4em,itemsep=2pt]
+\item \textbf{Parámetros de los procesos de choque} (persistencias,
+desviaciones estándar). No cambian $\mathbf{G}$ en absoluto: solo cambian
+$d\mathbf{Z}$. Se calcula $\mathbf{G}$ \textbf{una vez} y cada evaluación es
+álgebra lineal pura. Esta separación no existe en el enfoque de espacio de
+estados, y es una ventaja decisiva del espacio de secuencias.
+\item \textbf{Parámetros que no tocan el estado estacionario del problema
+individual} (rigidez de precios, costos de ajuste, coeficientes de la regla de
+Taylor). Cambian los bloques simples pero no el jacobiano del bloque
+heterogéneo, que es lo caro. Se recalcula solo la parte barata.
+\item \textbf{Parámetros que sí cambian el estado estacionario individual} (la
+tasa de descuento, el proceso de ingreso). Obligan a recalcular estado
+estacionario y jacobiano en cada evaluación. Sigue siendo mucho más rápido que
+antes, pero es el caso costoso y conviene evitarlo: esos parámetros suelen
+calibrarse, no estimarse.
+\end{enumerate}
+\end{receta}
+
+\begin{idea}
+Diseñar la estimación consiste, en buena medida, en empujar la mayor cantidad
+posible de parámetros a las categorías 1 y 2. Esa es una decisión de
+investigación, no solo de implementación: conviene tomarla antes de escribir el
+código, no después.
+\end{idea}
+
+\section{Una advertencia sobre identificación}
+
+La facilidad de estimar no resuelve el problema de siempre: que los parámetros
+estén identificados. Con modelos de agentes heterogéneos hay un riesgo
+específico. Muchos mecanismos distintos pueden producir jacobianos agregados
+parecidos --- esa es, después de todo, la lección del ``estadístico
+suficiente'' --- y si dos parámetros mueven $\J$ de la misma manera, los datos
+agregados no pueden separarlos.
+
+La respuesta natural es combinar series de tiempo agregadas con momentos
+microeconómicos. El método lo permite: cualquier momento de la distribución
+puede ser un producto del bloque (capítulo \ref{cap:extensiones}), y por lo
+tanto puede entrar en el vector de observables con su propio error de muestreo.
+
+\begin{tutesis}
+Para tu caso la advertencia es concreta. La exposición al choque de liquidez
+$a_k$ y el acceso al interbancario $\tau_k$ entran en la decisión del banco de
+forma muy parecida: ambos aumentan el costo esperado del faltante y por lo tanto
+el colchón voluntario. Con datos agregados de encaje y crédito es improbable que
+puedas separarlos. La forma de identificarlos es con el \emph{corte transversal}:
+la volatilidad de depósitos por banco disciplina $a_k$ (tu Hecho Estilizado 2) y
+los saldos interbancarios por banco disciplinan $\tau_k$. Eso significa que tu
+estrategia de IE2 debería apuntar a momentos transversales, no a series de tiempo
+agregadas, y conviene decirlo explícitamente en el Anexo II.
+\end{tutesis}

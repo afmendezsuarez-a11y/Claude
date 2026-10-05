@@ -1,0 +1,114 @@
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-noshorthands,es-nodecimaldot,es-tabla]{babel}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[a4paper,margin=2.6cm,headheight=22pt]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{bm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage{listings}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{caption}
+\usepackage[hidelinks,colorlinks=true,linkcolor=azulosc,citecolor=azulosc,urlcolor=azulosc]{hyperref}
+
+% ---------------------------------------------------------------- colores
+\usepackage{xcolor}
+\definecolor{azul}{HTML}{2A78D6}
+\definecolor{azulosc}{HTML}{1C5CAB}
+\definecolor{naranja}{HTML}{EB6834}
+\definecolor{aqua}{HTML}{1BAF7A}
+\definecolor{tinta}{HTML}{0B0B0B}
+\definecolor{tinta2}{HTML}{52514E}
+\definecolor{gris}{HTML}{E8E7E3}
+\definecolor{grisclaro}{HTML}{F6F5F2}
+
+% ---------------------------------------------------------------- titulos
+\titleformat{\chapter}[display]
+  {\normalfont\sffamily\bfseries}
+  {\color{azul}\large CAPÍTULO \thechapter}{0.3em}{\Huge\color{tinta}}
+\titlespacing*{\chapter}{0pt}{-10pt}{26pt}
+\titleformat{\section}{\normalfont\sffamily\large\bfseries\color{tinta}}{\color{azul}\thesection}{0.7em}{}
+\titleformat{\subsection}{\normalfont\sffamily\bfseries\color{tinta}}{\color{azul}\thesubsection}{0.6em}{}
+\titleformat{\paragraph}[runin]{\normalfont\bfseries\color{azulosc}}{}{0pt}{}[.]
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\footnotesize\sffamily\color{tinta2}\leftmark}
+\fancyhead[R]{\footnotesize\sffamily\color{tinta2}\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{gris}\leaders\hrule height \headrulewidth\hfill}}
+
+\captionsetup{font=small,labelfont={bf,color=azulosc},width=0.95\textwidth}
+\setlength{\parskip}{0.25em}
+
+% ---------------------------------------------------------------- teoremas
+\theoremstyle{definition}
+\newtheorem{definicion}{Definición}[chapter]
+\newtheorem{ejemplo}[definicion]{Ejemplo}
+\theoremstyle{plain}
+\newtheorem{proposicion}[definicion]{Proposición}
+\newtheorem{lema}[definicion]{Lema}
+\newtheorem{teorema}[definicion]{Teorema}
+\theoremstyle{remark}
+\newtheorem{observacion}[definicion]{Observación}
+
+% ---------------------------------------------------------------- cajas
+\newtcolorbox{idea}[1][Idea clave]{
+  enhanced, breakable, colback=azul!5, colframe=azul, boxrule=0pt,
+  leftrule=2.5pt, arc=0pt, outer arc=0pt, left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\sffamily\bfseries\small, coltitle=azulosc, colbacktitle=azul!14,
+  title={#1}}
+
+\newtcolorbox{trampa}[1][Trampa frecuente]{
+  enhanced, breakable, colback=naranja!5, colframe=naranja, boxrule=0pt,
+  leftrule=2.5pt, arc=0pt, outer arc=0pt, left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\sffamily\bfseries\small, coltitle=naranja!65!black, colbacktitle=naranja!16,
+  title={#1}}
+
+\newtcolorbox{tutesis}[1][En tu tesis]{
+  enhanced, breakable, colback=aqua!6, colframe=aqua, boxrule=0pt,
+  leftrule=2.5pt, arc=0pt, outer arc=0pt, left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\sffamily\bfseries\small, coltitle=aqua!45!black, colbacktitle=aqua!16,
+  title={#1}}
+
+\newtcolorbox{receta}[1][Receta]{
+  enhanced, breakable, colback=grisclaro, colframe=tinta2, boxrule=0pt,
+  leftrule=2.5pt, arc=0pt, outer arc=0pt, left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\sffamily\bfseries\small, coltitle=tinta, colbacktitle=gris, title={#1}}
+
+% ---------------------------------------------------------------- codigo
+\lstdefinestyle{py}{
+  language=Python, basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{azulosc}\bfseries, commentstyle=\color{tinta2}\itshape,
+  stringstyle=\color{aqua!60!black}, numbers=left, numberstyle=\tiny\color{tinta2},
+  numbersep=7pt, frame=leftline, framerule=1.2pt, rulecolor=\color{gris},
+  backgroundcolor=\color{grisclaro}, xleftmargin=16pt, framexleftmargin=16pt,
+  breaklines=true, showstringspaces=false, columns=fullflexible,
+  literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1 {ñ}{{\~n}}1,
+}
+\lstset{style=py}
+
+% ---------------------------------------------------------------- macros
+\newcommand{\J}{\mathcal{J}}
+\newcommand{\F}{\mathcal{F}}
+\newcommand{\E}{\mathcal{E}}
+\newcommand{\Ex}{\mathbb{E}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\sst}{\mathrm{ss}}
+\newcommand{\Tr}{\mathsf{T}}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\abrs}{\textsc{abrs}}
+\newcommand{\ABRS}{Auclert, Bardóczy, Rognlie y Straub (2021)}

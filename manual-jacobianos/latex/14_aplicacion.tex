@@ -1,0 +1,448 @@
+\chapter{Del modelo estático al dinámico: bancos, encaje y dolarización}
+\label{cap:aplicacion}
+
+Este capítulo hace el ejercicio completo. Toma un marco estático por capas
+--- banco representativo, heterogeneidad en la exposición al choque de liquidez,
+acceso desigual al interbancario, soles y dólares con respaldo público asimétrico
+--- y lo traduce a un bloque de agentes heterogéneos en el sentido del capítulo
+\ref{cap:bloque}, para después resolverlo en el espacio de secuencias.
+
+El objetivo no es producir un modelo cuantitativo del sistema bancario peruano.
+Es mostrar \emph{qué decisiones hay que tomar} para hacer la traducción, y qué
+preguntas nuevas aparecen cuando uno la hace. La sección
+\ref{sec:limitaciones-prototipo} es explícita sobre los límites del resultado.
+
+\section{La traducción, objeto por objeto}
+
+La tabla \ref{tab:traduccion} resume la correspondencia. Casi todo se traslada
+directamente; lo que no, se señala.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Correspondencia entre el marco estático y el bloque dinámico.}
+\label{tab:traduccion}
+\begin{tabular}{@{}p{0.41\textwidth}p{0.52\textwidth}@{}}
+\toprule
+\textbf{Marco estático} & \textbf{Bloque en el espacio de secuencias}\\
+\midrule
+Tipos $k\in\{L,S\}$ con masas $\mu_k$ &
+Estado exógeno $e$ con cadena de Markov $\Pi$; las masas son su distribución
+estacionaria, pero ahora los bancos \emph{transitan} entre tipos\\[3pt]
+Reservas $m=\rho+u$ &
+Igual, pero $u^c_t$ se reelige cada período según una condición de primer orden\\[3pt]
+Choque $\varepsilon_k\sim F_k$, media cero &
+$\varepsilon\sim U[-a_e,a_e]$; la uniforme da forma cerrada para $G$ y $X$\\[3pt]
+$\omega^c = \beta_k A^c + \varepsilon^c$, con $A^u=-\eta$ con prob. $p$ &
+Estado agregado \emph{intraperiodo} $A\in\{\text{normal},\text{escaso}\}$,
+integrado dentro del paso hacia atrás\\[3pt]
+$\tau_k = 1-e^{-\lambda_k}$ &
+$\tau(e,n_-) = \tau_e\, n_-/(n_-+\bar{n})$: acceso creciente en el tamaño\\[3pt]
+$\psi_k = \tau_k\min(1,P/Q)$ &
+Igual, por estado agregado: $\psi(e,n_-,A)=\tau(e,n_-)\Psi^u_t(A)$\\[3pt]
+$\Delta = \sum_k\mu_k(1-\psi_k)D_k$ &
+$\Delta^u_t$, agregado sobre la distribución conjunta de tipo y tamaño\\[3pt]
+$F^u = v_F\rho^u D^u + R_D$, $\phi=\min(1,F^u/\Delta^u)$ &
+Igual, pero $F^u_t$ y $\Delta^u_t$ son secuencias y $\phi_t$ es una incógnita del
+sistema de equilibrio\\[3pt]
+$C^u_k = \Ex[\phi(1-\psi_k)D^u_k]$ &
+Igual; es la variable de incidencia y se calcula por tipo\\[3pt]
+--- (no existe) &
+Patrimonio $n_-$ como \textbf{estado endógeno}: acumulación y erosión de capital\\[3pt]
+--- (no existe) &
+Entrada y salida de bancos, que fija la escala del sistema\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Dos entradas de la tabla merecen comentario, porque no son traducciones sino
+decisiones.
+
+\paragraph{El acceso al interbancario depende del tamaño} En el marco estático
+$\tau_k$ es un parámetro por tipo. Si se traslada así, la distribución de tamaños
+no afecta a ningún agregado --- todos los productos del bloque serían lineales en
+$n_-$ --- y el bloque heterogéneo colapsaría a tres bancos representativos, como
+advertía el capítulo \ref{cap:macrofinanzas}. Hacer que $\tau$ dependa del tamaño
+es lo que le da contenido a la distribución, y además conecta directamente con el
+Hecho Estilizado 2 del marco estático (bancos más pequeños, depósitos más
+volátiles).
+
+\paragraph{La liquidez voluntaria se deriva, no se supone} El marco estático deja
+$u^c_k$ como una decisión pendiente. Aquí se cierra con una condición de primer
+orden explícita, que es lo que permite que el encaje y el colchón interactúen.
+
+\section{El problema del banco}
+
+\paragraph{Dentro del período} Un banco con tipo $e$ y patrimonio $n_-$ capta
+depósitos $d=\lambda n_-$, de los cuales una fracción $w_e$ está en dólares.
+Elige colchones voluntarios $u^s, u^u$; sus reservas son $\mathrm{res}^c=\rho^c+u^c$
+y su crédito $b = n_- + d - \sum_c \mathrm{res}^c d^c$.
+
+Después se realiza el estado agregado $A$ y el choque idiosincrático. Bajo
+\emph{encaje no utilizable} (NU) la posición de liquidez por unidad de depósitos
+en la moneda $c$ es $\mu^c_A = u^c + m_A$, donde $m_A$ es el desplazamiento
+agregado ($0$ en el estado normal, $-\eta$ en el escaso). El faltante esperado es
+\begin{equation}
+G(\mu;a) = \Ex\big[(-(\varepsilon+\mu))^+\big]
+= \begin{cases}
+-\mu & \mu\le-a\\
+(a-\mu)^2/(4a) & -a<\mu<a\\
+0 & \mu\ge a
+\end{cases}
+\label{eq:G}
+\end{equation}
+y el excedente esperado es $X(\mu;a)=G(\mu;a)+\mu$, identidad que conviene usar
+como prueba del código.
+
+\paragraph{La condición de primer orden del colchón} El banco iguala el costo de
+oportunidad de inmovilizar liquidez con el beneficio marginal esperado de la
+cobertura:
+\begin{equation}
+\underbrace{r^b - r^{m,c}}_{\text{costo de oportunidad}}
+=\;
+\sum_A p_A\,\underbrace{\kappa_A}_{\substack{\text{costo esperado del}\\\text{faltante residual}}}
+\cdot\underbrace{\Pr(\text{faltante}\mid A)}_{-G'(\mu^c_A;a)},
+\qquad
+\kappa_A = \iota^{\text{ef}}_A\big(1-\tau(e,n_-)\,\Psi^c_A\big),
+\label{eq:cpo}
+\end{equation}
+con $\iota^{\text{ef}}_A = \phi_A\iota^u + (1-\phi_A)\bar\iota^u$: el faltante
+cubierto por el respaldo cuesta $\iota^u$, el no cubierto cuesta $\bar\iota^u$,
+que es mucho más.
+
+\begin{idea}
+La ecuación \eqref{eq:cpo} es el corazón económico del modelo y conviene leerla
+despacio. El beneficio marginal de una unidad extra de colchón es la
+\emph{probabilidad de que llegue a usarse}, ponderada por lo que costaría el
+faltante. Esa probabilidad es $-G'$, que es continua: de ahí viene la
+diferenciabilidad de todo el modelo, pese a los $\max$. Y el costo esperado
+$\kappa_A$ depende de dos variables de equilibrio general --- el racionamiento
+del interbancario $\Psi^u$ y la capacidad de respaldo $\phi$ --- lo que hace que
+las decisiones privadas de liquidez y la capacidad pública de cobertura se
+determinen \emph{simultáneamente}.
+\end{idea}
+
+Con un solo estado agregado, \eqref{eq:cpo} tiene solución cerrada,
+$u^* = a(1-2\,\mathrm{spread}/\kappa)$. Con varios estados el lado derecho es
+lineal a trozos y conviene resolverla por bisección: cuesta poco y evita errores
+de álgebra en los casos de esquina.
+
+\paragraph{La decisión dinámica} El resultado del período, por unidad de
+patrimonio, es
+\begin{equation}
+R(e,n_-) = 1 + r^b + \lambda\Big[(r^b-r^d) - \kappa^{\text{op}}
+- \sum_c \omega^c_e\big((r^b-r^{m,c})\,\mathrm{res}^c + \textstyle\sum_A p_A \iota^{\text{ef}}_A (1-\psi^c_A) G^c_A\big)\Big].
+\end{equation}
+El banquero reparte $R\,n_-$ entre dividendos y patrimonio retenido maximizando
+$\Ex\sum\beta^t u(\mathrm{div}_t)$ con $u$ cóncava, y sobrevive con probabilidad
+$\varsigma$; los que salen consumen su patrimonio y son reemplazados por
+entrantes de tamaño fijo. Formalmente es el mismo problema de ahorro del
+capítulo \ref{cap:bloque}, con un retorno que depende del tipo y del tamaño, y
+se resuelve con el mismo método del punto endógeno.
+
+\section{El grafo de equilibrio general}
+
+Hay simultaneidad genuina: $\Psi^u$ y $\phi$ entran en \eqref{eq:cpo}, y las
+decisiones que resultan de \eqref{eq:cpo} determinan la oferta, la demanda y el
+faltante residual que fijan $\Psi^u$ y $\phi$. Siguiendo el capítulo
+\ref{cap:dag}, el ciclo se rompe declarando ambas como incógnitas.
+
+\begin{center}\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Incógnitas} & \textbf{Objetivos} & \textbf{Choques}\\
+\midrule
+$r^b_t$ (tasa activa) & vaciado del mercado de crédito & $\rho^u_t$ (encaje en ME)\\
+$\Psi^u_t$ (holgura del interbancario) & $\Psi^u_t = \min(1, P^u_t/Q^u_t)$ & $\eta_t$ (escasez de dólares)\\
+$\phi_t$ (capacidad de respaldo) & $\phi_t = \min(1, F^u_t/\Delta^u_t)$ &\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+El grafo tiene cuatro bloques en orden topológico: \textsf{bancos} (heterogéneo),
+\textsf{crédito}, \textsf{interbancario} y \textsf{respaldo} (los tres simples).
+El sistema es de $3T\times 3T$ y se resuelve en segundos.
+
+\section{El estado estacionario}
+
+La calibración es trimestral e ilustrativa. Los encajes exigibles se fijan en los
+valores agregados de julio de 2026 --- $5.56\%$ en moneda nacional y $35.37\%$ en
+moneda extranjera --- y las dispersiones de los tres tipos, $a_e\in\{0.08,0.15,0.28\}$,
+corresponden a desviaciones estándar del choque de retiro de $4.6\%$, $8.7\%$ y
+$16.2\%$ de los depósitos, que es el rango de volatilidad del crecimiento de
+depósitos documentado en el marco estático. El resto de los parámetros se eligen
+para obtener un estado estacionario con las propiedades de la tabla
+\ref{tab:ss}.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Estado estacionario del prototipo. Las tres últimas filas son los
+puntos que hay que verificar antes de calcular jacobianos.}
+\label{tab:ss}
+\begin{tabular}{@{}lrl@{}}
+\toprule
+Ratio de capital & $12.50\%$ & patrimonio sobre activos\\
+ROE anualizada & $12.12\%$ & dividendos sobre patrimonio\\
+Colchón voluntario en ME & $16.83\%$ & de los depósitos en ME\\
+Reservas totales en ME & $52.20\%$ & de los depósitos en ME\\
+\midrule
+$P^u/Q^u$ en el estado escaso & $0.359$ & el interbancario raciona\\
+$\phi$ en el estado escaso & $0.800$ & el fondo cubre el 80\% del faltante residual\\
+$v_F$ (fracción movilizable) & $0.115$ & calibrada al objetivo anterior\\
+\midrule
+Masa en el último punto de la grilla & $1.9\times10^{-9}$ & la grilla no ata\\
+Distancia al quiebre en $\min(1,P/Q)$ & $0.64$ & el estado estacionario es interior\\
+Distancia al quiebre en $\min(1,F/\Delta)$ & $0.20$ & el estado estacionario es interior\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig09_bancos_estado_estacionario.pdf}
+\caption{Estado estacionario del prototipo. Izquierda: cola de la distribución de
+tamaños dentro de cada tipo; la mediana está en $1.13$ y el percentil 99 en
+$3.60$ veces el tamaño de entrada. Centro: el acceso al interbancario crece con
+el tamaño, lo que hace que la distribución importe para los agregados. Derecha:
+la incidencia estacionaria por tipo.}
+\label{fig:bancos-ss}
+\end{figure}
+
+El panel derecho de la figura \ref{fig:bancos-ss} contiene el resultado
+distributivo básico, que reproduce la hipótesis del marco estático y la matiza:
+
+\begin{itemize}[leftmargin=1.4em]
+\item El tipo más expuesto y con peor acceso (tipo 3) utiliza un $78\%$ más de
+cobertura pública por unidad de depósito en moneda extranjera que el tipo menos
+expuesto ($0.0085$ frente a $0.0048$).
+\item Pero también mantiene el mayor colchón voluntario ($22.0\%$ frente a
+$15.5\%$). El autoseguro \emph{atenúa} el ordenamiento sin revertirlo, que es
+exactamente la salvedad que el marco estático anticipa.
+\item Hay una no monotonicidad que vale la pena notar: el tipo 2 mantiene
+\emph{menos} colchón que el tipo 1 ($14.2\%$ frente a $15.5\%$) pese a ser más
+expuesto. La razón es que el colchón cubre dos riesgos distintos ---
+el idiosincrático y el agregado --- y para un banco de baja dispersión
+el motivo agregado domina y no escala con $a_e$. Es un mecanismo que el modelo
+estático con un solo choque no puede generar.
+\end{itemize}
+
+\section{Los jacobianos del bloque}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig10_bancos_jacobianos.pdf}
+\caption{Columnas del jacobiano del bloque bancario respecto del encaje exigible
+en moneda extranjera. Cada curva es la respuesta a la noticia, recibida hoy, de
+que $\rho^u$ será un punto más alto en la fecha $s$.}
+\label{fig:bancos-J}
+\end{figure}
+
+Hay dos verificaciones analíticas que estos jacobianos pasan exactamente y que
+conviene usar siempre que se construye un bloque nuevo.
+
+\begin{enumerate}[leftmargin=1.4em]
+\item $\J^{B,\rho^u}_{0,0} = -3.265699$, que coincide hasta la última cifra con
+$-D^u_\sst = -3.265699$. Tiene que ser así: un punto más de encaje inmoviliza
+exactamente un punto de los depósitos en moneda extranjera, y en impacto los
+depósitos están predeterminados.
+\item $\J^{Y,\rho^u}_{0,s} = 0$ para todo $s\ge1$ y toda variable de acervo $Y$.
+Una noticia sobre el encaje futuro no puede cambiar el crédito ni el patrimonio
+de hoy, porque ambos están determinados por la distribución heredada. Lo que
+\emph{sí} cambia hoy es el dividendo --- el banco retiene más capital anticipando
+el costo futuro --- y en efecto $\J^{\mathrm{div},\rho^u}_{0,5} = -7.8\times10^{-4}$.
+\end{enumerate}
+
+\begin{idea}
+Esa pareja de verificaciones es el mejor ejemplo de lo que un jacobiano enseña.
+La primera fila de la matriz dice qué puede moverse hoy: solo las variables de
+flujo que son elección. Todo lo demás es acervo heredado. Si tu código produce
+una respuesta no nula en la primera fila para una variable predeterminada, hay un
+error de contabilidad temporal.
+\end{idea}
+
+\section{Un choque de encaje: el canal que el modelo estático no ve}
+
+La figura \ref{fig:bancos-irf} muestra la respuesta de equilibrio general a un
+aumento de un punto porcentual del encaje en moneda extranjera, con persistencia
+AR(1) de $0.90$.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig11_bancos_irf_encaje.pdf}
+\caption{Respuesta a un aumento de 1 punto porcentual del encaje exigible en
+moneda extranjera ($\rho=0.90$). El patrimonio está predeterminado en impacto y
+se erosiona después; el colchón voluntario \emph{cae}; la cobertura pública
+utilizada \emph{sube}.}
+\label{fig:bancos-irf}
+\end{figure}
+
+Los números en impacto: el crédito cae $0.32\%$, la tasa activa sube $0.31$
+puntos básicos, el colchón voluntario en moneda extranjera cae $0.74\%$ y la
+cobertura pública utilizada sube $3.00\%$. El patrimonio no se mueve en impacto
+--- está predeterminado --- y alcanza su caída máxima de $0.10\%$ en el trimestre
+12.
+
+El resultado interesante es el del colchón voluntario, y conviene entender por
+qué ocurre. Estamos en régimen de \emph{encaje no utilizable}: el requisito no
+es un colchón, de modo que $\partial u^u/\partial\rho^u = 0$ \emph{dentro del
+bloque} --- en efecto, $\J^{Uu,\rho^u}_{0,0}=0$ exactamente. Sin embargo, en
+equilibrio general el colchón cae. El canal es indirecto:
+
+\begin{equation}
+\rho^u \uparrow
+\;\Longrightarrow\;
+F^u = v_F\rho^u D^u \uparrow
+\;\Longrightarrow\;
+\phi = \min(1, F^u/\Delta^u) \uparrow
+\;\Longrightarrow\;
+\iota^{\text{ef}} = \phi\iota^u + (1-\phi)\bar\iota^u \downarrow
+\;\Longrightarrow\;
+u^u \downarrow .
+\end{equation}
+
+Es decir: \textbf{el encaje desplaza liquidez voluntaria no porque la sustituya
+mecánicamente, sino porque engorda el fondo de respaldo y abarata el faltante}.
+En impacto $\phi$ sube $0.88\%$ y eso basta para que el colchón caiga $0.74\%$ y
+la cobertura utilizada suba $3.00\%$. Este canal no existe en el modelo
+estático con $\phi$ dado, y es el tipo de resultado que justifica el esfuerzo de
+pasar a dinámico.
+
+\paragraph{Incidencia} El panel izquierdo de la figura \ref{fig:bancos-incid}
+muestra que el aumento relativo de la cobertura utilizada es mayor para el tipo
+menos expuesto ($+3.97\%$) que para los tipos 2 y 3 ($+2.53\%$ y $+2.75\%$).
+Conviene no leer mal este resultado: en \emph{niveles} el tipo 3 sigue usando
+mucha más cobertura, porque parte de una base casi el doble de grande. Lo que
+dice el ejercicio es que el ajuste marginal ante un cambio de encaje recae
+proporcionalmente más sobre los bancos menos expuestos. Separar la incidencia
+en niveles de la incidencia marginal es, probablemente, una distinción que vale
+la pena hacer explícita en una tesis sobre incidencia.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig12_bancos_incidencia.pdf}
+\caption{Respuesta de la cobertura pública utilizada por tipo de banco, en
+porcentaje de su valor estacionario. Izquierda: choque de encaje. Derecha:
+choque de escasez de dólares. El cambio de signo entre tipos en el panel derecho
+es un mecanismo del modelo, no un artefacto numérico; se explica en el texto.}
+\label{fig:bancos-incid}
+\end{figure}
+
+\section{Un choque de escasez de dólares}
+
+El panel derecho de la figura \ref{fig:bancos-incid} muestra algo más llamativo.
+Ante un aumento de 5 puntos porcentuales en la magnitud de la salida agregada de
+dólares, la cobertura utilizada por el tipo 1 \emph{cae} un $35\%$, la del tipo 2
+\emph{sube} un $12\%$ y la del tipo 3 cae un $10\%$.
+
+El mecanismo es el siguiente, y vale la pena seguirlo porque ilustra cómo se
+diagnostica un resultado contraintuitivo.
+
+\begin{enumerate}[leftmargin=1.4em]
+\item Para el tipo 1, cuya dispersión idiosincrática es pequeña ($a=0.08$), el
+colchón óptimo está determinado \emph{solo} por el motivo agregado: en el estado
+normal su posición de liquidez ya excede $a$ y nunca tiene faltante. La derivada
+numérica confirma $\partial u^u/\partial\eta = 1.0000$ exactamente: ese banco
+compensa la salida agregada uno a uno.
+\item Los tipos 2 y 3 también se aseguran contra el riesgo idiosincrático, de
+modo que su colchón responde solo parcialmente: $\partial u^u/\partial\eta$ vale
+$0.32$ y $0.30$.
+\item En equilibrio general, el choque reduce la holgura del interbancario
+($-11.4\%$) y la capacidad de respaldo ($-6.8\%$), lo que encarece el faltante
+residual y empuja a todos los bancos a aumentar su colchón más allá de la
+compensación mecánica. El colchón agregado sube $25.8\%$.
+\item Para el tipo 1, ese exceso de autoseguro domina: su posición de liquidez
+esperada \emph{mejora}, su faltante esperado cae y termina usando menos
+cobertura pública. Para el tipo 2 no alcanza y termina usando más.
+\end{enumerate}
+
+\begin{idea}
+La lectura económica es que un choque de escasez de dólares provoca una
+\emph{huida hacia el autoseguro privado}, y que esa huida es más intensa
+--- en términos relativos --- entre los bancos cuyo único motivo de liquidez es
+el riesgo agregado. El resultado es una recomposición de quién usa el respaldo
+público, no solo un cambio de nivel. Es exactamente la clase de pregunta
+distributiva que motiva el marco estático, y solo el modelo dinámico con
+equilibrio general simultáneo la puede contestar.
+\end{idea}
+
+\section{Encaje utilizable y el umbral}
+\label{sec:regimenes}
+
+El marco estático menciona, como resultado secundario, que bajo \emph{encaje
+utilizable} un aumento del requisito podría sustituir liquidez voluntaria. El
+prototipo lo hace preciso.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig13_bancos_regimenes.pdf}
+\caption{Colchón voluntario óptimo en función del encaje exigible, por tipo de
+banco. Bajo encaje no utilizable (izquierda) el requisito no afecta la decisión
+privada. Bajo encaje utilizable (derecha) la sustituye uno a uno hasta un umbral
+--- el nivel que el banco elegiría por sí mismo --- y después deja de tener
+efecto marginal.}
+\label{fig:regimenes}
+\end{figure}
+
+Bajo encaje utilizable, el colchón efectivo es $\mu^c = \max\{\rho^c, \mu^{c*}\}$,
+donde $\mu^{c*}$ resuelve \eqref{eq:cpo}. Por lo tanto
+\begin{equation}
+u^c = \max\{\mu^{c*}-\rho^c,\,0\},
+\qquad
+\frac{\partial u^c}{\partial \rho^c} =
+\begin{cases}
+-1 & \text{si } \rho^c < \mu^{c*} \quad\text{(sustitución uno a uno)}\\
+0 & \text{si } \rho^c > \mu^{c*} \quad\text{(el requisito es holgado)}
+\end{cases}
+\end{equation}
+
+El umbral $\mu^{c*}$ depende del tipo: en la calibración vale $0.159$, $0.144$ y
+$0.223$ para los tres tipos. Con un encaje exigible en moneda extranjera de
+$35.4\%$, los tres están muy por encima de su umbral, de modo que bajo encaje
+utilizable el requisito eliminaría prácticamente todo el riesgo de liquidez en
+dólares --- y con él, el motivo asegurador que el marco estático quiere estudiar.
+
+\begin{tutesis}
+Esto es un resultado con consecuencias directas para tu diseño de investigación,
+y conviene tenerlo claro antes de IE2. La distinción entre encaje utilizable y
+no utilizable no es un detalle de implementación: determina si el instrumento
+\emph{tiene} un margen interesante. Con $\rho^u=35\%$ y choques de retiro de
+hasta $28\%$ de los depósitos, bajo encaje utilizable no hay faltante en casi
+ningún estado y el modelo se vuelve degenerado. Tu interpretación del encaje
+como un \emph{fondo} que financia un seguro --- es decir, el régimen NU --- no es
+solo la más fiel al arreglo institucional peruano: es la única bajo la cual la
+pregunta de incidencia tiene contenido con encajes de esa magnitud. Vale la pena
+decirlo así, con el número al lado, en lugar de presentar NU como un supuesto
+auxiliar.
+\end{tutesis}
+
+\section{Qué habría que arreglar antes de usar esto cuantitativamente}
+\label{sec:limitaciones-prototipo}
+
+El prototipo es correcto como ilustración del método y es honesto decir dónde no
+alcanza.
+
+\begin{enumerate}[leftmargin=1.4em]
+\item \textbf{La fricción de pago de dividendos es una forma reducida.} La
+utilidad cóncava sobre dividendos es un sustituto conveniente de un costo de
+emisión de capital o de un valor de franquicia, pero no está microfundada y sus
+parámetros no están disciplinados por nada. Para un ejercicio cuantitativo
+convendría reemplazarla por una especificación tipo Gertler--Karadi con una
+restricción de incentivos explícita.
+\item \textbf{La restricción de apalancamiento es exógena y siempre ata.} En los
+datos el ratio de capital varía por banco y en el tiempo, y a veces no ata.
+\item \textbf{Los choques en soles y en dólares son independientes.} En una
+crisis de dolarización están correlacionados, y esa correlación es probablemente
+importante para la demanda de cobertura conjunta.
+\item \textbf{La composición monetaria $w_e$ es fija.} El marco estático lo
+justifica como aproximación de primer orden, y es razonable; pero en un modelo
+dinámico la sustitución de depósitos entre monedas ante un cambio de encaje es un
+canal de política de primer orden.
+\item \textbf{No hay precio del dólar.} Un modelo que quiera hablar de escasez de
+dólares en serio necesita un tipo de cambio y una condición de arbitraje.
+\item \textbf{La calibración es ilustrativa.} Las dispersiones $a_e$ están
+elegidas para abarcar el rango observado de volatilidad de depósitos, no
+estimadas; $\tau_e$, $\iota^u$ y $\bar\iota^u$ no están disciplinados por nada.
+El capítulo \ref{cap:hoja-ruta} propone cómo disciplinarlos.
+\end{enumerate}
+
+Ninguna de estas limitaciones es del método: todas son del modelo. Esa distinción
+importa, porque significa que arreglarlas no obliga a cambiar de herramienta.
