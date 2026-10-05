@@ -97,7 +97,7 @@ Sumas de características de rivales (propios y de otras firmas).
 **Problema (Armstrong 2016):** con muchos productos, estos instrumentos pierden potencia porque las sumas convergen a constantes y la variación desaparece. En mercados grandes, los instrumentos BLP se vuelven **débiles asintóticamente**.
 
 **Instrumentos de diferenciación (Gandhi y Houde 2019) — el estándar actual:**
-$$d_{jk,t} = x_{jt}-x_{kt},\qquad z_{jt}^{GH}=\Big\{\sum_{k\ne j}\mathbb{1}\{|d_{jk,t}|<c\},\ \ \sum_{k\ne j}d_{jk,t}^2\Big\}$$
+$$d_{jk,t} = x_{jt}-x_{kt},\qquad z_{jt}^{GH}=\Big\{\sum_{k\ne j}\mathbf{1}\{|d_{jk,t}|<c\},\ \ \sum_{k\ne j}d_{jk,t}^2\Big\}$$
 
 **Lógica mejorada:** lo que importa no es la suma de características de rivales, sino **cuántos rivales están cerca en el espacio de características**. Contar vecinos locales captura directamente la curvatura de la demanda, que es lo que identifica los parámetros no lineales.
 

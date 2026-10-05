@@ -134,7 +134,7 @@ $$\varepsilon^H_{ij} = \varepsilon_{ij} + \eta_i w_j = -\delta_{ij} + \frac{\gam
 
 $$\boxed{\ \varepsilon^H_{ij} = -\delta_{ij} + \frac{\gamma_{ij}}{w_i} + w_j\ }$$
 
-Y el elemento de la matriz de Slutsky en participaciones es $s_{ij} = w_i\varepsilon^H_{ij}/\,$… en la forma que se usa para testear negatividad:
+El elemento de la matriz de Slutsky expresado en participaciones, $s_{ij} = w_i\,\varepsilon^H_{ij}$, es la forma que se usa para testear negatividad:
 $$s_{ij} = \gamma_{ij} + w_i w_j - \delta_{ij}w_i \ (+\ \beta_i\beta_j\ln(X/P) \text{ en la versión exacta})$$
 
 > **⚠️ Para análisis antimonopolio esto es decisivo.** Un informe que concluya "son sustitutos" basándose en $\varepsilon_{ij}>0$ Marshalliana está usando el concepto correcto para un test SSNIP. Pero si la pregunta es sobre **sustituibilidad en bienestar** (¿pierde mucho el consumidor si desaparece un producto?), hay que usar la Hicksiana. En S05, la res y el pollo tienen $\varepsilon_{ij}$ Marshalliana ligeramente positiva (0.01–0.08) pero $\varepsilon^H_{ij}$ sustancialmente más positiva (al sumar $w_j \approx 0.15$–$0.42$). **La conclusión sobre sustituibilidad cambia de "casi independientes" a "sustitutos claros".**

@@ -182,7 +182,7 @@ $$\boxed{\ CV = \frac{1}{\alpha}\Big[\ln\sum_j e^{V_j^1} - \ln\sum_j e^{V_j^0}\B
 
 $$WTP_k = \frac{\partial V/\partial x_k}{\partial V/\partial(-p)} = \frac{\beta_k}{\alpha}$$
 
-**Ejemplo de S06:** en la elección de sistema de calefacción, $\alpha_{IC}=-0.00153$ y $\alpha_{OC}=-0.00700$. El cociente $\alpha_{IC}/\alpha_{OC}=0.219$ dice que **un dólar de ahorro anual en operación se valora como $0.22 de reducción en costo de instalación**. Invertido: $1/0.219 = 4.57$ es el factor de capitalización que el consumidor aplica, lo que implica una **tasa de descuento implícita** de $r$ tal que $\sum_{t=1}^{30}(1+r)^{-t}=4.57$, es decir $r\approx 21\%$ anual.
+**Ejemplo de S06:** en la elección de sistema de calefacción, $\alpha_{IC}=-0.00153$ y $\alpha_{OC}=-0.00700$. El cociente $\alpha_{IC}/\alpha_{OC}=0.219$ dice que **un dólar de ahorro anual en operación se valora como US\$0.22 de reducción en costo de instalación**. Invertido: $1/0.219 = 4.57$ es el factor de capitalización que el consumidor aplica, lo que implica una **tasa de descuento implícita** de $r$ tal que $\sum_{t=1}^{30}(1+r)^{-t}=4.57$, es decir $r\approx 21\%$ anual.
 
 > **Esto es un resultado sustantivo, no un detalle técnico.** Una tasa implícita de 21% en una inversión de eficiencia energética con horizonte de 30 años es evidencia de **miopía energética** (*energy efficiency gap*) y es el fundamento de las políticas de estándares mínimos de eficiencia. Toda una literatura (Hausman 1979; Allcott y Greenstone 2012) nace de este cálculo.
 

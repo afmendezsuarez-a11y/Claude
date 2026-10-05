@@ -1,0 +1,256 @@
+/* ============ Manual Avanzado de Organización Industrial Empírica ============ */
+
+@page {
+  size: A4;
+  margin: 20mm 18mm 18mm 18mm;
+}
+@page :first { margin: 0; }
+
+:root {
+  --azul:      #0B4F8A;
+  --azul-osc:  #073A66;
+  --azul-claro:#E8F0F8;
+  --gris:      #5A6572;
+  --gris-cl:   #F4F6F8;
+  --linea:     #D4DAE0;
+  --rojo:      #A8322A;
+  --verde:     #1F6B4A;
+  --ambar:     #8A6100;
+}
+
+* { box-sizing: border-box; }
+/* KaTeX exige content-box: border-box colapsa \boxed, \underbrace y matrices */
+.katex, .katex *, .katex-display, .katex-display * { box-sizing: content-box; }
+.katex { text-align: initial; hyphens: none; -webkit-hyphens: none; word-spacing: normal; }
+
+html { font-size: 10pt; }
+
+body {
+  font-family: "Bitstream Charter", "DejaVu Serif", Georgia, serif;
+  font-size: 10pt;
+  line-height: 1.52;
+  color: #1B1F24;
+  margin: 0;
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  orphans: 3;
+  widows: 3;
+}
+
+/* ---------------------------------------------------------------- PORTADA */
+.cover {
+  page-break-after: always;
+  break-after: page;
+  height: 297mm;
+  width: 210mm;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  text-align: left;
+  color: #fff;
+  background: linear-gradient(160deg, #0B4F8A 0%, #073A66 55%, #04243F 100%);
+  overflow: hidden;
+}
+.cover .grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.055) 1px, transparent 1px);
+  background-size: 14mm 14mm;
+}
+.cover .inner { position: relative; padding: 38mm 24mm 24mm 24mm; height: 100%; }
+.cover .kicker {
+  font-family: "DejaVu Sans", sans-serif;
+  font-size: 9.5pt; letter-spacing: .22em; text-transform: uppercase;
+  color: #9FC6E8; margin-bottom: 10mm;
+}
+.cover h1 {
+  font-family: "DejaVu Sans", sans-serif;
+  font-size: 34pt; font-weight: 700; line-height: 1.12;
+  margin: 0 0 7mm 0; letter-spacing: -.015em; color: #fff;
+  border: 0; padding: 0;
+}
+.cover .sub {
+  font-size: 14pt; line-height: 1.42; color: #CFE2F3;
+  font-style: italic; margin-bottom: 16mm; max-width: 135mm;
+}
+.cover .rule { width: 46mm; height: 3px; background: #4E9BD6; margin-bottom: 12mm; }
+.cover .meta { font-family: "DejaVu Sans", sans-serif; font-size: 10pt; line-height: 1.95; color: #BBD6EC; }
+.cover .meta b { color: #fff; font-weight: 600; }
+.cover .pie {
+  position: absolute; left: 24mm; right: 24mm; bottom: 20mm;
+  font-family: "DejaVu Sans", sans-serif; font-size: 8.5pt; color: #8FB4D4;
+  border-top: 1px solid rgba(255,255,255,.22); padding-top: 5mm;
+}
+.cover .chips { margin-top: 14mm; max-width: 150mm; }
+.cover .chip {
+  display: inline-block;
+  font-family: "DejaVu Sans", sans-serif; font-size: 8pt;
+  border: 1px solid rgba(255,255,255,.35); border-radius: 20px;
+  padding: 1.6mm 3.4mm; margin: 0 2mm 2.4mm 0; color: #DCEAF6;
+}
+
+/* ------------------------------------------------------------------- TOC */
+.toc { page-break-after: always; break-after: page; text-align: left; }
+.toc h1 {
+  font-family: "DejaVu Sans", sans-serif; font-size: 20pt; color: var(--azul-osc);
+  border-bottom: 2.5px solid var(--azul); padding-bottom: 3mm; margin: 0 0 8mm 0;
+  page-break-before: auto; break-before: auto;
+}
+.toc table.toctab {
+  width: 100%; border-collapse: collapse; margin: 0;
+  font-family: inherit; font-size: inherit;
+}
+.toc table.toctab td {
+  border: 0; background: none !important; padding: 0; vertical-align: baseline;
+}
+.toc td.pg {
+  font-family: "DejaVu Sans", sans-serif; font-variant-numeric: tabular-nums;
+  text-align: right; white-space: nowrap; width: 12mm; padding-left: 3mm;
+  color: var(--gris);
+}
+.toc tr.t1 td {
+  font-family: "DejaVu Sans", sans-serif; font-size: 10.5pt; font-weight: 600;
+  color: var(--azul-osc); padding-top: 4.2mm; padding-bottom: .4mm;
+  border-bottom: 1px solid var(--linea);
+}
+.toc tr.t1 td.pg { color: var(--azul); }
+.toc tr.t2 td {
+  font-size: 9pt; color: #3C4651; padding-top: 1.05mm;
+}
+.toc tr.t2 td.ttl { padding-left: 9mm; }
+.toc tr { break-inside: avoid; page-break-inside: avoid; }
+.toc a { color: inherit; text-decoration: none; }
+.toc .lead { color: var(--gris); font-size: 9.5pt; font-style: italic; margin: -4mm 0 9mm 0; }
+
+/* -------------------------------------------------------------- CAPÍTULOS */
+.chapter { page-break-before: always; break-before: page; }
+.chapter:first-of-type { page-break-before: always; }
+
+h1 {
+  font-family: "DejaVu Sans", sans-serif;
+  font-size: 21pt; font-weight: 700; line-height: 1.16;
+  color: var(--azul-osc); margin: 0 0 7mm 0; padding-bottom: 3.5mm;
+  border-bottom: 2.5px solid var(--azul);
+  text-align: left; letter-spacing: -.012em;
+  break-after: avoid-page;
+}
+.eyebrow {
+  font-family: "DejaVu Sans", sans-serif; font-size: 8.5pt; font-weight: 700;
+  letter-spacing: .2em; text-transform: uppercase; color: var(--azul);
+  margin-bottom: 2.5mm;
+}
+h2 {
+  font-family: "DejaVu Sans", sans-serif;
+  font-size: 13pt; font-weight: 700; color: var(--azul-osc);
+  margin: 9mm 0 3mm 0; text-align: left; line-height: 1.25;
+  break-after: avoid-page; page-break-after: avoid;
+}
+h3 {
+  font-family: "DejaVu Sans", sans-serif;
+  font-size: 10.8pt; font-weight: 700; color: #22303D;
+  margin: 6.5mm 0 2.2mm 0; text-align: left;
+  break-after: avoid-page; page-break-after: avoid;
+}
+h4 {
+  font-family: "DejaVu Sans", sans-serif;
+  font-size: 9.8pt; font-weight: 700; color: #37424E;
+  margin: 5mm 0 1.6mm 0; text-align: left;
+  break-after: avoid-page;
+}
+p { margin: 0 0 2.9mm 0; }
+strong { font-weight: 700; color: #0E1317; }
+em { font-style: italic; }
+a { color: var(--azul); text-decoration: none; }
+
+ul, ol { margin: 0 0 3.2mm 0; padding-left: 6.5mm; }
+li { margin-bottom: 1.1mm; }
+li > ul, li > ol { margin-top: 1.1mm; margin-bottom: 1.1mm; }
+
+hr {
+  border: 0; border-top: 1px solid var(--linea);
+  margin: 7mm 0; break-after: avoid-page;
+}
+
+/* ---------------------------------------------------------------- TABLAS */
+table {
+  width: 100%; border-collapse: collapse;
+  font-family: "DejaVu Sans", sans-serif; font-size: 8.1pt; line-height: 1.34;
+  margin: 3.5mm 0 4.5mm 0; text-align: left;
+  break-inside: auto;
+}
+thead { display: table-header-group; }
+tr { break-inside: avoid; page-break-inside: avoid; }
+th {
+  background: var(--azul); color: #fff; font-weight: 600;
+  padding: 1.8mm 2.2mm; text-align: left; vertical-align: bottom;
+  border: 1px solid var(--azul);
+}
+td {
+  padding: 1.6mm 2.2mm; border: 1px solid var(--linea);
+  vertical-align: top; text-align: left;
+}
+tbody tr:nth-child(even) td { background: #FAFBFC; }
+table code { font-size: 7.4pt; }
+table p { margin: 0; }
+
+/* ------------------------------------------------------------------ CODE */
+code {
+  font-family: "DejaVu Sans Mono", monospace;
+  font-size: 8.4pt;
+  background: #EEF1F4; color: #10304E;
+  padding: .3mm 1mm; border-radius: 2px;
+}
+pre {
+  font-family: "DejaVu Sans Mono", monospace;
+  font-size: 7.6pt; line-height: 1.38;
+  background: #F7F9FA; border: 1px solid var(--linea);
+  border-left: 3px solid var(--azul);
+  padding: 2.8mm 3.2mm; margin: 3.2mm 0 4mm 0;
+  white-space: pre; overflow-x: hidden;
+  text-align: left; border-radius: 2px;
+  break-inside: auto;
+}
+pre code { background: none; padding: 0; font-size: inherit; color: #16212B; }
+/* diagramas ASCII: sin recorte */
+pre.diagram { font-size: 7pt; line-height: 1.26; }
+
+/* ------------------------------------------------------------- CALLOUTS */
+blockquote {
+  margin: 3.5mm 0 4mm 0; padding: 2.8mm 3.4mm;
+  background: var(--gris-cl); border-left: 3px solid var(--gris);
+  font-size: 9.3pt; break-inside: avoid; page-break-inside: avoid;
+  border-radius: 2px;
+}
+blockquote p:last-child { margin-bottom: 0; }
+blockquote.teorema  { background: #EFF4FA; border-left-color: var(--azul); }
+blockquote.trampa   { background: #FBF4E8; border-left-color: var(--ambar); }
+blockquote.peru     { background: #FBEFEE; border-left-color: var(--rojo); }
+blockquote.idea     { background: #EDF6F1; border-left-color: var(--verde); }
+.tag {
+  display: inline-block; font-family: "DejaVu Sans", sans-serif;
+  font-size: 6.8pt; font-weight: 700; letter-spacing: .13em; text-transform: uppercase;
+  padding: .7mm 1.8mm; border-radius: 2px; margin-right: 2mm;
+  vertical-align: 1.5px; color: #fff;
+}
+.tag.trampa  { background: var(--ambar); }
+.tag.peru    { background: var(--rojo); }
+.tag.idea    { background: var(--verde); }
+.tag.teorema { background: var(--azul); }
+
+/* ------------------------------------------------------------------ MATH */
+.katex { font-size: 1.02em; }
+.katex-display {
+  margin: 3.4mm 0 3.8mm 0;
+  break-inside: avoid; page-break-inside: avoid;
+  overflow: visible;   /* medido: ninguna fórmula desborda; evita recortar exponentes */
+  padding: 0.6mm 0;
+}
+.katex-display > .katex { font-size: 1.0em; }
+
+/* --------------------------------------------------------------- VARIOS */
+.chapter > p:first-of-type { }
+.nobreak { break-inside: avoid; page-break-inside: avoid; }
+.colofon { page-break-before: always; break-before: page; }
+.colofon h1 { border-bottom-color: var(--gris); color: var(--gris); }

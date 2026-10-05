@@ -275,7 +275,7 @@ $$\Pi_f=M\sum_{j\in\mathcal F_f}(p_j-c_j)s_j(\boldsymbol p)$$
 CPO para $k\in\mathcal F_f$:
 $$s_k+\sum_{j\in\mathcal F_f}(p_j-c_j)\frac{\partial s_j}{\partial p_k}=0$$
 
-Definimos $\Delta_{jk}=\partial s_j/\partial p_k$ y $H_{jk}=\mathbb 1\{j,k \text{ misma firma}\}$. La suma restringida a $\mathcal F_f$ se escribe, para todo $k$ y toda firma simultáneamente, como
+Definimos $\Delta_{jk}=\partial s_j/\partial p_k$ y $H_{jk}=\mathbf{1}\{j,k \text{ misma firma}\}$. La suma restringida a $\mathcal F_f$ se escribe, para todo $k$ y toda firma simultáneamente, como
 $$s_k+\sum_{j=1}^{J}H_{jk}\,\Delta_{jk}\,(p_j-c_j)=0$$
 
 En forma vectorial, la fila $k$ del sistema tiene coeficientes $\{H_{jk}\Delta_{jk}\}_j$, es decir, el vector $(\boldsymbol\Delta\odot\boldsymbol H)$ transpuesto aplicado a $(\boldsymbol p-\boldsymbol c)$:
@@ -380,7 +380,7 @@ $$\boxed{\ c = b - \frac{1-G(b)}{(n-1)\,g(b)}\ } \tag{A13.1}$$
 **Conclusión:** $F_c$ está identificada **no paramétricamente** a partir de la distribución observada de pujas. No se requiere ninguna forma funcional. $\blacksquare$
 
 **Estimación en dos pasos (GPV 2000):**
-$$\hat G(b)=\frac{1}{L n}\sum_{\ell,i}\mathbb 1\{b_{i\ell}\le b\},\qquad \hat g(b)=\frac{1}{Lnh}\sum_{\ell,i}K\Big(\frac{b-b_{i\ell}}{h}\Big)$$
+$$\hat G(b)=\frac{1}{L n}\sum_{\ell,i}\mathbf{1}\{b_{i\ell}\le b\},\qquad \hat g(b)=\frac{1}{Lnh}\sum_{\ell,i}K\Big(\frac{b-b_{i\ell}}{h}\Big)$$
 $$\hat c_{i\ell}=b_{i\ell}-\frac{1-\hat G(b_{i\ell})}{(n_\ell-1)\hat g(b_{i\ell})}$$
 y luego un kernel sobre $\{\hat c_{i\ell}\}$ para $\hat F_c$.
 
