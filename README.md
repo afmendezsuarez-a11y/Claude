@@ -148,7 +148,11 @@ scripts/04b_prepare_eldu_memorias.R  serie anual canónica; excluye periodos par
 scripts/05_build_panel.R        panel anual; SE DETIENE si falta lo obligatorio
 scripts/06_estimate.R           estimación
 scripts/07_forecast.R           proyección
-scripts/08_report.Rmd           informe (rinde con y sin resultados)
+scripts/08_report.Rmd           informe HTML (rinde con y sin resultados)
+scripts/09_figuras_informe.R    figuras vectoriales del informe LaTeX
+scripts/10_tablas_informe.R     tablas LaTeX, emitidas desde las salidas
+report/informe_eldu.tex         informe académico en PDF
+report/Makefile                 compilación del PDF
 tests/integration_smoke.R  prueba de integración end-to-end
 ```
 
@@ -156,6 +160,29 @@ Salidas: `output/tables/elasticidad.csv`, `output/forecast_volumenes.xlsx`,
 `output/informe_demanda_ELDU.html`, `output/tables/diagnosticos.csv`,
 `data/raw/SOURCES.md`, `output/fetch_log.txt`, `output/sessionInfo.txt`,
 `renv.lock`.
+
+### Informe académico en PDF (LaTeX)
+
+```bash
+Rscript run_all.R        # genera figuras (09) y tablas (10) del informe
+make -C report           # compila report/informe_eldu.pdf
+```
+
+`report/informe_eldu.tex` es un paper de 8 páginas con resumen, datos, hechos
+estilizados, especificación, resultados, diagnósticos y robustez, proyección,
+limitaciones y dos apéndices de tablas.
+
+**Ni las figuras ni las tablas del PDF se editan a mano.** `scripts/09_figuras_informe.R`
+y `scripts/10_tablas_informe.R` las generan desde las mismas salidas del pipeline
+que alimentan el informe HTML, así que el documento compila lo que la corrida
+produjo: no hay ni una cifra retipeada en el `.tex`.
+
+Requiere `pdflatex` y `latexmk` (en Ubuntu: `texlive-latex-recommended`,
+`texlive-latex-extra`, `texlive-fonts-recommended`, `texlive-lang-spanish`,
+`lmodern`, `latexmk`). `make -C report todo` regenera insumos y recompila.
+
+A diferencia del informe HTML, el PDF está escrito en registro académico y no
+contrasta contra los supuestos del DCF.
 
 ---
 

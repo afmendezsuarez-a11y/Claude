@@ -20,3 +20,12 @@ data/processed/
 .RData
 .Rproj.user/
 renv/library/
+
+# Auxiliares de LaTeX (el PDF y los insumos generados sí se versionan)
+report/*.aux
+report/*.log
+report/*.out
+report/*.fls
+report/*.fdb_latexmk
+report/*.toc
+report/*.synctex.gz

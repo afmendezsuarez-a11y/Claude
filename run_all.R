@@ -154,6 +154,13 @@ ok7 <- run_stage("scripts/07_forecast.R", "07 — proyección", fatal = TRUE)
 if (inherits(ok7, "error")) { write_session_info(); quit(status = 1L) }
 
 invisible(render_report())
+
+## Insumos del informe LaTeX (figuras y tablas). Sólo requieren R: la compilación
+## del PDF es aparte, con `make -C report`, porque necesita una instalación de
+## LaTeX que no todas las máquinas tienen.
+run_stage("scripts/09_figuras_informe.R", "09 — figuras del informe LaTeX")
+run_stage("scripts/10_tablas_informe.R",  "10 — tablas del informe LaTeX")
+
 write_session_info()
 render_sources_md()
 
