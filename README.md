@@ -12,49 +12,81 @@ pipeline ARDL/ECM completo.
 
 ---
 
-## ⚠️ Estado de esta corrida: BLOQUEADO EN LA ETAPA DE DATOS
+## Estado: corre completo con data real (n = 8, FY2018–FY2025)
 
-El código está completo y probado, pero **en este contenedor no se obtuvo ni una
-sola serie**: la política de egreso de red rechaza con `403` el `CONNECT` a
-**todos** los hosts de las fuentes, y tampoco se proveyeron los PDFs ni
-`escenarios.csv`.
+`Rscript run_all.R` termina con **código 0** y produce estimación, proyección e
+informe. Insumos efectivamente usados (todos en `data/raw/`, registrados con
+SHA256 en [`data/raw/SOURCES.md`](data/raw/SOURCES.md)):
 
-| Host | Para qué | Estado |
+| Insumo | Archivo | Rol |
 |---|---|---|
-| `estadisticas.bcrp.gob.pe` | PBI real, IPC, tipo de cambio | ⛔ 403 |
-| `www.gob.pe` / `cdn.www.gob.pe` | Anuario MINEM, Osinergmin | ⛔ 403 |
-| `www.inei.gob.pe` | PBI departamental de Ica | ⛔ 403 |
-| `www.cpc.ncep.noaa.gov` | ONI / Niño 3.4 (opcional) | ⛔ 403 |
-| `data/raw/pdf/*.pdf` | Memorias Anuales ELDU | ausente |
-| `data/raw/escenarios.csv` | Escenarios de PBI | ausente |
+| Energía distribuida y clientes de ELDU, 2018–2025 | `eldu_demanda_memorias.csv` | **variable dependiente** |
+| VAB real de Ica a precios constantes, 2007–2025 (INEI) | `inei_vab_ica.xlsx` | **driver de ingreso** (regional, no proxy) |
+| PBI nacional, var. % interanual (BCRP `PN01728AM`) | `bcrp_pbi_nacional_yoy.csv` | driver alternativo (robustez) |
+| IPC Lima (BCRP `PN38705PM`) | `bcrp_ipc_lima.csv` | control, **no entra a la regresión** |
+| Tipo de cambio venta (BCRP `PD04638PD`) | `bcrp_tc_venta.csv` | control, **no entra a la regresión** |
 
-Por la **regla dura anti-invención**, el pipeline se detuvo y lo reportó en vez
-de rellenar: ver [`output/BLOCKERS.md`](output/BLOCKERS.md) (qué falta y las dos
-vías para desbloquearlo) y [`output/fetch_log.txt`](output/fetch_log.txt) (cada
-URL intentada, con su error).
+El IPC y el tipo de cambio quedan registrados pero no se usan como regresores: la
+energía es una magnitud física y el VAB entra real, así que no hay nada que
+deflactar, y con n = 8 agregarlos sería sobre-ajustar. Los índices ENSO quedaron
+fuera de alcance por pedido.
 
-**Consecuencia para el comité:** el supuesto vigente (η = 0.8 / 0.9) **no fue
-validado ni reemplazado**. Sigue siendo *a dedo* y debe tratarse como tal. No hay
-en este repositorio ninguna cifra de elasticidad ni de volúmenes, porque
-producirla sin data sería inventarla.
+### El hallazgo principal no es el número de η, es la fórmula
 
-### Cómo desbloquear
+El crecimiento del volumen de ELDU se parte así (CAGR 2018–2025):
 
-**A) Abrir el egreso de red** a los cuatro hosts de arriba y correr
-`Rscript run_all.R`. Los scripts 01–04 bajan todo solos.
+| Componente | CAGR |
+|---|---|
+| Clientes (conexiones nuevas) | **2.65%** |
+| Energía por cliente | **1.52%** |
+| **Total energía distribuida** | **4.17%** |
+| _(driver)_ VAB real de Ica | _3.94%_ |
 
-**B) Cargar los archivos a mano** en `data/raw/` — basta con energía + ingreso:
+**Las conexiones explican ~64% del crecimiento.** Por eso el modelo pasó de una
+elasticidad única a una **descomposición**: η se estima sobre el **consumo por
+cliente** y el crecimiento de conexiones entra como supuesto explícito.
 
-| Insumo | Dónde ponerlo | Obligatorio |
+La regla original `Q(1+η·g)` no tiene término de conexiones, así que asume que el
+volumen sólo crece si crece el ingreso. Comparado sobre el escenario base:
+
+| Regla de proyección | CAGR implícito | GWh FY2035 |
 |---|---|---|
-| Energía anual ELDU (GWh) | `data/raw/minem_anuario_01.xlsx`, o `data/raw/pdf/*.pdf`, o `data/raw/eldu_energia_anual.csv` (`year,energia_gwh[,clientes]`) | **sí** |
-| Ingreso | `data/raw/inei_pbi_departamental_01.xlsx` (Ica) o PBI nacional del BCRP (proxy, se marca) | **sí** |
-| IPC, tipo de cambio | API BCRP | no |
-| ONI / Niño 3.4 | `data/raw/noaa_oni.ascii.txt` | no |
-| Escenarios de PBI | `data/raw/escenarios.csv` (`escenario,year,g_pbi`) — ver `config/escenarios.csv.ejemplo` | no (hay defaults, marcados como supuesto) |
+| Observado 2018–2025 | **4.17%** | — |
+| Dos términos (clientes + η por cliente) | **3.63%** | 1 580 |
+| Una sola elasticidad, sin clientes | 0.96% | 1 217 |
+| Supuesto DCF vigente (η≈0.85), sin clientes | 2.55% | 1 423 |
 
-También se puede pegar una URL directa en `CFG$minem$direct_urls`,
-`CFG$inei$direct_urls` u `CFG$osinergmin$direct_urls` (`config/config.R`).
+El 0.8/0.9 del DCF **acierta de casualidad**: es un número inflado que compensa
+un término de conexiones que falta. Se parece al histórico por la razón
+equivocada, y deja de funcionar en cuanto el ritmo de conexiones cambie — que es
+justo lo que una valorización a 10 años necesita poder mover.
+
+**Recomendación:** usar los dos términos, con η en el rango estimado aplicado al
+consumo por cliente, y el ritmo de conexiones como supuesto del comité.
+
+### Lo que esta data NO permite
+
+- **El desagregado BT/MT/libres.** Las ventas por segmento existen sólo desde 2022
+  (4 años). El objetivo original —reemplazar 0.8 BT y 0.9 MT por *dos*
+  elasticidades estimadas— **no es alcanzable**: sólo se entrega una η agregada.
+- **ADF, cointegración, ECM y validación out-of-sample.** Con n = 8 no hay grados
+  de libertad; se omiten en vez de forzarse (ver la escalera más abajo).
+- **Un punto creíble para η.** Se entrega como **rango**, porque η varía entre
+  especificaciones razonables más que el umbral configurado.
+
+### Si consigue más data
+
+| Insumo | Dónde ponerlo | Qué habilita |
+|---|---|---|
+| Anuario MINEM (serie larga ~2000–2024) | `data/raw/minem_anuario_01.xlsx` | n≈20 → ADF, cointegración, ECM, out-of-sample |
+| Memorias ELDU en PDF | `data/raw/pdf/*.pdf` | extracción con traza (script `04`) |
+| Pesos de ingreso BT/MT/libres | `CFG$segment_weights` | reparto por segmento |
+| Escenarios propios de PBI | `data/raw/escenarios.csv` (`escenario,year,g_pbi[,g_clientes]`) | reemplaza los defaults (hoy marcados como supuesto) |
+
+Abrir el egreso de red a `estadisticas.bcrp.gob.pe`, `www.gob.pe`,
+`www.inei.gob.pe` y `www.cpc.ncep.noaa.gov` hace que los scripts 01–04 bajen todo
+solos; hoy esos hosts responden `403` por política de egreso del contenedor y la
+data llegó cargada a mano.
 
 ---
 
@@ -112,6 +144,7 @@ scripts/01_fetch_bcrp.R         SOLO descarga  -> data/raw/
 scripts/02_fetch_noaa.R         SOLO descarga  -> data/raw/
 scripts/03_fetch_minem_inei.R   SOLO descarga  -> data/raw/
 scripts/04_extract_memorias.R   SOLO extracción -> data/raw/pdf_text/ + candidatos
+scripts/04b_prepare_eldu_memorias.R  serie anual canónica; excluye periodos parciales
 scripts/05_build_panel.R        panel anual; SE DETIENE si falta lo obligatorio
 scripts/06_estimate.R           estimación
 scripts/07_forecast.R           proyección
@@ -126,36 +159,62 @@ Salidas: `output/tables/elasticidad.csv`, `output/forecast_volumenes.xlsx`,
 
 ---
 
-## Modelo: el mínimo viable, no un ARDL forzado
+## Modelo: descomposición, no una elasticidad única
 
-Con data anual el n es chico (~8 si sólo hay Memorias, ~20 si el Anuario MINEM da
-serie larga). **El método reportado corresponde al n disponible**:
+```
+  Q = clientes x (energia por cliente)
+  ln(Q/clientes) = a + eta*ln(VAB) + d*t     <- de aqui sale eta
+  g_clientes                                  <- supuesto explicito
+```
+
+Las conexiones responden a política de expansión y demografía, no al PBI, así que
+no se estiman contra él. Si no hay número de clientes, el pipeline cae a la
+elasticidad sobre energía total y lo dice.
+
+**El método reportado corresponde al n disponible**:
 
 | Paso | Qué | Condición |
 |---|---|---|
-| 1 | logs, deflactado, gráficos | siempre |
-| 2 | ADF sobre `ln(Q)` y `ln(PBI)` | `n ≥ 12` |
-| 3 | **OLS log-log**: `ln(Q) = α + η·ln(PBI) + δ·t`, EE **HAC/Newey-West** | siempre |
-| 4 | **Diferencias**: `Δln(Q) = c + η_CP·Δln(PBI)`, HAC | siempre |
+| 1 | descomposición del crecimiento (clientes vs por-cliente) | siempre |
+| 2 | ADF sobre `ln(Q)`, `ln(VAB)`, `ln(Q/clientes)` | `n ≥ 12` |
+| 3 | **OLS log-log** con y sin tendencia, EE **HAC/Newey-West** | siempre |
+| 4 | **Diferencias**: `Δln(Q/cl) = c + η·Δln(VAB)`, HAC | siempre |
 | 5 | Engle-Granger + **ECM** de una ecuación | `n ≥ 15` **y** cointegración |
 | 6 | R², Durbin-Watson, Breusch-Godfrey, influencia leave-one-out | siempre |
-| 7 | Out-of-sample: deja fuera los últimos 2 años, reporta MAPE | `n ≥ 12` |
+| 7 | Out-of-sample: deja fuera los últimos 2 años, MAPE | `n ≥ 12` |
+| 8 | robustez: volumen alternativo, exclusión del choque COVID, driver nacional | siempre |
 
-Dos cosas que el pipeline reporta en vez de esconder:
+Cuatro cosas que el pipeline reporta en vez de esconder:
 
-- **Colinealidad ln(PBI) ↔ tendencia.** En una serie corta y creciente, el PBI y
-  el tiempo son casi la misma variable. Se calcula `cor` y `VIF`; si `VIF > 20`
-  la especificación preferida pasa a ser **sin tendencia** y el informe lo dice.
-- **Regla de prudencia.** Si el IC 95% de η es más ancho que
-  `CFG$est$wide_ci_width` (1.0) o incluye el cero, η se reporta como **rango**,
-  no como punto, con la recomendación de mantener el supuesto del DCF dentro de
-  ese rango. No se fuerza una precisión que la data no da.
+- **Qué especificación es la principal, y por qué.** Si `n < 12`, la separación
+  ingreso/tendencia en niveles es frágil, así que se reporta la de **diferencias**
+  y los niveles quedan como corroboración. Si `VIF(ln_ingreso~t) > 20`, se prefiere
+  la versión sin tendencia.
+- **La constante de la ecuación en diferencias**, que es el crecimiento
+  **autónomo** del volumen: la pieza que una regla `Q(1+η·g)` sin término de
+  conexiones tira a la basura.
+- **Regla de prudencia.** η se reporta como **rango** si el IC 95% es más ancho que
+  `CFG$est$wide_ci_width`, si incluye cero, **o** si η varía entre especificaciones
+  razonables más que `CFG$est$spec_spread_range`. Esto último es clave: a n chico
+  la incertidumbre real es de **especificación**, no sólo de muestreo.
+- **Que los IC son optimistas.** Los errores HAC son asintóticos y sub-cubren con
+  n de un dígito; el informe lo dice explícitamente.
 
 ### Proyección
 
-`Q_{t+1} = Q_t · (1 + η · g_PBI_{t+1})`, por escenario, hasta **FY2035**. Las
-bandas vienen del **IC 95% de η**, no de un supuesto. El reparto BT/MT/libres
-**sólo** se hace si se cargan pesos en `CFG$segment_weights`: no se inventan.
+```
+  Q_{t+1} = Q_t * (1 + g_clientes) * (1 + eta * g_ingreso)
+```
+
+Por escenario, hasta **FY2035**. Las bandas vienen del intervalo de η. Se calculan
+además, para comparar, la regla de una sola elasticidad y la del supuesto DCF
+vigente (`output/tables/comparacion_reglas.csv`).
+
+Sostener el ritmo de conexiones hasta FY2035 es **el supuesto más fuerte de toda
+la proyección** y mueve el resultado más que η. Se cambia en `CFG$clientes`:
+`g_override` para fijar una tasa, o `taper_to` + `taper_years` para que converja
+a una tasa menor. El reparto BT/MT/libres **sólo** se hace si se cargan pesos en
+`CFG$segment_weights`: no se inventan.
 
 ---
 
@@ -189,7 +248,17 @@ Esa serie vive en un directorio **temporal**, nunca en `data/`, nunca entra al
 informe, y **el pipeline no tiene ninguna ruta que la use**. Es una prueba de
 código, no un modo demo.
 
-El test cubre dos tamaños de muestra (n=20 y n=9) y verifica, además de que η se
-recupere y que las bandas encierren al central, que **el método reportado
-corresponda al n**: con n=9 el ADF, el ECM y la validación out-of-sample se
-omiten en lugar de forzarse.
+El test cubre tres casos —n=20, n=9, y n=8 **con** número de clientes— y verifica,
+además de que η se recupere y que las bandas encierren al central:
+
+- que **el método reportado corresponda al n**: con n=9 el ADF, el ECM y la
+  validación out-of-sample se omiten en lugar de forzarse;
+- que con clientes η se estime sobre el **consumo por cliente** y la energía total
+  quede como comparación, y sin clientes pase a ser el bloque principal;
+- que la descomposición recupere el crecimiento de conexiones del fixture y que
+  clientes + por-cliente sume el crecimiento total;
+- que la regla de dos términos proyecte por encima de la de una sola elasticidad.
+
+La cobertura del IC 95% se exige **sólo** en el caso de muestra larga: los errores
+HAC sub-cubren con n de un dígito, y exigirlo ahí sería pedirle al estimador algo
+que la teoría no promete — es la misma razón por la que el pipeline reporta rango.

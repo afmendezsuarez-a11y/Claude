@@ -10,6 +10,9 @@ suppressPackageStartupMessages({
   library(httr)
 })
 
+#' Valor por defecto cuando el de la izquierda es NULL o vacío.
+`%||%` <- function(a, b) if (is.null(a) || !length(a)) b else a
+
 ## ---- Logging ---------------------------------------------------------------
 
 #' Escribe una línea en output/fetch_log.txt y en consola.

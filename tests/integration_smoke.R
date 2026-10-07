@@ -52,7 +52,9 @@ check <- function(cond, what) {
 ## "el metodo reportado corresponda al n disponible": con n largo debe intentar
 ## ADF/ECM/out-of-sample, y con n corto debe saltarselos en vez de forzarlos.
 ## ---------------------------------------------------------------------------
-run_case <- function(n_years, label) {
+G_CLIENTES_TRUE <- 0.025   # crecimiento anual de conexiones del fixture
+
+run_case <- function(n_years, label, with_clients = FALSE) {
   cat(sprintf("\n=========== CASO: %s (n = %d) ===========\n", label, n_years))
   tmp <- Sys.getenv("ELDU_SMOKE_DIR",
                     unset = file.path(dirname(tempdir()),
@@ -73,7 +75,12 @@ run_case <- function(n_years, label) {
   ## ---- Fixture 1: PBI mensual con la forma EXACTA de la API del BCRP -------
   ## (asi el test ejercita read_bcrp_json() y to_annual(), no solo la regresion)
   years    <- Y0_BASE:(Y0_BASE + n_years - 1L)
-  g_annual <- 0.04 + stats::rnorm(n_years, 0, 0.012)
+  ## La varianza del crecimiento del ingreso importa para el test: si el driver
+  ## es demasiado liso, la regresion en diferencias no tiene de donde identificar
+  ## eta y el estimador se vuelve puro ruido a n chico. El PBI real del Peru
+  ## oscila fuerte (de -11% en 2020 a +16% en 2021), asi que el fixture usa una
+  ## dispersion de ese orden en vez de una serie artificialmente tranquila.
+  g_annual <- 0.04 + stats::rnorm(n_years, 0, 0.05)
   pbi_ann  <- 100 * cumprod(c(1, 1 + g_annual[-1]))
   meses    <- c("Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic")
   periods  <- list()
@@ -90,10 +97,20 @@ run_case <- function(n_years, label) {
     file.path(tmp, "data/raw/bcrp_pbi_real.json"), auto_unbox = TRUE)
 
   ## ---- Fixture 2: energia con eta conocida ---------------------------------
-  ln_q <- log(600) + ETA_TRUE * (log(pbi_ann) - log(pbi_ann[1])) +
-          stats::rnorm(n_years, 0, 0.012)
-  utils::write.csv(data.frame(year = years, energia_gwh = round(exp(ln_q), 2)),
-                   file.path(tmp, "data/raw/eldu_energia_anual.csv"), row.names = FALSE)
+  ## Sin clientes: eta_true va directo sobre la energia total.
+  ## Con clientes: eta_true va sobre la energia POR CLIENTE y las conexiones
+  ## crecen a G_CLIENTES_TRUE, de modo que el total mezcla ambos efectos. Asi se
+  ## prueba que la descomposicion recupera eta sin contaminarla con conexiones.
+  shock <- ETA_TRUE * (log(pbi_ann) - log(pbi_ann[1])) + stats::rnorm(n_years, 0, 0.012)
+  if (with_clients) {
+    clientes <- round(250000 * exp(G_CLIENTES_TRUE * (seq_len(n_years) - 1)))
+    q_pc     <- 0.0024 * exp(shock)            # GWh por cliente
+    energia  <- clientes * q_pc
+    eldu <- data.frame(year = years, energia_gwh = round(energia, 2), clientes = clientes)
+  } else {
+    eldu <- data.frame(year = years, energia_gwh = round(600 * exp(shock), 2))
+  }
+  utils::write.csv(eldu, file.path(tmp, "data/raw/eldu_energia_anual.csv"), row.names = FALSE)
 
   ## ---- Correr el pipeline completo en el sandbox ---------------------------
   ## OJO: system2() hereda el directorio de trabajo, asi que hay que cambiarlo
@@ -113,15 +130,61 @@ run_case <- function(n_years, label) {
   check(file.exists(el_p), "existe output/tables/elasticidad.csv")
   if (file.exists(el_p)) {
     el  <- utils::read.csv(el_p, stringsAsFactors = FALSE)
-    row <- el[el$parametro == "eta_largo_plazo" & el$metodo_reportado, ][1, ]
-    cat(sprintf("     eta estimado = %.3f (IC95 %.3f a %.3f); eta_true = %.2f\n",
-                row$estimate, row$ci95_low, row$ci95_high, ETA_TRUE))
+    row <- el[el$rol == "PRINCIPAL", ][1, ]
+    check(nrow(el[el$rol == "PRINCIPAL", ]) == 1L,
+          "hay exactamente UNA especificacion marcada como PRINCIPAL")
+    cat(sprintf("     eta PRINCIPAL = %.3f (IC95 %.3f a %.3f); eta_true = %.2f  [%s]\n",
+                row$estimate, row$ci95_low, row$ci95_high, ETA_TRUE, row$metodo))
     check(abs(row$estimate - ETA_TRUE) < 0.25,
           "la estimacion recupera eta_true con tolerancia 0.25")
-    check(row$ci95_low <= ETA_TRUE && ETA_TRUE <= row$ci95_high,
-          "el IC95 contiene eta_true")
-    check(nrow(el[el$parametro == "eta_crecimiento", ]) == 1L,
+    ## La cobertura del IC solo se exige con muestra larga. Los errores HAC
+    ## (Newey-West) SUB-CUBREN en muestras diminutas: a n<12 el IC95 nominal
+    ## tiene cobertura real menor al 95%, asi que exigir que contenga eta_true
+    ## seria exigirle al estimador algo que la teoria no promete. Esa es
+    ## justamente la razon por la que el pipeline reporta un RANGO y no el IC
+    ## pelado cuando la muestra es corta.
+    if (n_years >= 12L) {
+      check(row$ci95_low <= ETA_TRUE && ETA_TRUE <= row$ci95_high,
+            "el IC95 contiene eta_true (muestra larga)")
+    } else {
+      cat(sprintf("  [nota] n=%d: no se exige cobertura del IC95 (HAC sub-cubre a n chico)\n",
+                  n_years))
+    }
+    check(any(grepl("diferencias", el$metodo, ignore.case = TRUE)),
           "se reporta tambien la elasticidad en diferencias")
+    check(all(row$bloque == if (with_clients) "energia_por_cliente" else "energia_total"),
+          sprintf("%s, eta se estima sobre %s",
+                  if (with_clients) "con clientes" else "sin clientes",
+                  if (with_clients) "energia POR CLIENTE" else "energia total"))
+    if (with_clients)
+      check(any(el$bloque == "energia_total" & el$rol == "comparacion"),
+            "se reporta la elasticidad sobre energia total como comparacion con el DCF")
+  }
+
+  ## ---- Descomposicion y comparacion de reglas (ruta de dos terminos) -------
+  if (with_clients) {
+    dc <- file.path(tmp, "output/tables/descomposicion_crecimiento.csv")
+    check(file.exists(dc), "existe output/tables/descomposicion_crecimiento.csv")
+    if (file.exists(dc)) {
+      D <- utils::read.csv(dc, stringsAsFactors = FALSE)
+      g_cl <- D$cagr_pct[D$componente == "clientes"] / 100
+      cat(sprintf("     g_clientes estimado = %.4f ; g_clientes_true = %.4f\n",
+                  g_cl, G_CLIENTES_TRUE))
+      check(abs(g_cl - G_CLIENTES_TRUE) < 0.003,
+            "la descomposicion recupera el crecimiento de clientes del fixture")
+      check(abs(sum(D$cagr_pct[D$componente %in% c("clientes", "energia por cliente")]) -
+                D$cagr_pct[D$componente == "energia distribuida"]) < 0.05,
+            "clientes + por-cliente suma el crecimiento de la energia total")
+    }
+    cr <- file.path(tmp, "output/tables/comparacion_reglas.csv")
+    check(file.exists(cr), "existe output/tables/comparacion_reglas.csv")
+    if (file.exists(cr)) {
+      R2 <- utils::read.csv(cr, stringsAsFactors = FALSE)
+      dos <- R2$cagr_pct[grepl("dos terminos", R2$regla)]
+      una <- R2$cagr_pct[grepl("una sola", R2$regla)]
+      check(length(dos) == 1 && length(una) == 1 && dos > una,
+            "la regla de dos terminos proyecta mas que la de una sola elasticidad")
+    }
   }
   for (f in c("output/forecast_volumenes.xlsx", "output/informe_demanda_ELDU.html",
               "data/raw/SOURCES.md", "output/sessionInfo.txt",
@@ -173,6 +236,7 @@ run_case <- function(n_years, label) {
 
 run_case(20L, "serie larga tipo Anuario MINEM")
 run_case(9L,  "serie corta tipo Memorias Anuales")
+run_case(8L,  "serie corta CON clientes (ruta de dos terminos)", with_clients = TRUE)
 
 cat("\n")
 if (isTRUE(ANY_FAIL)) { cat("[FALLA] al menos una asercion fallo\n"); quit(status = 1L) }

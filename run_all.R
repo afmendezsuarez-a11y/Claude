@@ -58,6 +58,7 @@ run_stage("scripts/01_fetch_bcrp.R",      "01 — BCRP")
 run_stage("scripts/02_fetch_noaa.R",      "02 — NOAA CPC")
 run_stage("scripts/03_fetch_minem_inei.R","03 — MINEM / Osinergmin / INEI")
 run_stage("scripts/04_extract_memorias.R","04 — Memorias ELDU (PDF)")
+run_stage("scripts/04b_prepare_eldu_memorias.R", "04b — serie anual ELDU")
 
 ## ---- Barrera: 05 se detiene si falta un insumo obligatorio ----------------
 write_blockers <- function(err_msg) {
@@ -152,7 +153,7 @@ if (inherits(ok6, "error")) { write_session_info(); quit(status = 1L) }
 ok7 <- run_stage("scripts/07_forecast.R", "07 — proyección", fatal = TRUE)
 if (inherits(ok7, "error")) { write_session_info(); quit(status = 1L) }
 
-render_report()
+invisible(render_report())
 write_session_info()
 render_sources_md()
 

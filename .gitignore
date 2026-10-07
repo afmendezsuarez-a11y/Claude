@@ -4,6 +4,10 @@ data/raw/*.xlsx
 data/raw/*.xls
 data/raw/*.zip
 data/raw/pdf/*.pdf
+
+# Excepción: los insumos realmente usados por la corrida sí se versionan, para
+# que el resultado sea reproducible sin volver a conseguirlos.
+!data/raw/inei_vab_ica.xlsx
 data/raw/pdf_text/
 
 # Intermedios regenerables

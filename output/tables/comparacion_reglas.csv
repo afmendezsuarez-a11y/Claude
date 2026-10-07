@@ -1,0 +1,5 @@
+regla,cagr_pct,gwh_2035
+dos terminos (clientes + eta por cliente),3.6328466681860405,1580.2631231044754
+"una sola elasticidad, sin clientes",0.9586261567475107,1216.7166402315863
+supuesto DCF vigente (0.85),2.550000000000008,1422.6948978201763
+observado historico,4.1701486937328855,NA

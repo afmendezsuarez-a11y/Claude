@@ -1,0 +1,10 @@
+anio,dist_eld_gwh,dist_terceros_gwh,dist_total_gwh,ventas_total_eld_gwh,ventas_bt_gwh,ventas_mt_gwh,ventas_libres_gwh,ventas_reguladas_gwh,clientes_total,fuente
+2018,826,319,1145,,,,,,240981,Mem2025 graf. energia distribuida y clientes
+2019,836,358,1194,,,,,,245990,Mem2025 graf.
+2020,802,365,1167,,,,,,252523,Mem2025 graf.
+2021,868,399,1267,,,,,,259125,Mem2025 graf.
+2022,951,386,1337,830.0,407.1,197.7,225.2,604.8,264480,"Mem2023 (ventas por segmento, real 2022)"
+2023,1020,339,1359,940.5,432.1,197.6,310.7,629.7,271718,Mem2023/2024 (ventas por segmento)
+2024,1071,334,1405,1000.2,452.0,203.9,344.3,655.9,280907,"Mem2024 (ventas por segmento, real 2024)"
+2025,1106,399,1505,1013.9,465.2,218.4,330.5,683.5,290074,"Mem2025: reg 683(+4.2%),MT+7.1%,BT+2.9%,libres-4.0% -> BT/MT/libres DERIVADOS"
+2026_U12M_jun,1046.9,388.5,,1037.4,,,,,296880,"Fitch PC jun-2026 (ano movil, PARCIAL)"

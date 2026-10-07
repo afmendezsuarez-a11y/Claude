@@ -33,6 +33,28 @@ CFG$http <- list(
 ## contra `name_regex`. Si el nombre no coincide, descarta la serie y lo registra
 ## en el log — nunca acepta una serie "a ciegas".
 CFG$bcrp <- list(
+  ## CSV exportados a mano desde BCRPData (formato: 2 líneas de encabezado con
+  ## el código y el nombre de la serie, luego `periodo,valor` y "n.d." como
+  ## faltante; codificación latin1). Si existen, 05 los usa y NO se necesita red.
+  ## Ninguno es obligatorio: la energía es física (GWh) y el VAB entra real, así
+  ## que no hay nada que deflactar. Son controles, no regresores.
+  csv_files = list(
+    pbi_nacional_yoy = list(
+      path  = "data/raw/bcrp_pbi_nacional_yoy.csv",
+      label = "PBI nacional, variación % interanual (mensual)",
+      kind  = "yoy_pct",      # se encadena a índice anual
+      role  = "driver_alternativo"),
+    ipc_lima = list(
+      path  = "data/raw/bcrp_ipc_lima.csv",
+      label = "IPC Lima Metropolitana (Dic.2021 = 100)",
+      kind  = "index",
+      role  = "control"),
+    tc_venta = list(
+      path  = "data/raw/bcrp_tc_venta.csv",
+      label = "Tipo de cambio interbancario venta (S/ por US$), diario",
+      kind  = "level",
+      role  = "control")
+  ),
   api_base = "https://estadisticas.bcrp.gob.pe/estadisticas/series/api",
   ## Candidatos de URL del catálogo de metadatos (CSV). Se prueban en orden.
   metadata_urls = c(
@@ -124,7 +146,16 @@ CFG$inei <- list(
   link_regex  = "(?i)(pbi|producto\\s*bruto).*(departament|region).*\\.(xlsx|xls|zip|pdf)",
   direct_urls = character(0),
   region      = "Ica",
-  mandatory   = FALSE   # si falta, se usa PBI nacional como PROXY (se marca)
+  mandatory   = FALSE,  # si falta, se usa PBI nacional como PROXY (se marca)
+  ## Archivo ya provisto por el usuario (VAB de Ica a precios constantes).
+  xlsx = "data/raw/inei_vab_ica.xlsx",
+  ## La tabla del INEI trae el departamento en el TÍTULO, no en una fila, así
+  ## que la fila a extraer se identifica por su rótulo de total.
+  total_row_regex = "^\\s*valor\\s+agregado\\s+bruto\\s*$",
+  ## El libro tiene varias hojas con la MISMA fila de total: niveles (miles de
+  ## soles), estructura porcentual (=100) y variación porcentual. Sólo la de
+  ## niveles pasa este piso, así que es la que se toma.
+  min_level = 1000
 )
 
 ## ---- 4) Memorias Anuales ELDU (PDF provistos por el usuario) --------------
@@ -154,6 +185,20 @@ CFG$memorias <- list(
 ## un CSV curado a mano por el usuario (extraído de esas fuentes) en esta ruta,
 ## siempre que quede registrado en data/raw/SOURCES.md.
 CFG$eldu <- list(
+  ## Tabla armada por el usuario a partir de las Memorias Anuales de ELDU.
+  memorias_csv = "data/raw/eldu_demanda_memorias.csv",
+  ## Variable de volumen. `dist_eld_gwh` = energía distribuida a clientes
+  ## propios: es la serie más larga (2018-2025) y la medida de demanda más
+  ## limpia. `dist_total_gwh` incluye el peaje de terceros (otra economía) y se
+  ## corre sólo como robustez. `ventas_total_eld_gwh` existe recién desde 2022
+  ## (4 años): no alcanza para estimar.
+  memorias_variable   = "dist_eld_gwh",
+  memorias_robustness = "dist_total_gwh",
+  memorias_clients    = "clientes_total",
+  ## Filas cuyo año no es un entero de 4 dígitos (p.ej. "2026_U12M_jun", un año
+  ## móvil parcial) se EXCLUYEN: mezclar un periodo parcial con años completos
+  ## es justamente el tipo de error que produce saltos irreales.
+  year_regex = "^(19|20)\\d{2}$",
   manual_csv = "data/raw/eldu_energia_anual.csv",
   ## Esquema esperado del CSV: year,energia_gwh[,clientes][,segmento]
   required_cols = c("year", "energia_gwh"),
@@ -187,7 +232,39 @@ CFG$est <- list(
   ## como RANGO y no como punto.
   wide_ci_width    = 1.00,
   hac_lag          = NULL,  # NULL => Newey-West automático (bwNeweyWest)
-  alpha            = 0.05
+  alpha            = 0.05,
+  ## En una distribuidora el volumen crece por DOS vías: más conexiones y más
+  ## consumo por conexión. Estimar eta sobre la energía total mezcla ambas y
+  ## carga el crecimiento de clientes dentro de la elasticidad-ingreso. Por eso
+  ## el modelo PRINCIPAL es la descomposición: eta se estima sobre energía POR
+  ## CLIENTE y la proyección lleva dos términos.
+  per_client       = TRUE,
+  ## Con muestras cortas, separar "efecto ingreso" de "tendencia" en niveles es
+  ## frágil. Por debajo de este n, la estimación que se reporta como principal
+  ## es la de DIFERENCIAS, y los niveles quedan como corroboración.
+  prefer_differences_below_n = 12L,
+  ## Si eta cambia más que esto entre especificaciones razonables, se recomienda
+  ## un RANGO en vez de un punto, aunque el IC de cada una sea estrecho: la
+  ## incertidumbre real es de especificación, no sólo de muestreo.
+  spec_spread_range = 0.15,
+  ## Años a excluir en el chequeo de robustez por choque extremo. 2020-2021 son
+  ## el desplome y el rebote del COVID; en n=8 pueden determinar eta por sí solos.
+  shock_years = c(2020L, 2021L)
+)
+
+## ---- Crecimiento de clientes (el OTRO término de la proyección) -----------
+## No se modela econométricamente: las conexiones responden a política de
+## expansión y demografía, no al PBI. Entra como supuesto EXPLÍCITO.
+##   g_source = "historico" -> usa el CAGR observado de clientes en el panel
+##   g_override            -> fija una tasa (ej. 0.02); manda sobre lo anterior
+##   taper_to / taper_years-> converge linealmente a esa tasa en N años
+## Sostener el CAGR histórico hasta 2035 es el supuesto más fuerte de toda la
+## proyección: es una decisión del comité, no del modelo.
+CFG$clientes <- list(
+  g_source    = "historico",
+  g_override  = NULL,
+  taper_to    = NULL,
+  taper_years = NULL
 )
 
 CFG$paths <- list(
