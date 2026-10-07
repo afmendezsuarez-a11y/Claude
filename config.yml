@@ -1,0 +1,83 @@
+# ============================================================================
+# config.yml — Parametros del pipeline de estimacion de demanda ELDU
+# Toda cifra del informe es trazable a este archivo o a data/raw/.
+# ============================================================================
+
+project:
+  nombre: "Electro Dunas S.A.A. (ELDU) - Modelo de demanda electrica"
+  seed: 20261007
+
+paths:
+  # Directorio de insumos. Se puede sobreescribir con la variable de entorno
+  # ELDU_DATA_DIR (util para correr el pipeline contra un set de prueba sin
+  # tocar data/raw/).
+  data_dir: "data/raw"
+  archivo_demanda: "eldu_demanda"       # se busca .xlsx y luego .csv
+  archivo_escenarios: "escenarios.csv"
+  processed_dir: "data/processed"
+  output_dir: "output"
+
+segmentos:
+  - id: "BT"
+    label: "Baja tension (regulado)"
+    mwh: "mwh_bt"
+    clientes: "cli_bt"
+    tarifa: "tarifa_bt"
+  - id: "MT"
+    label: "Media tension (regulado)"
+    mwh: "mwh_mt"
+    clientes: "cli_mt"
+    tarifa: "tarifa_mt"
+  - id: "LIBRES"
+    label: "Clientes libres"
+    mwh: "mwh_libres"
+    clientes: "cli_libres"
+    tarifa: "tarifa_libres"
+
+transformaciones:
+  # Variable de actividad regional usada como Y en el ECM.
+  # Alternativas evaluadas en 05: pbi_ica (default) y vab_agro_ica.
+  actividad: "pbi_ica"
+  actividad_alternativa: "vab_agro_ica"
+  # Metodo de interpolacion si pbi_ica viene en frecuencia menor que mensual.
+  # "spline" (zoo::na.spline, monotono por defecto) o "denton" (tempdisagg).
+  metodo_interpolacion: "spline"
+  covid_inicio: "2020-03-01"
+  covid_fin: "2020-12-01"
+  dummies_estacionales: true        # 11 dummies (feb..dic), enero = base
+
+ardl:
+  # Ordenes maximos en la parametrizacion ECM:
+  #   pd = n. de rezagos de D(ln q) incluidos  (ARDL p = pd + 1)
+  #   qd = n. de rezagos de D(ln x) ademas del contemporaneo (ARDL q = qd + 1)
+  max_pd: 3
+  max_qd: 3
+  criterio_seleccion: "AIC"          # "AIC" o "BIC"
+  bounds_case: 3                     # PSS: 3 = intercepto no restringido, sin tendencia
+  hac_lag: null                      # null => regla automatica de Newey-West
+  # Regresores exogenos (fuera del vector de largo plazo)
+  exogenos: ["nino34", "d_covid"]
+
+diagnosticos:
+  bg_order: 12                       # Breusch-Godfrey (rezagos)
+  reset_power: [2, 3]
+
+forecast:
+  fin: "2035-12-01"                  # horizonte del DCF
+  fy_inicio_mes: 1                   # 1 = anio calendario
+  n_boot: 1000                       # replicas para bandas de confianza
+  backtest_meses: 24                 # validacion pseudo-fuera-de-muestra
+  nivel_confianza: 0.95
+  # Si lambda estimado no cae en (0, 2) la recursion del ECM es inestable;
+  # en ese caso se usa la solucion de largo plazo estatica y se marca el metodo.
+  lambda_min: 0.0
+  lambda_max: 2.0
+
+# Supuestos "a dedo" del modelo de valorizacion DCF, para la seccion
+# "supuestos vs. estimado" del informe. Son INSUMOS, no resultados.
+supuestos_valorizacion:
+  elasticidad_ingreso:
+    BT: 0.8
+    MT: 0.9
+    LIBRES: null                     # el modelo de valorizacion no fija un valor
+

@@ -1,0 +1,7 @@
+escenario,anio,g_pbi_ica,g_tarifa_real_bt,g_tarifa_real_mt,g_tarifa_real_libres,nino34
+base,2026,0.035,0.000,0.000,0.000,0.0
+base,2027,0.035,0.000,0.000,0.000,0.0
+optimista,2026,0.055,-0.010,-0.010,-0.010,0.0
+optimista,2027,0.055,-0.010,-0.010,-0.010,0.0
+pesimista,2026,0.012,0.015,0.015,0.015,1.2
+pesimista,2027,0.012,0.015,0.015,0.015,0.5

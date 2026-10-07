@@ -1,0 +1,26 @@
+# Salidas regeneradas por el pipeline
+/output/
+/data/processed/
+
+# Datos de entrada: los provee el usuario, no se versionan
+/data/raw/*
+!/data/raw/.gitkeep
+!/data/raw/LEEME.md
+!/data/raw/PLANTILLA_*.csv
+
+# Datos sinteticos de prueba (regenerables con R/99_make_demo_data.R)
+/data/demo/
+
+# renv: se versiona el lockfile, no la libreria
+/renv/library/
+/renv/local/
+/renv/cellar/
+/renv/staging/
+/renv/python/
+/renv/sandbox/
+
+# R
+.Rhistory
+.RData
+.Rproj.user/
+*.Rproj

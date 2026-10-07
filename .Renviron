@@ -1,0 +1,3 @@
+# Locale UTF-8 para que R lea/escriba correctamente los acentos del proyecto.
+LANG=C.UTF-8
+LC_ALL=C.UTF-8

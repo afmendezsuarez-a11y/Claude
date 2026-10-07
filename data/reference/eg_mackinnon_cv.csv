@@ -1,0 +1,14 @@
+# Valores criticos asintoticos para el test de Engle-Granger (ADF sobre el
+# residuo de la regresion de largo plazo), caso con constante y SIN tendencia.
+# Fuente: MacKinnon, J.G. (1991), "Critical Values for Cointegration Tests",
+#   en Engle & Granger (eds.), Long-Run Economic Relationships, Oxford UP,
+#   Tabla II (superficie de respuesta, valores asintoticos N -> inf).
+# n_vars = numero TOTAL de variables del sistema (dependiente + regresores).
+# Son valores ASINTOTICOS: con muestras cortas son conservadores. Verificar
+# contra la fuente antes de citar en un documento final.
+n_vars,cv_1pct,cv_5pct,cv_10pct
+2,-3.90,-3.34,-3.04
+3,-4.29,-3.74,-3.45
+4,-4.64,-4.10,-3.81
+5,-4.96,-4.42,-4.13
+6,-5.25,-4.70,-4.42

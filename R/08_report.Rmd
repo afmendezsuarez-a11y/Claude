@@ -1,0 +1,718 @@
+---
+title: "Electro Dunas S.A.A. — Modelo de demanda eléctrica"
+subtitle: "Elasticidades de largo plazo y proyección de volúmenes para el DCF"
+date: "Generado el `r format(Sys.time(), '%Y-%m-%d %H:%M')`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+    number_sections: true
+    theme: flatly
+    df_print: paged
+    self_contained: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE,
+                      fig.width = 9, fig.height = 5, dpi = 130)
+source(here::here("R", "00_utils.R"))
+suppressPackageStartupMessages({library(knitr); library(kableExtra)})
+cfg <- load_config(); set_project_seed(cfg)
+panel <- read_panel(cfg); mods <- read_models(cfg)
+df <- panel$data; segs <- panel$segmentos; act <- panel$actividad
+ln_act <- paste0("ln_", act)
+
+# Toda cifra de este informe se lee de un archivo generado por los scripts.
+tb <- function(nombre) {
+  p <- cfg_path(cfg, "tables", nombre)
+  if (!file.exists(p)) return(NULL)
+  readr::read_csv(p, show_col_types = FALSE)
+}
+# Las figuras se incrustan como data URI: funciona dentro de bucles (a
+# diferencia de include_graphics, que solo emite el valor final del chunk) y
+# deja el HTML realmente autocontenido. Requiere results='asis' en el chunk.
+fig <- function(nombre, ancho = "1000px") {
+  p <- cfg_path(cfg, "figs", nombre)
+  if (!file.exists(p)) {
+    cat(sprintf("\n_(figura no disponible: `%s`)_\n", nombre))
+    return(invisible(NULL))
+  }
+  cat(sprintf('\n<img src="%s" alt="%s" style="width:100%%;max-width:%s;display:block;margin:1rem auto;">\n',
+              knitr::image_uri(p), nombre, ancho))
+  invisible(NULL)
+}
+kt <- function(x, digits = 3, ...) {
+  if (is.null(x) || nrow(x) == 0) return(cat("_(sin datos)_\n"))
+  kableExtra::kable_styling(
+    knitr::kable(x, digits = digits, format = "html", ...),
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width = FALSE, font_size = 12)
+}
+pct <- function(x, d = 1) sprintf(paste0("%.", d, "f%%"), x)
+nm <- function(x, d = 2) formatC(x, format = "f", digits = d, big.mark = ",")
+
+elas    <- tb("elasticidades.csv")
+resumen <- tb("elasticidades_resumen.csv")
+ur      <- tb("unit_roots.csv")
+eg      <- tb("cointegration_engle_granger.csv")
+jb      <- tb("cointegration_johansen_beta.csv")
+js      <- tb("cointegration_johansen_stats.csv")
+bounds  <- tb("bounds_test.csv")
+diag    <- tb("diagnostics.csv")
+corto   <- tb("coeficientes_corto_plazo.csv")
+cli_d   <- tb("clientes_modelo_diferencias.csv")
+fa      <- tb("forecast_anual.csv")
+fm      <- tb("forecast_mensual.csv")
+svs     <- tb("supuestos_vs_estimado.csv")
+bk      <- tb("backtest.csv")
+cons    <- tb("forecast_consistencia.csv")
+enso    <- tb("enso_relevancia.csv")
+altact  <- tb("actividad_alternativa.csv")
+q_res   <- if (!is.null(resumen)) dplyr::filter(resumen, startsWith(modelo, "q (")) else NULL
+conf    <- cfg$forecast$nivel_confianza
+```
+
+# Resumen ejecutivo
+
+```{r resumen-exec, results='asis'}
+if (!is.null(q_res)) {
+  ult <- max(df$fecha)
+  cat(sprintf(
+"Se estimó la demanda de ELDU por segmento con un enfoque **ARDL / modelo de
+corrección de errores**, descomponiendo la energía en clientes por consumo
+unitario ($Q_{k,t} = N_{k,t} \\cdot q_{k,t}$). La muestra va de **%s a %s**
+(%d meses) y la variable de actividad es **%s**. Insumo: `%s`.\n\n",
+    format(min(df$fecha)), format(ult), nrow(df), act, panel$fuente))
+
+  cat("**Elasticidades de largo plazo del consumo unitario** (IC ",
+      sprintf("%.0f%%", 100 * conf), ", errores estándar HAC Newey-West):\n\n", sep = "")
+}
+```
+
+```{r tabla-exec}
+if (!is.null(q_res)) {
+  q_res %>%
+    dplyr::transmute(
+      Segmento = segmento,
+      n = n, `ARDL` = ardl_order,
+      `η (ingreso)` = sprintf("%.3f", eta_lp),
+      `IC η` = sprintf("[%.3f; %.3f]", eta_ic_inf, eta_ic_sup),
+      `ρ (precio)` = sprintf("%.3f", rho_lp),
+      `IC ρ` = sprintf("[%.3f; %.3f]", rho_ic_inf, rho_ic_sup),
+      `λ (ajuste)` = sprintf("%.3f", lambda),
+      `p(λ)` = format.pval(lambda_p, digits = 2, eps = 1e-16),
+      `R²` = sprintf("%.3f", r2),
+      `Bounds F` = sprintf("%.2f", bounds_F),
+      Cointegración = bounds_conclusion) %>%
+    kt()
+}
+```
+
+```{r resumen-exec2, results='asis'}
+if (!is.null(q_res)) {
+  ok_sig <- q_res %>% dplyr::filter(signo_eta_ok, signo_rho_ok, lambda_ok)
+  cat(sprintf("\n- **Signos y ajuste:** %d de %d segmentos cumplen simultáneamente
+η > 0, ρ ≤ 0 y λ > 0 significativo al 10%%.\n", nrow(ok_sig), nrow(q_res)))
+  cat(sprintf("- **Velocidad de ajuste:** λ entre %.2f y %.2f por mes, es decir
+una vida media de la desviación de %.1f a %.1f meses.\n",
+    min(q_res$lambda), max(q_res$lambda),
+    log(2) / -log(1 - max(q_res$lambda)), log(2) / -log(1 - min(q_res$lambda))))
+}
+if (!is.null(svs) && nrow(svs) > 0) {
+  for (i in seq_len(nrow(svs))) {
+    r <- svs[i, ]
+    cat(sprintf("- **Supuesto del DCF para %s:** el modelo de valorización usa
+η = %.2f; lo estimado es **%.3f** (IC [%.3f; %.3f]). El supuesto %s dentro del
+intervalo (p = %s). Usar el supuesto en lugar de lo estimado cambia los
+volúmenes de %d en **%s** y el acumulado del horizonte en **%s**.\n",
+      r$segmento, r$eta_supuesto_dcf, r$eta_estimada, r$eta_ic_inf, r$eta_ic_sup,
+      ifelse(r$supuesto_dentro_del_IC95, "**sí** está", "**no** está"),
+      format.pval(r$p_valor_h0, digits = 2, eps = 1e-16),
+      r$anio_final, pct(r$dif_pct_anio_final), pct(r$dif_pct_acumulado)))
+  }
+}
+if (!is.null(bk) && nrow(bk) > 0) {
+  cat(sprintf("- **Validación:** en un backtest pseudo-fuera-de-muestra de %d
+meses el error absoluto medio es de %s a %s según segmento, frente a %s a %s del
+random walk estacional.\n", bk$h[1], pct(min(bk$mape_pct)), pct(max(bk$mape_pct)),
+    pct(min(bk$mape_naive_pct)), pct(max(bk$mape_naive_pct))))
+}
+```
+
+```{r resumen-exec3, results='asis'}
+if (!is.null(fa)) {
+  tot <- fa %>% dplyr::filter(segmento == "TOTAL")
+  if (nrow(tot) > 0) {
+    ult_a <- max(tot$anio_fiscal)
+    cat("\n**Energía total proyectada (GWh por año fiscal):**\n\n")
+  }
+}
+```
+
+```{r tabla-exec-vol}
+if (!is.null(fa)) {
+  tot <- fa %>% dplyr::filter(segmento == "TOTAL")
+  if (nrow(tot) > 0) {
+    tot %>%
+      dplyr::filter(anio_fiscal %in% c(min(anio_fiscal),
+                                       round(stats::median(unique(anio_fiscal))),
+                                       max(anio_fiscal))) %>%
+      dplyr::transmute(Escenario = escenario, `Año fiscal` = anio_fiscal,
+                       GWh = round(mwh / 1000, 1),
+                       `IC inf` = round(mwh_ic_inf / 1000, 1),
+                       `IC sup` = round(mwh_ic_sup / 1000, 1)) %>%
+      kt()
+  }
+}
+```
+
+# El modelo
+
+La demanda de cada segmento $k \in \{BT, MT, LIBRES\}$ se descompone en
+número de clientes y consumo unitario:
+
+$$Q_{k,t} = N_{k,t}\cdot q_{k,t}, \qquad q_{k,t} = \frac{MWh_{k,t}}{N_{k,t}}$$
+
+**Clientes.** Especificación en diferencias logarítmicas respecto de la
+actividad regional, y en paralelo un ECM para el nivel:
+
+$$\Delta \ln N_{k,t} = \alpha_k + \beta_k\,\Delta \ln ACT_t + \varepsilon_t$$
+
+**Consumo unitario.** ECM condicional (reparametrización UECM de un ARDL):
+
+$$\Delta \ln q_{k,t} = \gamma_k + \sum_j \delta_{kj}\Delta \ln Y_{t-j}
++ \theta_k \Delta \ln \tilde p_{k,t} + \phi_k ENSO_t
+- \lambda_k\Big(\ln q_{k,t-1} - \mu_k - \eta_k \ln Y_{t-1}
+- \rho_k \ln \tilde p_{k,t-1}\Big) + u_t$$
+
+donde $Y$ es la actividad de Ica, $\tilde p$ la tarifa real,
+$\eta_k$ la **elasticidad-ingreso de largo plazo**, $\rho_k$ la
+**elasticidad-precio de largo plazo** y $\lambda_k$ la velocidad de ajuste.
+
+En la forma estimada los coeficientes de los niveles rezagados son
+$\pi_y$ y $\pi_j$, con
+$\lambda = -\pi_y$ y $\eta_j = -\pi_j/\pi_y$. Las elasticidades y sus
+intervalos se obtienen por **delta-method** sobre ese cociente, usando la
+matriz de covarianzas **HAC (Newey-West)**.
+
+# Datos y transformaciones
+
+```{r datos, results='asis'}
+cat(sprintf("- Insumo: `%s`\n- Observaciones: %d meses (%s a %s)\n", panel$fuente,
+            nrow(df), format(min(df$fecha)), format(max(df$fecha))))
+cat(sprintf("- Deflactación: `tarifa_real_k = tarifa_k / (ipc/100)`\n"))
+cat(sprintf("- Actividad: `%s`", act))
+if (panel$interpolacion$n_interp > 0) {
+  cat(sprintf(" — **%d de %d meses interpolados** (método: %s), marcados con la
+bandera `pbi_interp`. La interpolación solo opera dentro del rango observado;
+no extrapola.\n", panel$interpolacion$n_interp, nrow(df),
+    panel$interpolacion$metodo))
+} else cat(" — sin interpolación (serie mensual original).\n")
+cat(sprintf("- Exógenas: %s\n- Dummies estacionales: %d (febrero a diciembre;
+enero es la categoría base)\n- Dummy COVID: %s a %s\n",
+  paste(panel$exogenos, collapse = ", "), length(panel$dummies_estacionales),
+  cfg$transformaciones$covid_inicio, cfg$transformaciones$covid_fin))
+cat("\nEl reporte de validación completo del insumo está en
+[`output/00_data_check.html`](00_data_check.html).\n")
+```
+
+### Muestra efectiva por segmento
+
+```{r muestras}
+kt(panel$muestras)
+```
+
+```{r eda-figs, results='asis'}
+fig("02_energia_nivel.png"); fig("02_ln_q.png")
+fig("02_actividad.png"); fig("02_tarifas_reales.png")
+fig("02_estacionalidad.png"); fig("02_enso.png")
+```
+
+# Orden de integración
+
+ADF ($H_0$: raíz unitaria) y KPSS ($H_0$: estacionariedad), en nivel
+logarítmico y en primera diferencia. Rezagos del ADF por AIC con $k_{max}$ de
+Schwert. El veredicto combina ambos tests al 5 %.
+
+```{r unit-roots}
+if (!is.null(ur)) {
+  ur %>% dplyr::transmute(
+    Variable = variable, n = n,
+    `ADF (c)` = sprintf("%.2f", adf_drift_stat), `vc 5%` = sprintf("%.2f", adf_drift_cv5),
+    `ADF (c,t)` = sprintf("%.2f", adf_trend_stat),
+    `KPSS (μ)` = sprintf("%.3f", kpss_mu_stat), `vc 5% ` = sprintf("%.3f", kpss_mu_cv5),
+    `ADF Δ` = sprintf("%.2f", d_adf_drift_stat),
+    Orden = orden_integracion) %>% kt()
+}
+```
+
+```{r ur-nota, results='asis'}
+if (!is.null(ur)) {
+  n_amb <- sum(grepl("ambiguo|I\\(2\\)", ur$orden_integracion))
+  if (n_amb > 0) cat(sprintf("\n> **Nota.** %d serie(s) tienen veredicto
+ambiguo o posible I(2). El enfoque ARDL con bounds test admite mezclas de
+I(0) e I(1), por lo que la estrategia sigue siendo válida; una serie I(2)
+invalidaría la interpretación de largo plazo y debe revisarse.\n", n_amb))
+}
+```
+
+```{r acf-figs, results='asis'}
+for (id in segs$id) fig(paste0("03_acf_ln_q_", id, ".png"))
+```
+
+# Cointegración
+
+## Engle-Granger
+
+Regresión de largo plazo $\ln q = \mu + \eta \ln Y + \rho \ln \tilde p$ y ADF
+sobre el residuo, con valores críticos de MacKinnon (1991) para
+`r if (!is.null(eg)) eg$n_vars[1] else 3` variables. Se reportan las variantes
+sin y con dummies estacionales.
+
+```{r eg}
+if (!is.null(eg)) {
+  eg %>% dplyr::transmute(
+    Segmento = segmento, `Dummies estac.` = ifelse(estacional, "sí", "no"),
+    n = n, `ADF residuo` = sprintf("%.2f", adf_resid_stat),
+    `vc 5%` = sprintf("%.2f", cv_5pct), Conclusión = conclusion,
+    `η (LP)` = sprintf("%.3f", eta_lp), `ρ (LP)` = sprintf("%.3f", rho_lp),
+    `R²` = sprintf("%.3f", r2_lp)) %>% kt()
+}
+```
+
+> Las estimaciones de Engle-Granger son consistentes pero sesgadas en muestras
+> finitas y no permiten inferencia directa. Se usan como contraste de los
+> resultados del ECM, no como estimación de referencia.
+
+```{r eg-figs, results='asis'}
+for (id in segs$id) fig(paste0("04_residuo_lp_", id, ".png"))
+```
+
+## Johansen
+
+```{r joh}
+if (!is.null(js)) {
+  js %>% dplyr::transmute(
+    Segmento = segmento, Hipótesis = hipotesis,
+    `Traza` = sprintf("%.2f", trace_stat), `vc 5%` = sprintf("%.2f", trace_cv5),
+    `Máx-eigen` = sprintf("%.2f", eigen_stat), `vc 5% ` = sprintf("%.2f", eigen_cv5)) %>%
+    kt()
+}
+```
+
+### Vector cointegrante normalizado
+
+```{r joh-beta}
+if (!is.null(jb)) {
+  jb %>% dplyr::transmute(Segmento = segmento, Término = termino,
+                          `β normalizado` = sprintf("%.4f", beta_norm),
+                          `Elasticidad implícita` = sprintf("%.4f", elasticidad_implicita)) %>%
+    kt()
+}
+```
+
+# ARDL / ECM: elasticidades de largo plazo
+
+## Bounds test de Pesaran-Shin-Smith
+
+Prueba de referencia para la existencia de una relación de nivel. Caso
+`r cfg$ardl$bounds_case` (intercepto no restringido, sin tendencia). Los
+valores críticos provienen del paquete `ARDL`, que replica PSS (2001); se
+calculan con la matriz de covarianzas convencional, que es la que usa la
+derivación de PSS.
+
+```{r bounds}
+if (!is.null(bounds)) {
+  bounds %>% dplyr::transmute(
+    Segmento = segmento, Modelo = modelo, ARDL = ardl_order,
+    `F` = sprintf("%.2f", F_stat),
+    `I(0) 5%` = sprintf("%.2f", F_I0_5pct), `I(1) 5%` = sprintf("%.2f", F_I1_5pct),
+    `p(F)` = format.pval(F_pvalue, digits = 2, eps = 1e-16),
+    `t` = sprintf("%.2f", t_stat),
+    `p(t)` = format.pval(t_pvalue, digits = 2, eps = 1e-16)) %>% kt()
+}
+```
+
+## Elasticidades estimadas
+
+```{r elas}
+if (!is.null(elas)) {
+  elas %>% dplyr::transmute(
+    Segmento = segmento, Modelo = modelo, Concepto = concepto,
+    Variable = variable,
+    Estimado = sprintf("%.4f", estimado), `EE (HAC)` = sprintf("%.4f", se),
+    `IC inf` = sprintf("%.4f", ic_inf), `IC sup` = sprintf("%.4f", ic_sup),
+    `p` = format.pval(p_valor, digits = 2, eps = 1e-16),
+    n = n, `R²` = sprintf("%.3f", r2), ARDL = ardl_order) %>% kt()
+}
+```
+
+```{r elas-plot, fig.height=4.2}
+if (!is.null(elas)) {
+  d <- elas %>% dplyr::filter(parametro == "lp", startsWith(modelo, "q ("))
+  if (nrow(d) > 0) {
+    d$tipo <- ifelse(grepl("ptilde", d$variable), "Precio (ρ)", "Ingreso (η)")
+    p <- ggplot2::ggplot(d, ggplot2::aes(estimado, segmento, colour = tipo)) +
+      ggplot2::geom_vline(xintercept = 0, colour = "grey60") +
+      ggplot2::geom_errorbarh(ggplot2::aes(xmin = ic_inf, xmax = ic_sup),
+                              height = .18, linewidth = .7) +
+      ggplot2::geom_point(size = 2.4)
+    if (!is.null(svs) && nrow(svs) > 0) {
+      sv <- svs %>% dplyr::transmute(segmento, estimado = eta_supuesto_dcf,
+                                     tipo = "Ingreso (η)")
+      p <- p + ggplot2::geom_point(data = sv, shape = 4, size = 3.4,
+                                   stroke = 1.2, colour = "black")
+    }
+    p + ggplot2::facet_wrap(~tipo, scales = "free_x") +
+      ggplot2::scale_colour_brewer(palette = "Dark2", guide = "none") +
+      ggplot2::labs(title = "Elasticidades de largo plazo con IC 95%",
+                    subtitle = "La X negra marca el supuesto del modelo de valorización",
+                    x = NULL, y = NULL) + theme_eldu()
+  }
+}
+```
+
+## Coeficientes de corto plazo
+
+```{r corto}
+if (!is.null(corto)) {
+  corto %>% dplyr::filter(startsWith(modelo, "q ("),
+                          !grepl("^m[01]", termino)) %>%
+    dplyr::transmute(Segmento = segmento, Término = termino, Bloque = bloque,
+                     Estimado = sprintf("%.4f", estimado),
+                     `EE (HAC)` = sprintf("%.4f", se_hac),
+                     `p` = format.pval(p_valor, digits = 2, eps = 1e-16)) %>% kt()
+}
+```
+
+## Modelo de clientes
+
+```{r cli}
+if (!is.null(cli_d)) {
+  cli_d %>% dplyr::transmute(
+    Segmento = segmento, Término = termino,
+    Estimado = sprintf("%.5f", estimado), `EE (HAC)` = sprintf("%.5f", se_hac),
+    `IC inf` = sprintf("%.5f", ic_inf), `IC sup` = sprintf("%.5f", ic_sup),
+    `p` = format.pval(p_valor, digits = 2, eps = 1e-16),
+    n = n, `R²` = sprintf("%.3f", r2)) %>% kt()
+}
+```
+
+```{r cli-nota, results='asis'}
+r <- if (!is.null(resumen)) dplyr::filter(resumen, modelo == "N (clientes)") else NULL
+if (!is.null(r) && nrow(r) > 0) {
+  cat("\nEl ECM para el nivel de clientes arroja:\n\n")
+}
+```
+
+```{r cli-ecm}
+if (!is.null(resumen)) {
+  resumen %>% dplyr::filter(modelo == "N (clientes)") %>%
+    dplyr::transmute(Segmento = segmento, n = n, ARDL = ardl_order,
+                     `η (actividad)` = sprintf("%.3f", eta_lp),
+                     `IC η` = sprintf("[%.3f; %.3f]", eta_ic_inf, eta_ic_sup),
+                     `λ` = sprintf("%.4f", lambda),
+                     `p(λ)` = format.pval(lambda_p, digits = 2, eps = 1e-16),
+                     `λ utilizable` = ifelse(lambda_ok, "sí", "no")) %>% kt()
+}
+```
+
+> **Regla de selección (determinística, aplicada en `07_forecast.R`):** para
+> proyectar clientes se usa el ECM solo si $\lambda_N > 0$ y es significativo
+> al 10 %; en caso contrario se usa el modelo en diferencias. La hoja
+> `diagnostico_proyeccion` del Excel indica qué modelo se usó en cada caso.
+
+## ENSO y actividad alternativa
+
+```{r enso}
+if (!is.null(enso) && nrow(enso) > 0) {
+  enso %>% dplyr::transmute(Segmento = segmento, Modelo = modelo,
+                            `Coef. Niño 3.4` = sprintf("%.4f", estimado),
+                            `EE (HAC)` = sprintf("%.4f", se_hac),
+                            `p` = format.pval(p_valor, digits = 2, eps = 1e-16),
+                            `Relevante al 5%` = ifelse(relevante_5pct, "sí", "no")) %>%
+    kt()
+}
+```
+
+```{r altact}
+if (!is.null(altact) && nrow(altact) > 0) {
+  altact %>% dplyr::transmute(
+    Segmento = segmento, `Actividad base` = actividad_base,
+    `AIC base` = sprintf("%.1f", AIC_base), `η base` = sprintf("%.3f", eta_base),
+    `Actividad alt.` = actividad_alt, `AIC alt.` = sprintf("%.1f", AIC_alt),
+    `η alt.` = sprintf("%.3f", eta_alt), `Mejor AIC` = mejor,
+    `n base` = n_base, `n alt.` = n_alt) %>% kt()
+  cat("\n> La comparación de AIC solo es válida si ambas muestras coinciden
+(columnas `n base` y `n alt.`).\n")
+}
+```
+
+# Diagnósticos
+
+```{r diag}
+if (!is.null(diag)) {
+  diag %>% dplyr::transmute(
+    Segmento = segmento, Modelo = modelo, n = n,
+    `BG (p)` = format.pval(bg_p, digits = 2, eps = 1e-16),
+    `BP (p)` = format.pval(bp_p, digits = 2, eps = 1e-16),
+    `White (p)` = format.pval(white_p, digits = 2, eps = 1e-16),
+    `JB (p)` = format.pval(jb_p, digits = 2, eps = 1e-16),
+    `RESET (p)` = format.pval(reset_p, digits = 2, eps = 1e-16),
+    `CUSUM (p)` = format.pval(cusum_p, digits = 2, eps = 1e-16),
+    `CUSUM² (p)` = format.pval(cusumsq_p, digits = 2, eps = 1e-16),
+    Estable = ifelse(estable_ok, "sí", "no")) %>% kt()
+}
+```
+
+```{r diag-disc, results='asis'}
+if (!is.null(diag)) {
+  q <- diag %>% dplyr::filter(startsWith(modelo, "q ("))
+  mal <- q %>% dplyr::filter(!autocorr_ok | !homoced_ok | !forma_ok | !estable_ok)
+  cat("\n**Discusión.**\n\n")
+  cat("- La inferencia sobre las elasticidades usa errores estándar **HAC
+Newey-West**, por lo que el rechazo de Breusch-Godfrey o Breusch-Pagan afecta
+la *eficiencia* de los estimadores, no la validez de los intervalos
+reportados.\n")
+  if (nrow(mal) == 0) {
+    cat("- Ninguna ecuación de consumo unitario rechaza los diagnósticos al 5 %.\n")
+  } else {
+    for (i in seq_len(nrow(mal))) {
+      r <- mal[i, ]
+      fallos <- c(if (!r$autocorr_ok) "autocorrelación",
+                  if (!r$homoced_ok) "heterocedasticidad",
+                  if (!r$forma_ok) "forma funcional (RESET)",
+                  if (!r$estable_ok) "estabilidad (CUSUM/CUSUM²)")
+      cat(sprintf("- **%s** rechaza: %s. ", r$segmento,
+                  paste(fallos, collapse = ", ")))
+      if (!r$estable_ok) cat("La inestabilidad de parámetros es la señal más
+relevante para una proyección de largo plazo: sugiere un quiebre estructural
+(migración de clientes regulados a libres, cambio de pliego, shock COVID) que
+convendría modelar explícitamente. ")
+      cat("\n")
+    }
+  }
+  cat("- El rechazo de normalidad (Jarque-Bera) es habitual en series mensuales
+de energía por valores atípicos (paros, mantenimientos, clima) y no invalida la
+estimación por MCO ni los intervalos asintóticos.\n")
+}
+```
+
+```{r cusum-figs, results='asis'}
+for (id in segs$id) {
+  fig(paste0("06_cusum_", id, "_q.png"))
+  fig(paste0("06_residuos_", id, "_q.png"))
+}
+```
+
+# Ajuste del modelo y validación
+
+## Ajuste dentro de muestra
+
+```{r ajuste, fig.height=7}
+fits <- purrr::map_dfr(segs$id, function(id) {
+  o <- mods$modelos[[paste0(id, "_q")]]
+  if (is.null(o)) return(NULL)
+  tibble::tibble(segmento = id, fecha = o$ecm$fechas,
+                 observado = o$ecm$design[[paste0("d_", o$dep)]],
+                 ajustado = as.numeric(stats::fitted(o$ecm$fit)))
+})
+if (nrow(fits) > 0) {
+  fits %>% tidyr::pivot_longer(c(observado, ajustado)) %>%
+    ggplot2::ggplot(ggplot2::aes(fecha, 100 * value, colour = name)) +
+    ggplot2::geom_hline(yintercept = 0, colour = "grey70") +
+    ggplot2::geom_line(linewidth = .45) +
+    ggplot2::facet_wrap(~segmento, scales = "free_y", ncol = 1) +
+    ggplot2::scale_colour_manual(values = c(observado = "grey25",
+                                            ajustado = "#c0392b")) +
+    ggplot2::labs(title = "Ajuste del ECM: Δ ln q observado vs. ajustado",
+                  subtitle = "en % mensual", x = NULL, y = "%", colour = NULL) +
+    theme_eldu()
+}
+```
+
+## Backtest pseudo-fuera-de-muestra
+
+Se re-estima el modelo completo (incluida la selección de órdenes) excluyendo
+los últimos meses, y se proyecta ese tramo de forma dinámica con los valores
+**observados** de actividad, tarifa real y ENSO. Mide el error de la mecánica
+de proyección, aislado del error de los supuestos macro.
+
+```{r backtest}
+if (!is.null(bk)) {
+  bk %>% dplyr::transmute(
+    Segmento = segmento, Desde = desde, Hasta = hasta,
+    `n entren.` = n_entrenamiento,
+    `MAPE %` = sprintf("%.2f", mape_pct),
+    `MAPE naïve %` = sprintf("%.2f", mape_naive_pct),
+    `Mejor que naïve` = ifelse(mejor_que_naive, "sí", "no"),
+    `Sesgo %` = sprintf("%.2f", sesgo_pct),
+    `Error acum. %` = sprintf("%.2f", error_acumulado_pct)) %>% kt()
+  cat("\n> La referencia naïve es un random walk estacional (mismo mes del año
+anterior).\n")
+}
+```
+
+# Proyección de volúmenes
+
+```{r fcast-sup, results='asis'}
+if (!is.null(fm)) {
+  cat(sprintf("Horizonte: **%s a %s**. Escenarios: **%s**. Las sendas de
+actividad y de tarifa real son *deterministas* dentro de cada escenario y se
+leen de `%s`; las bandas de %.0f %% reflejan incertidumbre de estimación
+(coeficientes ~ N(β̂, V_HAC)) y de los choques (remuestreo de residuos), **no**
+incertidumbre sobre los supuestos macro.\n\n",
+    format(min(fm$fecha)), format(max(fm$fecha)),
+    paste(unique(fm$escenario), collapse = ", "),
+    cfg$paths$archivo_escenarios, 100 * conf))
+}
+```
+
+```{r fcast-figs, results='asis'}
+fig("07_forecast_total.png"); fig("07_forecast_mensual.png")
+fig("07_forecast_anual.png")
+```
+
+## Volúmenes anuales por segmento
+
+```{r fcast-anual}
+if (!is.null(fa)) {
+  fa %>% dplyr::filter(segmento != "TOTAL") %>%
+    dplyr::transmute(Escenario = escenario, Segmento = segmento,
+                     `Año fiscal` = anio_fiscal, GWh = round(mwh / 1000, 1),
+                     `IC inf` = round(mwh_ic_inf / 1000, 1),
+                     `IC sup` = round(mwh_ic_sup / 1000, 1),
+                     `Clientes (fin)` = round(clientes_fin),
+                     `q medio (MWh/cli)` = round(q_prom, 3)) %>% kt(digits = 1)
+}
+```
+
+## Consistencia con la trayectoria histórica
+
+```{r consist}
+if (!is.null(cons)) {
+  cons %>% dplyr::transmute(
+    Segmento = segmento, Escenario = escenario,
+    `q hist %/a` = sprintf("%.2f", q_hist_cagr_pct),
+    `q proy %/a` = sprintf("%.2f", q_proy_cagr_pct),
+    `N hist %/a` = sprintf("%.2f", N_hist_cagr_pct),
+    `N proy %/a` = sprintf("%.2f", N_proy_cagr_pct),
+    `Q hist %/a` = sprintf("%.2f", Q_hist_cagr_pct),
+    `Q proy %/a` = sprintf("%.2f", Q_proy_cagr_pct),
+    `Brecha pp` = sprintf("%.2f", brecha_Q_pp),
+    Alerta = ifelse(alerta, "sí", "")) %>% kt()
+}
+```
+
+```{r consist-nota, results='asis'}
+if (!is.null(cons) && any(cons$alerta, na.rm = TRUE)) {
+  cat("\n> **Lectura de las alertas.** Una brecha grande entre el crecimiento
+histórico y el proyectado casi nunca es un error de estimación: aparece cuando
+el escenario rompe con la trayectoria observada de una variable explicativa.
+Las dos causas habituales son (i) una senda de **tarifa real plana** cuando en
+la historia la tarifa real venía subiendo o bajando con fuerza —el término
+$\\rho\\,\\Delta\\ln\\tilde p$ desaparece del crecimiento proyectado— y (ii) un
+**último dato de ENSO** alejado del supuesto de condiciones neutras, lo que
+genera un salto de nivel de $\\phi/\\lambda$ por grado al normalizarse. Conviene
+verificar que esos dos supuestos sean los que se quieren usar en el DCF.\n")
+}
+```
+
+# Supuestos del DCF vs. elasticidades estimadas
+
+```{r svs-intro, results='asis'}
+sup <- cfg$supuestos_valorizacion$elasticidad_ingreso
+sup <- sup[!vapply(sup, is.null, logical(1))]
+if (length(sup) > 0) {
+  cat(sprintf("El modelo de valorización fija las elasticidades-ingreso a dedo:
+%s. Esta sección las contrasta con lo estimado y cuantifica el impacto de la
+diferencia sobre los volúmenes proyectados.\n\n",
+    paste(sprintf("**%s = %.2f**", names(sup), unlist(sup)), collapse = ", ")))
+}
+```
+
+```{r svs}
+if (!is.null(svs) && nrow(svs) > 0) {
+  svs %>% dplyr::transmute(
+    Segmento = segmento,
+    `η estimada` = sprintf("%.3f", eta_estimada),
+    `EE` = sprintf("%.3f", eta_se),
+    `IC 95%` = sprintf("[%.3f; %.3f]", eta_ic_inf, eta_ic_sup),
+    `η supuesto DCF` = sprintf("%.2f", eta_supuesto_dcf),
+    Diferencia = sprintf("%+.3f", diferencia),
+    `Supuesto en IC` = ifelse(supuesto_dentro_del_IC95, "sí", "**no**"),
+    `z` = sprintf("%.2f", z),
+    `p (H₀: η = supuesto)` = format.pval(p_valor_h0, digits = 2, eps = 1e-16),
+    `Δ volumen año final` = sprintf("%+.1f%%", dif_pct_anio_final),
+    `Δ volumen acumulado` = sprintf("%+.1f%%", dif_pct_acumulado)) %>% kt()
+}
+```
+
+```{r svs-disc, results='asis'}
+if (!is.null(svs) && nrow(svs) > 0) {
+  cat("\n**Cómo leer el contrafactual.** Para aislar el efecto de la
+*pendiente*, se impone $\\eta = \\eta_0$ fijando
+$\\pi_x = -\\eta_0\\,\\pi_y$ y se reajusta la constante de forma que el
+equilibrio de largo plazo en el último mes observado no cambie. Así la
+diferencia de volúmenes refleja únicamente la distinta respuesta al
+crecimiento de la actividad, que es lo que el supuesto del DCF fija, y no un
+salto de nivel.\n\n")
+  for (i in seq_len(nrow(svs))) {
+    r <- svs[i, ]
+    sentido <- if (r$diferencia < 0) "más alta" else "más baja"
+    cat(sprintf("- **%s.** El supuesto (%.2f) es %s que lo estimado (%.3f).
+%s Sostener el supuesto en el DCF implica %s de volumen en %d y
+%s acumulado en el horizonte.\n",
+      r$segmento, r$eta_supuesto_dcf, sentido, r$eta_estimada,
+      if (r$supuesto_dentro_del_IC95)
+        "La diferencia **no** es estadísticamente significativa al 5 %: el supuesto es compatible con los datos."
+      else
+        "La diferencia **sí** es estadísticamente significativa al 5 %: los datos rechazan ese valor.",
+      sprintf("%+.1f%%", r$dif_pct_anio_final), r$anio_final,
+      sprintf("%+.1f%%", r$dif_pct_acumulado)))
+  }
+}
+```
+
+# Limitaciones y alcance
+
+- **Clientes libres.** Su demanda depende de contratos bilaterales y de la
+  migración entre el mercado regulado y el libre, no solo de la actividad
+  económica. Las bandas reportadas **subestiman** su incertidumbre: un solo
+  contrato que entra o sale mueve el agregado. Tratar la proyección de este
+  segmento como indicativa.
+- **Agro de Ica.** La demanda de ELDU está dominada por la agroexportación, que
+  se desacopla del PBI nacional. Por eso se usa `r act` y se evalúa el VAB
+  agropecuario como alternativa; ningún proxy nacional entra al modelo.
+- **Interpolación de la actividad.** Si la serie regional es trimestral, la
+  interpolación introduce autocorrelación artificial en las diferencias
+  mensuales, lo que infla el rechazo de Breusch-Godfrey. La inferencia HAC
+  mitiga el efecto sobre los intervalos, pero las elasticidades de corto plazo
+  deben leerse con cautela.
+- **Escenarios deterministas.** Las bandas no incorporan incertidumbre sobre las
+  sendas de actividad ni de tarifa real. El rango entre escenarios es la medida
+  de ese riesgo.
+- **Independencia de q y N.** Las réplicas bootstrap de consumo unitario y de
+  clientes se extraen de forma independiente; si hubiera correlación entre
+  ambos errores, las bandas de $Q$ estarían mal calibradas.
+- **Valores críticos.** Los del bounds test vienen del paquete `ARDL` (replica
+  verificada de PSS 2001). Los de Engle-Granger se leen de
+  `data/reference/eg_mackinnon_cv.csv` y son **asintóticos**: con muestras
+  cortas son conservadores.
+
+# Reproducibilidad
+
+```{r repro, results='asis'}
+cat(sprintf("- Punto de entrada único: `Rscript run_all.R`\n- Semilla: `%s`
+- Configuración: `config.yml`\n- Insumos: `%s/`\n- Entorno: `output/sessionInfo.txt`,
+dependencias en `renv.lock`\n- %s\n",
+  cfg$project$seed, cfg$paths$data_dir, R.version.string))
+cat("\nTodas las cifras de este informe se leen de archivos generados por los
+scripts `R/01`–`R/07`; ninguna está escrita a mano en el documento.\n")
+```
+
+```{r archivos}
+tablas <- list.files(cfg_path(cfg, "tables"), pattern = "\\.csv$")
+tibble::tibble(`Archivo en output/tables/` = tablas) %>% kt()
+```
