@@ -1,0 +1,88 @@
+# fetch_log — corrida iniciada 2026-10-07 06:55:55 UTC
+# R 4.3.3
+2026-10-07 06:55:55 | run_all        | INFO    | semilla = 20261007 / R 4.3.3
+2026-10-07 06:55:55 | run_all        | INFO    | >>> 01 — BCRP (scripts/01_fetch_bcrp.R)
+2026-10-07 06:55:55 | 01_bcrp        | INFO    | inicio — descarga de series BCRP
+2026-10-07 06:55:56 | 01_bcrp        | WARN    | intento 1/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/metadata; reintento en 2s
+2026-10-07 06:55:58 | 01_bcrp        | WARN    | intento 2/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/metadata; reintento en 4s
+2026-10-07 06:56:02 | 01_bcrp        | WARN    | intento 3/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/metadata; reintento en 8s
+2026-10-07 06:56:11 | 01_bcrp        | FAIL    | NO se pudo descargar https://estadisticas.bcrp.gob.pe/estadisticas/series/metadata — último error: CONNECT tunnel failed, response 403
+2026-10-07 06:56:11 | 01_bcrp        | WARN    | intento 1/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/ayuda/metadatos; reintento en 2s
+2026-10-07 06:56:13 | 01_bcrp        | WARN    | intento 2/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/ayuda/metadatos; reintento en 4s
+2026-10-07 06:56:18 | 01_bcrp        | WARN    | intento 3/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/ayuda/metadatos; reintento en 8s
+2026-10-07 06:56:26 | 01_bcrp        | FAIL    | NO se pudo descargar https://estadisticas.bcrp.gob.pe/estadisticas/series/ayuda/metadatos — último error: CONNECT tunnel failed, response 403
+2026-10-07 06:56:26 | 01_bcrp        | WARN    | intento 1/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN01770AM/json/1990-1/2026-10; reintento en 2s
+2026-10-07 06:56:28 | 01_bcrp        | WARN    | intento 2/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN01770AM/json/1990-1/2026-10; reintento en 4s
+2026-10-07 06:56:33 | 01_bcrp        | WARN    | intento 3/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN01770AM/json/1990-1/2026-10; reintento en 8s
+2026-10-07 06:56:41 | 01_bcrp        | FAIL    | NO se pudo descargar https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN01770AM/json/1990-1/2026-10 — último error: CONNECT tunnel failed, response 403
+2026-10-07 06:56:41 | 01_bcrp        | WARN    | intento 1/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN02079AM/json/1990-1/2026-10; reintento en 2s
+2026-10-07 06:56:43 | 01_bcrp        | WARN    | intento 2/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN02079AM/json/1990-1/2026-10; reintento en 4s
+2026-10-07 06:56:48 | 01_bcrp        | WARN    | intento 3/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN02079AM/json/1990-1/2026-10; reintento en 8s
+2026-10-07 06:56:56 | 01_bcrp        | FAIL    | NO se pudo descargar https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN02079AM/json/1990-1/2026-10 — último error: CONNECT tunnel failed, response 403
+2026-10-07 06:56:56 | 01_bcrp        | WARN    | intento 1/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN01773AM/json/1990-1/2026-10; reintento en 2s
+2026-10-07 06:56:59 | 01_bcrp        | WARN    | intento 2/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN01773AM/json/1990-1/2026-10; reintento en 4s
+2026-10-07 06:57:03 | 01_bcrp        | WARN    | intento 3/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN01773AM/json/1990-1/2026-10; reintento en 8s
+2026-10-07 06:57:11 | 01_bcrp        | FAIL    | NO se pudo descargar https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN01773AM/json/1990-1/2026-10 — último error: CONNECT tunnel failed, response 403
+2026-10-07 06:57:11 | 01_bcrp        | BLOCKED | [pbi_real] ninguna de las 3 URL/código candidato entregó una serie válida
+2026-10-07 06:57:11 | 01_bcrp        | WARN    | intento 1/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN01270PM/json/1990-1/2026-10; reintento en 2s
+2026-10-07 06:57:14 | 01_bcrp        | WARN    | intento 2/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN01270PM/json/1990-1/2026-10; reintento en 4s
+2026-10-07 06:57:18 | 01_bcrp        | WARN    | intento 3/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN01270PM/json/1990-1/2026-10; reintento en 8s
+2026-10-07 06:57:26 | 01_bcrp        | FAIL    | NO se pudo descargar https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN01270PM/json/1990-1/2026-10 — último error: CONNECT tunnel failed, response 403
+2026-10-07 06:57:27 | 01_bcrp        | WARN    | intento 1/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN38705PM/json/1990-1/2026-10; reintento en 2s
+2026-10-07 06:57:29 | 01_bcrp        | WARN    | intento 2/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN38705PM/json/1990-1/2026-10; reintento en 4s
+2026-10-07 06:57:33 | 01_bcrp        | WARN    | intento 3/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN38705PM/json/1990-1/2026-10; reintento en 8s
+2026-10-07 06:57:42 | 01_bcrp        | FAIL    | NO se pudo descargar https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN38705PM/json/1990-1/2026-10 — último error: CONNECT tunnel failed, response 403
+2026-10-07 06:57:42 | 01_bcrp        | FAIL    | [ipc] ninguna de las 2 URL/código candidato entregó una serie válida
+2026-10-07 06:57:42 | 01_bcrp        | WARN    | intento 1/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN01208PM/json/1990-1/2026-10; reintento en 2s
+2026-10-07 06:57:44 | 01_bcrp        | WARN    | intento 2/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN01208PM/json/1990-1/2026-10; reintento en 4s
+2026-10-07 06:57:48 | 01_bcrp        | WARN    | intento 3/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN01208PM/json/1990-1/2026-10; reintento en 8s
+2026-10-07 06:57:57 | 01_bcrp        | FAIL    | NO se pudo descargar https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN01208PM/json/1990-1/2026-10 — último error: CONNECT tunnel failed, response 403
+2026-10-07 06:57:57 | 01_bcrp        | WARN    | intento 1/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN01210PM/json/1990-1/2026-10; reintento en 2s
+2026-10-07 06:57:59 | 01_bcrp        | WARN    | intento 2/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN01210PM/json/1990-1/2026-10; reintento en 4s
+2026-10-07 06:58:04 | 01_bcrp        | WARN    | intento 3/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN01210PM/json/1990-1/2026-10; reintento en 8s
+2026-10-07 06:58:12 | 01_bcrp        | FAIL    | NO se pudo descargar https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN01210PM/json/1990-1/2026-10 — último error: CONNECT tunnel failed, response 403
+2026-10-07 06:58:12 | 01_bcrp        | WARN    | intento 1/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN01209PM/json/1990-1/2026-10; reintento en 2s
+2026-10-07 06:58:14 | 01_bcrp        | WARN    | intento 2/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN01209PM/json/1990-1/2026-10; reintento en 4s
+2026-10-07 06:58:19 | 01_bcrp        | WARN    | intento 3/4 falló (CONNECT tunnel failed, response 403) en https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN01209PM/json/1990-1/2026-10; reintento en 8s
+2026-10-07 06:58:27 | 01_bcrp        | FAIL    | NO se pudo descargar https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN01209PM/json/1990-1/2026-10 — último error: CONNECT tunnel failed, response 403
+2026-10-07 06:58:27 | 01_bcrp        | FAIL    | [tc] ninguna de las 3 URL/código candidato entregó una serie válida
+2026-10-07 06:58:27 | 01_bcrp        | INFO    | fin — 0/3 series BCRP obtenidas ()
+2026-10-07 06:58:27 | run_all        | INFO    | >>> 02 — NOAA CPC (scripts/02_fetch_noaa.R)
+2026-10-07 06:58:27 | 02_noaa        | INFO    | inicio — descarga de índices ENSO (NOAA CPC)
+2026-10-07 06:58:27 | 02_noaa        | WARN    | intento 1/4 falló (CONNECT tunnel failed, response 403) en https://www.cpc.ncep.noaa.gov/data/indices/oni.ascii.txt; reintento en 2s
+2026-10-07 06:58:29 | 02_noaa        | WARN    | intento 2/4 falló (CONNECT tunnel failed, response 403) en https://www.cpc.ncep.noaa.gov/data/indices/oni.ascii.txt; reintento en 4s
+2026-10-07 06:58:34 | 02_noaa        | WARN    | intento 3/4 falló (CONNECT tunnel failed, response 403) en https://www.cpc.ncep.noaa.gov/data/indices/oni.ascii.txt; reintento en 8s
+2026-10-07 06:58:42 | 02_noaa        | FAIL    | NO se pudo descargar https://www.cpc.ncep.noaa.gov/data/indices/oni.ascii.txt — último error: CONNECT tunnel failed, response 403
+2026-10-07 06:58:42 | 02_noaa        | WARN    | intento 1/4 falló (CONNECT tunnel failed, response 403) en https://www.cpc.ncep.noaa.gov/data/indices/ersst5.nino.mth.91-20.ascii; reintento en 2s
+2026-10-07 06:58:45 | 02_noaa        | WARN    | intento 2/4 falló (CONNECT tunnel failed, response 403) en https://www.cpc.ncep.noaa.gov/data/indices/ersst5.nino.mth.91-20.ascii; reintento en 4s
+2026-10-07 06:58:49 | 02_noaa        | WARN    | intento 3/4 falló (CONNECT tunnel failed, response 403) en https://www.cpc.ncep.noaa.gov/data/indices/ersst5.nino.mth.91-20.ascii; reintento en 8s
+2026-10-07 06:58:57 | 02_noaa        | FAIL    | NO se pudo descargar https://www.cpc.ncep.noaa.gov/data/indices/ersst5.nino.mth.91-20.ascii — último error: CONNECT tunnel failed, response 403
+2026-10-07 06:58:57 | 02_noaa        | FAIL    | ningún índice ENSO disponible — el panel se construirá SIN variable de clima
+2026-10-07 06:58:57 | run_all        | INFO    | >>> 03 — MINEM / Osinergmin / INEI (scripts/03_fetch_minem_inei.R)
+2026-10-07 06:58:57 | 03_minem_inei  | INFO    | inicio — MINEM / Osinergmin / INEI
+2026-10-07 06:58:58 | 03_minem_inei  | FAIL    | no se pudo leer la página https://www.gob.pe/institucion/minem/informes-publicaciones (CONNECT tunnel failed, response 403)
+2026-10-07 06:58:58 | 03_minem_inei  | FAIL    | no se pudo leer la página https://www.gob.pe/institucion/minem/colecciones/4425-anuario-estadistico-electrico (CONNECT tunnel failed, response 403)
+2026-10-07 06:58:58 | 03_minem_inei  | FAIL    | [minem] no se halló ningún documento. Pegue una URL directa en CFG$minem$direct_urls
+2026-10-07 06:58:58 | 03_minem_inei  | FAIL    | no se pudo leer la página https://www.gob.pe/institucion/osinergmin/informes-publicaciones (CONNECT tunnel failed, response 403)
+2026-10-07 06:58:58 | 03_minem_inei  | FAIL    | [osinergmin] no se halló ningún documento. Pegue una URL directa en CFG$osinergmin$direct_urls
+2026-10-07 06:58:59 | 03_minem_inei  | FAIL    | no se pudo leer la página https://www.inei.gob.pe/estadisticas/indice-tematico/economia/ (CONNECT tunnel failed, response 403)
+2026-10-07 06:58:59 | 03_minem_inei  | FAIL    | no se pudo leer la página https://www.inei.gob.pe/media/MenuRecursivo/publicaciones_digitales/Est/ (CONNECT tunnel failed, response 403)
+2026-10-07 06:58:59 | 03_minem_inei  | FAIL    | [inei] no se halló ningún documento. Pegue una URL directa en CFG$inei$direct_urls
+2026-10-07 06:58:59 | 03_minem_inei  | WARN    | PBI departamental de Ica NO obtenido — 05_build_panel.R usará el PBI nacional del BCRP como PROXY, y quedará marcado como tal en el informe
+2026-10-07 06:58:59 | 03_minem_inei  | WARN    | Ni MINEM ni Osinergmin disponibles — la energía de ELDU deberá venir de las Memorias Anuales (04) o de data/raw/eldu_energia_anual.csv
+2026-10-07 06:58:59 | 03_minem_inei  | INFO    | fin
+2026-10-07 06:58:59 | run_all        | INFO    | >>> 04 — Memorias ELDU (PDF) (scripts/04_extract_memorias.R)
+2026-10-07 06:58:59 | 04_memorias    | INFO    | inicio — extracción de Memorias Anuales ELDU (PDF)
+2026-10-07 06:58:59 | 04_memorias    | FAIL    | no hay PDF en data/raw/pdf — no se extrae nada. Coloque las Memorias Anuales ELDU (2023, 2024, 2025) ahí y re-corra.
+2026-10-07 06:58:59 | 04_memorias    | INFO    | fin (sin PDF)
+2026-10-07 06:58:59 | run_all        | INFO    | >>> 05 — panel anual (scripts/05_build_panel.R)
+2026-10-07 06:58:59 | 05_panel       | INFO    | inicio — construcción del panel anual
+2026-10-07 06:58:59 | 05_panel       | WARN    | [bcrp_pbi_real] archivo ausente: /home/user/Claude/data/raw/bcrp_pbi_real.json
+2026-10-07 06:58:59 | 05_panel       | WARN    | [bcrp_ipc] archivo ausente: /home/user/Claude/data/raw/bcrp_ipc.json
+2026-10-07 06:58:59 | 05_panel       | WARN    | [bcrp_tc] archivo ausente: /home/user/Claude/data/raw/bcrp_tc.json
+2026-10-07 06:58:59 | 05_panel       | BLOCKED | falta insumo obligatorio: serie de ingreso (PBI de Ica del INEI, o PBI nacional del BCRP como proxy)
+2026-10-07 06:58:59 | run_all        | BLOCKED | 05 — panel anual falló: / ========================================================================= / PIPELINE DETENIDO — falta un insumo OBLIGATORIO / ========================================================================= / Falta : serie de ingreso (PBI de Ica del INEI, o PBI nacional del BCRP como proxy) / Se buscó en : data/raw/inei_pbi_departamental*.xlsx / data/raw/bcrp_pbi_real.json / Cómo proveerlo: / - abrir el egreso de red a estadisticas.bcrp.gob.pe y www.inei.gob.pe, y re-correr `Rscript run_all.R` / - o descargar a mano el PBI departamental del INEI a data/raw/inei_pbi_departamental_01.xlsx / - o pegar una URL directa en CFG$inei$direct_urls / CFG$bcrp (config/config.R) / ------------------------------------------------------------------------- / NO se generan datos sintéticos para continuar. Ver output/fetch_log.txt / ========================================================================= /
+2026-10-07 06:58:59 | run_all        | INFO    | escrito output/BLOCKERS.md
+2026-10-07 06:59:00 | 08_report      | OK      | escrito output/informe_demanda_ELDU.html
+2026-10-07 06:59:00 | run_all        | OK      | escrito output/sessionInfo.txt
+2026-10-07 06:59:00 | run_all        | BLOCKED | corrida detenida en la etapa de datos — ver output/BLOCKERS.md. Sin datos sintéticos.

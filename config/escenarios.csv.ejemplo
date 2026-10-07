@@ -1,0 +1,7 @@
+escenario,year,g_pbi
+base,2026,0.030
+base,2027,0.030
+optimista,2026,0.045
+optimista,2027,0.045
+pesimista,2026,0.015
+pesimista,2027,0.015

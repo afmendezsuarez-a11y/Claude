@@ -1,0 +1,246 @@
+---
+title: "Electro Dunas — Elasticidad-ingreso de la demanda de energía y proyección de volúmenes"
+subtitle: "Estimación reproducible con data abierta (frecuencia anual)"
+date: "`r format(Sys.time(), '%Y-%m-%d %H:%M UTC', tz = 'UTC')`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    theme: flatly
+    df_print: kable
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.align = "center")
+suppressPackageStartupMessages({
+  library(here); library(dplyr); library(knitr); library(ggplot2)
+})
+if (!exists("CFG")) source(here::here("config/config.R"))
+if (!exists("log_event")) source(here::here("R/utils.R"))
+
+p_panel <- here::here(CFG$paths$processed, "panel_anual.rds")
+p_est   <- here::here(CFG$paths$processed, "estimacion.rds")
+p_fc    <- here::here(CFG$paths$processed, "forecast.rds")
+HAVE_RESULTS <- file.exists(p_panel) && file.exists(p_est)
+
+fmt <- function(x, d = 3) ifelse(is.na(x), "—", formatC(x, format = "f", digits = d))
+read_log <- function() {
+  f <- here::here(CFG$paths$fetch_log)
+  if (file.exists(f)) readLines(f, warn = FALSE) else character(0)
+}
+sources_table <- function() {
+  f <- here::here(CFG$paths$sources_csv)
+  if (!file.exists(f)) return(NULL)
+  utils::read.csv(f, stringsAsFactors = FALSE)
+}
+```
+
+```{r blocked, eval=!HAVE_RESULTS, results='asis'}
+cat("# ⛔ No se pudo estimar: faltan datos de origen\n\n")
+cat("Este informe se generó **sin resultados econométricos** porque el pipeline no\n",
+    "logró obtener los insumos obligatorios. Por diseño, **no se generan datos\n",
+    "sintéticos, simulados ni imputados** para rellenar el hueco: se reporta el\n",
+    "bloqueo y se explica su impacto.\n\n", sep = "")
+
+cat("## Qué falta y por qué importa\n\n")
+cat("| Insumo | Rol en el estudio | Estado |\n|---|---|---|\n")
+cat("| Energía anual de ELDU (GWh) | **Variable dependiente.** Sin ella no hay nada que explicar. | ",
+    if (file.exists(here::here(CFG$eldu$manual_csv))) "presente" else "**ausente**", " |\n", sep = "")
+cat("| PBI de Ica (INEI) o PBI nacional (BCRP) | **Variable de ingreso.** Es la que identifica η. | ",
+    if (length(list.files(here::here(CFG$paths$raw), pattern = "bcrp_pbi_real\\.json|inei_pbi"))) "presente" else "**ausente**", " |\n", sep = "")
+cat("| IPC (BCRP) | Deflactor / control. | ",
+    if (file.exists(file.path(here::here(CFG$paths$raw), "bcrp_ipc.json"))) "presente" else "ausente (opcional)", " |\n", sep = "")
+cat("| ONI / Niño 3.4 (NOAA) | Control climático, opcional. | ",
+    if (file.exists(file.path(here::here(CFG$paths$raw), "noaa_oni.ascii.txt"))) "presente" else "ausente (opcional)", " |\n\n", sep = "")
+
+cat("## Impacto sobre la valorización\n\n")
+cat("El supuesto vigente del DCF (**η = ", CFG$dcf_benchmark[["BT"]], " en BT y ",
+    CFG$dcf_benchmark[["MT"]], " en MT**) **no pudo ser validado ni reemplazado**.\n",
+    "Hasta que se obtenga la data, ese supuesto sigue siendo *a dedo*: el comité debe\n",
+    "tratarlo como tal y no como una estimación. No hay en este informe ninguna cifra\n",
+    "de elasticidad ni de volúmenes, porque producirla sin data sería inventarla.\n\n", sep = "")
+
+cat("## Log de la corrida (`output/fetch_log.txt`)\n\n```\n")
+cat(paste(read_log(), collapse = "\n"))
+cat("\n```\n\n")
+
+bl <- here::here(CFG$paths$blockers)
+if (file.exists(bl)) {
+  cat("## Cómo desbloquearlo\n\n")
+  cat(paste(readLines(bl, warn = FALSE), collapse = "\n"), "\n\n")
+}
+```
+
+```{r load-results, eval=HAVE_RESULTS}
+panel <- readRDS(p_panel)
+RES   <- readRDS(p_est)
+meta  <- RES$meta
+FC    <- if (file.exists(p_fc)) readRDS(p_fc) else NULL
+```
+
+```{r body, eval=HAVE_RESULTS, results='asis'}
+cat("# Resumen ejecutivo\n\n")
+eta <- RES$eta_used
+cat(sprintf("Con **n = %d observaciones anuales (%d–%d)**, la elasticidad-ingreso de la demanda de energía de Electro Dunas se estima en:\n\n",
+            RES$n, RES$years[1], RES$years[2]))
+if (isTRUE(eta$as_range)) {
+  cat(sprintf(paste0("> **η ∈ [%s , %s]** (IC 95%%). El intervalo es ancho (%.2f, umbral %.2f),\n",
+                     "> así que **la data no alcanza para un punto creíble**: se reporta como rango.\n",
+                     "> Recomendación: mantener el supuesto del DCF **dentro de este rango** y\n",
+                     "> documentarlo como tal ante el comité.\n\n"),
+              fmt(eta$low), fmt(eta$high), RES$prudence$ci_width, RES$prudence$threshold))
+} else {
+  cat(sprintf("> **η = %s** (IC 95%%: %s a %s), por %s.\n\n",
+              fmt(eta$point), fmt(eta$low), fmt(eta$high), eta$source))
+}
+cat(sprintf("Elasticidad de **crecimiento** (en diferencias, el chequeo que siempre se reporta): **%s** (IC 95%%: %s a %s).\n\n",
+            fmt(RES$sr$estimate), fmt(RES$sr$ci_low), fmt(RES$sr$ci_high)))
+cat(sprintf("Contraste con el supuesto vigente del DCF (**BT %.2f / MT %.2f**): %s\n\n",
+            CFG$dcf_benchmark[["BT"]], CFG$dcf_benchmark[["MT"]],
+            {
+              inside <- CFG$dcf_benchmark >= eta$low & CFG$dcf_benchmark <= eta$high
+              if (all(inside)) "ambos supuestos caen **dentro** del IC 95% estimado, es decir, la data no los contradice."
+              else if (any(inside)) sprintf("%s cae dentro del IC 95%%, %s **queda fuera**.",
+                                            paste(names(which(inside)), collapse = " y "),
+                                            paste(names(which(!inside)), collapse = " y "))
+              else "**ambos quedan fuera** del IC 95% estimado: el supuesto debería revisarse."
+            }))
+if (isTRUE(meta$income_is_proxy)) {
+  cat("\n> ⚠️ **PROXY:** el PBI departamental de Ica no se pudo obtener; se usó el **PBI nacional**.\n",
+      "> η mide entonces la respuesta al ciclo nacional, no al de Ica (cuya demanda la mueve el agro).\n\n", sep = "")
+}
+```
+
+```{r fuentes, eval=HAVE_RESULTS, results='asis'}
+cat("# Fuentes utilizadas\n\n")
+st <- sources_table()
+if (!is.null(st) && nrow(st)) {
+  print(knitr::kable(st[, c("file", "description", "url", "retrieved_at_utc")],
+                     col.names = c("Archivo", "Descripción", "URL", "Descargado (UTC)")))
+} else cat("_(registro de fuentes vacío)_\n")
+cat("\n\n**Procedencia de cada variable del panel:**\n\n")
+for (k in names(meta$provenance)) cat(sprintf("- `%s`: %s\n", k, meta$provenance[[k]]))
+cat("\n")
+```
+
+```{r series, eval=HAVE_RESULTS, results='asis', fig.width=7, fig.height=4}
+cat("# La serie\n\n")
+print(knitr::kable(panel %>% select(year, energia_gwh, pbi, ln_q, ln_y),
+                   digits = 3,
+                   col.names = c("Año", "Energía (GWh)", "PBI (índice/VAB)", "ln(Q)", "ln(PBI)")))
+cat("\n")
+for (f in c("01_energia_eldu.png", "02_dispersion_log.png")) {
+  fp <- file.path(CFG$paths$figures, f)
+  if (file.exists(here::here(fp))) cat(sprintf("\n![](%s)\n\n", here::here(fp)))
+}
+```
+
+```{r modelo, eval=HAVE_RESULTS, results='asis'}
+cat("# Modelo y resultados\n\n")
+cat(sprintf("El método reportado **corresponde al n disponible** (n = %d). No se fuerza un ARDL/ECM sobre una muestra corta.\n\n", RES$n))
+
+cat("## (2) Raíz unitaria\n\n")
+for (k in names(RES$adf)) {
+  a <- RES$adf[[k]]
+  cat(sprintf("- `%s`: %s\n", k, a$note))
+}
+cat("\n")
+
+cat("## (3)–(5) Estimaciones\n\n")
+tab <- utils::read.csv(here::here(CFG$paths$tables, "elasticidad.csv"), stringsAsFactors = FALSE)
+print(knitr::kable(tab %>% select(metodo, parametro, estimate, se_hac, ci95_low, ci95_high, p_value, n, r2),
+                   digits = 3,
+                   col.names = c("Método", "Parámetro", "Estimado", "EE (HAC)",
+                                 "IC95 inf", "IC95 sup", "p", "n", "R²")))
+cat("\n")
+cat(sprintf("\n**Especificación preferida:** `%s`. ", RES$lr_preferred_spec))
+cat(sprintf("Colinealidad entre ln(PBI) y la tendencia: cor = %.3f, VIF = %.1f. ",
+            RES$collinearity$cor_lny_t, RES$collinearity$vif))
+if (!is.na(RES$collinearity$vif) && RES$collinearity$vif > 20) {
+  cat("Con una colinealidad así, el término de tendencia absorbe casi toda la variación del PBI y η queda mal identificado; por eso se prefiere la versión **sin tendencia**.\n\n")
+} else {
+  cat("\n\n")
+}
+cat(sprintf("**ECM:** %s\n\n", RES$ecm$note))
+if (isTRUE(RES$ecm$cointegrated)) cat(sprintf("_Advertencia:_ %s\n\n", RES$ecm$caveat))
+
+cat("## (6) Diagnósticos\n\n")
+dg <- utils::read.csv(here::here(CFG$paths$tables, "diagnosticos.csv"), stringsAsFactors = FALSE)
+print(knitr::kable(dg, digits = 3))
+cat(sprintf("\n**Estabilidad (influencia leave-one-out):** al excluir un año, η se mueve en el rango [%s, %s]; el año más influyente es **%d** (Δη = %s).\n\n",
+            fmt(RES$stability$eta_loo_min), fmt(RES$stability$eta_loo_max),
+            RES$stability$worst_year, fmt(RES$stability$worst_shift)))
+
+cat("## (7) Validación out-of-sample\n\n")
+if (isTRUE(RES$oos$done)) {
+  cat(sprintf("Dejando fuera los últimos %d años y re-estimando: **MAPE = %.2f%%**.\n\n",
+              length(RES$oos$holdout_years), 100 * RES$oos$mape))
+  oos_tab <- data.frame(anio = RES$oos$holdout_years,
+                        observado = round(RES$oos$actual, 1),
+                        proyectado = round(RES$oos$pred, 1),
+                        error_pct = round(100 * RES$oos$ape, 2))
+  print(knitr::kable(oos_tab,
+                     col.names = c("Anio", "Observado", "Proyectado", "Error %")))
+  cat("\n")
+} else cat(sprintf("%s\n\n", RES$oos$note))
+```
+
+```{r proy, eval=HAVE_RESULTS && exists("FC") && !is.null(FC), results='asis', fig.width=7.5, fig.height=4.2}
+cat("# Proyección de volúmenes\n\n")
+cat(sprintf("Regla: `Q_{t+1} = Q_t * (1 + η * g_PBI_{t+1})`, desde Q(%d) = %.1f GWh hasta FY%d.\n\n",
+            FC$q0_year, FC$q0, CFG$fy_horizon))
+cat(sprintf("Escenarios de crecimiento del PBI: **%s**.\n\n", FC$esc_src))
+if (isTRUE(FC$esc_is_assumption)) {
+  cat("> ⚠️ Estos crecimientos son un **SUPUESTO** (no se proveyó `data/raw/escenarios.csv`).\n\n")
+}
+fp <- file.path(CFG$paths$figures, "03_proyeccion.png")
+if (file.exists(here::here(fp))) cat(sprintf("\n![](%s)\n\n", here::here(fp)))
+cat("\n**Volúmenes anuales con banda (banda = IC 95% de η):**\n\n")
+print(knitr::kable(FC$fc %>% mutate(across(c(gwh_central, gwh_low, gwh_high), ~round(.x, 1)),
+                                    g_pbi = sprintf("%.1f%%", 100 * g_pbi)),
+                   col.names = c("Escenario", "Año", "g PBI", "GWh central", "GWh banda inf", "GWh banda sup")))
+cat("\n")
+if (is.null(FC$seg)) {
+  cat("\n**Reparto por segmento (BT/MT/libres):** no se realizó. Requiere los pesos de ingreso\n",
+      "actuales de ELDU, que no están en la data obtenida. **No se inventan**: si el comité los\n",
+      "necesita, cargarlos en `CFG$segment_weights` (config/config.R) y re-correr.\n\n", sep = "")
+}
+```
+
+```{r limitaciones, eval=HAVE_RESULTS, results='asis'}
+cat("# Limitaciones (honestas)\n\n")
+cat(sprintf("1. **Frecuencia anual.** SICOM mensual de Osinergmin requiere solicitud formal y no se usó. Con data anual, toda la dinámica intra-anual (estacionalidad agro, efecto tarifario) es invisible.\n"))
+cat(sprintf("2. **Tamaño muestral: n = %d.** %s\n", RES$n,
+            if (RES$n < CFG$est$min_n_ecm)
+              sprintf("Por debajo de %d, un ARDL/ECM con cointegración no tiene grados de libertad; se reporta OLS log-log + diferencias, como corresponde.", CFG$est$min_n_ecm)
+            else "Suficiente para intentar Engle-Granger, pero sigue siendo una muestra corta: los IC son anchos y los diagnósticos tienen poca potencia."))
+if (isTRUE(meta$income_is_proxy)) {
+  cat("3. **Proxy de ingreso.** Se usó el **PBI nacional** en lugar del PBI departamental de Ica. La demanda de ELDU la mueve el agro de Ica, cuyo ciclo (y su exposición a El Niño y a la demanda de exportación) no coincide con el nacional. η está medido contra el driver equivocado y debe leerse como aproximación.\n")
+} else {
+  cat("3. **Ingreso regional.** Se usó el VAB real de Ica del INEI, que es el driver correcto, pero se publica con rezago y revisiones.\n")
+}
+k <- 4
+if (isTRUE(RES$prudence$report_as_range)) {
+  cat(sprintf("%d. **IC ancho.** El IC 95%% de η tiene ancho %.2f. Reportar un punto daría una falsa precisión; se entrega como rango.\n", k, RES$prudence$ci_width)); k <- k + 1
+}
+if (!is.na(RES$collinearity$vif) && RES$collinearity$vif > 20) {
+  cat(sprintf("%d. **Colinealidad PBI–tendencia** (VIF = %.1f). En una serie corta y creciente, el PBI y el tiempo son casi la misma variable: separar \"efecto ingreso\" de \"tendencia\" es, en el límite, imposible con esta data.\n", k, RES$collinearity$vif)); k <- k + 1
+}
+if (!any(grepl("^oni_verano$", names(panel)))) {
+  cat(sprintf("%d. **Sin control climático.** Los índices ENSO de NOAA no se incorporaron, así que un año de El Niño entra como ruido en el residuo.\n", k)); k <- k + 1
+}
+if (!isTRUE(RES$oos$done)) {
+  cat(sprintf("%d. **Sin validación out-of-sample.** %s\n", k, RES$oos$note)); k <- k + 1
+}
+cat(sprintf("%d. **Alcance.** Esto es un modelo de alto nivel para una valorización DCF de comité, no una tesis econométrica. El objetivo es reemplazar η *a dedo* por una estimación trazable **con su incertidumbre** — no producir la cifra definitiva. Cuando llegue el SICOM mensual, migrar al pipeline ARDL/ECM completo.\n", k))
+```
+
+```{r repro, results='asis'}
+cat("\n\n---\n\n# Reproducibilidad\n\n")
+cat("- Semilla: `", CFG$seed, "`\n", sep = "")
+cat("- `output/sessionInfo.txt` — versiones exactas de R y paquetes.\n")
+cat("- `data/raw/SOURCES.md` — procedencia (URL, fecha, SHA256) de cada archivo crudo.\n")
+cat("- `output/fetch_log.txt` — log completo de descargas, incluidas las fallidas.\n")
+cat("- Ejecutar todo con: `Rscript run_all.R`\n")
+```

@@ -1,0 +1,18 @@
+# Datos crudos binarios/pesados: NO se versionan, pero su procedencia sí queda
+# registrada en data/raw/SOURCES.md (URL, fecha, tamaño, SHA256).
+data/raw/*.xlsx
+data/raw/*.xls
+data/raw/*.zip
+data/raw/pdf/*.pdf
+data/raw/pdf_text/
+
+# Intermedios regenerables
+data/processed/
+
+# Sandboxes de los tests
+/tmp/eldu_smoke_*
+
+.Rhistory
+.RData
+.Rproj.user/
+renv/library/
