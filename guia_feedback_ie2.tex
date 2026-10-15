@@ -1,0 +1,1825 @@
+% ============================================================================
+%  guia_feedback_ie2.tex
+%  Guía de respuesta al feedback del jurado (IE1 -> IE2)
+%  Proyecto: Heterogeneidad bancaria, seguro interbancario y requerimientos
+%            de encaje en el Perú
+%  Compilar: pdflatex -> bibtex -> pdflatex x2
+% ============================================================================
+\documentclass[11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{booktabs,longtable,array}
+\usepackage[most]{tcolorbox}
+\usepackage[round]{natbib}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue!40!black,citecolor=blue!40!black,
+            urlcolor=blue!40!black}
+
+\bibliographystyle{apalike}
+
+% --- Cajas -----------------------------------------------------------------
+\newtcolorbox{jurado}{colback=blue!5,colframe=blue!40!black,
+                      title=Comentario del jurado,
+                      fonttitle=\bfseries\small, boxrule=0.6pt}
+\newtcolorbox{ie2}{colback=black!4,colframe=black!55,
+                   title=Compromiso para IE2,
+                   fonttitle=\bfseries\small, boxrule=0.6pt}
+
+% --- Macros de estructura --------------------------------------------------
+\newcommand{\diag}[1]{\par\noindent\textbf{Diagn\'ostico.}\ #1\par}
+\newcommand{\resp}{\par\noindent\textbf{Respuesta.}\par}
+\newcommand{\lit}{\par\noindent\textbf{Respaldo en literatura.}\par}
+
+% --- Notación --------------------------------------------------------------
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\NU}{\mathrm{NU}}
+\newcommand{\keff}{\kappa^{\mathrm{eff}}}
+
+\theoremstyle{definition}
+\newtheorem{prop}{Proposici\'on}
+\newtheorem{obs}{Observaci\'on}
+
+\title{\textbf{Gu\'ia de respuesta al feedback del jurado}\\[2mm]
+\large Heterogeneidad bancaria, seguro interbancario y requerimientos de
+encaje en el Per\'u\\[1mm]
+\normalsize Del Informe de Estudio 1 al Informe de Estudio 2}
+
+\author{Carlos G\'omez Puican \and Fabi\'an M\'endez Su\'arez}
+\date{Asesor: Marco Antonio Ortiz Sosa\\[1mm]
+Jurado: PhD C\'esar Salinas Depaz \quad PhD Joao Hern\'andez Calder\'on\\[2mm]
+Lima, octubre de 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent Este documento ordena los dieciocho comentarios recibidos en la
+sustentaci\'on del Plan de Trabajo y propone, para cada uno, una respuesta
+anclada en las ecuaciones del marco anal\'itico. No es un cap\'itulo del IE2:
+es el puente entre la cr\'itica del jurado y el contenido que el IE2 debe
+contener. Para cada comentario se indica si exige \emph{modelar} estructura
+adicional, \emph{justificar} una decisi\'on ya tomada, \emph{calibrar} un
+objeto a datos o \emph{posicionar} el trabajo en la literatura; se desarrolla
+la respuesta sobre la notaci\'on de la Secci\'on~\ref{sec:notacion}; y se cierra
+con un compromiso expl\'icito de qu\'e entra al IE2 y qu\'e queda fuera de
+alcance. Toda referencia citada fue cotejada contra su registro editorial; las
+que no pudieron verificarse figuran listadas, sin citarse, en el
+Ap\'endice~\ref{sec:verificacion}.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+% ===========================================================================
+\section{C\'omo leer este documento}
+% ===========================================================================
+
+El jurado plante\'o dieciocho observaciones. Le\'idas en conjunto, no son
+dieciocho pedidos independientes: son seis preguntas de fondo sobre si el
+marco es un modelo o una ilustraci\'on. Este documento las agrupa en esos seis
+bloques y responde cada comentario con el mismo formato fijo: cita textual,
+diagn\'ostico en una l\'inea, respuesta anclada en ecuaciones, respaldo en
+literatura verificada y compromiso para el IE2.
+
+Tres advertencias de lectura, que el documento respeta de principio a fin.
+
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Utilizaci\'on no es transferencia neta.} El objeto que el marco
+mide hoy es $C^u_k/d^u_k$: cobertura esperada recibida por unidad de dep\'osito.
+Hablar de subsidio cruzado exige especificar propiedad del fondo, remuneraci\'on,
+repago y absorci\'on de p\'erdidas. Esa distinci\'on no se relaja en ninguna
+respuesta; donde se promete avanzar hacia transferencias netas (C4) se dice
+expl\'icitamente qu\'e estructura adicional hace falta.
+
+\item \textbf{Honestidad sobre lo no resuelto.} Varias respuestas terminan en
+``esto no se hace en el IE2''. Eso es deliberado: el valor del plan est\'a en
+que sus hip\'otesis son refutables, no en que todas las extensiones est\'en
+prometidas.
+
+\item \textbf{Las referencias est\'an verificadas, no recordadas.} Cada
+\texttt{\textbackslash cite} de este documento corresponde a una entrada cotejada
+contra revista, volumen y p\'aginas. El Ap\'endice~\ref{sec:verificacion}
+reporta qu\'e qued\'o sin verificar y por qu\'e; entre ello, una referencia que
+la gu\'ia de trabajo atribu\'ia a uno de los miembros del jurado.
+\end{enumerate}
+
+% ===========================================================================
+\section{Resumen ejecutivo: mapa de los dieciocho comentarios}
+% ===========================================================================
+
+\begin{longtable}{@{}p{0.6cm}p{5.6cm}p{1.3cm}p{2.5cm}p{4.2cm}@{}}
+\toprule
+\textbf{ID} & \textbf{Comentario} & \textbf{Bloque} & \textbf{Tipo} &
+\textbf{Estado} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{ID} & \textbf{Comentario} & \textbf{Bloque} & \textbf{Tipo} &
+\textbf{Estado} \\
+\midrule
+\endhead
+C1  & Ser muy exigentes con cada ecuaci\'on, aun la m\'as b\'asica & A & JUSTIFICAR & Derivaciones existen; faltaba exponerlas paso a paso (Ap.~\ref{sec:derivaciones}) \\
+C13 & Las capas suenan l\'ogicas, como si forzaran las hip\'otesis & A & JUSTIFICAR & Respuesta fuerte: el modelo puede refutarse a s\'i mismo \\
+C16 & Decisi\'on \'optima del portafolio ($\omega_k$) & A & MODELAR & $\omega_k$ es el choque, exógeno; la elecci\'on es sobre $u_k$ \\
+C17 & Elecci\'on \'optima de $\omega$ con encaje legal distinto, v\'ia utilidad & A & MODELAR & Reformulado como elecci\'on de cartera con $\rho^s\neq\rho^u$ \\
+C18 & Elecciones \'optimas de $k$ (teor\'ia) & A/F & JUSTIFICAR & Criterio formal de tipos informativos \\
+C5  & Justificar est\'atico vs din\'amico & B & JUSTIFICAR & Tres argumentos; l\'imite reconocido \\
+C4  & La decisi\'on de cr\'edito/dep\'ositos es m\'as din\'amica & B & MODELAR & Extensi\'on de dos per\'iodos especificada \\
+C2  & Interbancario vs ventanilla dada la overnight (SOFR) & C & MODELAR & Cascada expl\'icita por costo marginal \\
+C3  & Tasa de inter\'es real en soles para la decisi\'on de acceso & C & MODELAR/\allowbreak CALIBRAR & El fractil es invariante al deflactor; el TCR entra entre monedas \\
+C7  & Entrada / no entrada de bancos al interbancario & C & MODELAR & Margen extensivo con costo fijo de participaci\'on \\
+C14 & No hay tasa objetivo; expectativas distintas por tama\~no & C & MODELAR & Oferta end\'ogena con acaparamiento \\
+C12 & Dado el pool de recursos, c\'omo modelar lo que falta & C & MODELAR & Mapa completo + cota de max-flow \\
+C6  & Imponer costo de financial distress en la minimizaci\'on & D & MODELAR & Rompe $\pi^*_k=c/\kappa$ com\'un entre tipos \\
+C11 & Funciones de optimizaci\'on para el encaje voluntario & D & MODELAR & \textbf{Resuelto}; se documenta \\
+C8  & Tipo de cambio real y descalce cambiario & E & MODELAR & Hoy ausente por construcci\'on; tres extensiones ordenadas \\
+C15 & La capa de monedas introduce muchas diferencias & E & JUSTIFICAR & Seis supuestos, uno por uno, con grados de libertad contados \\
+C9  & Justificar categor\'ias y c\'omo definir $K$ & F & JUSTIFICAR/\allowbreak CALIBRAR & Trade-off sesgo--varianza con referencia formal \\
+C10 & Elecci\'on de $F$ por tipo; por qu\'e la misma uniforme & F & JUSTIFICAR & \textbf{Resuelto}: misma $G$, distinta escala $\sigma_k$ \\
+\bottomrule
+\end{longtable}
+
+\noindent\textbf{Prioridad de profundidad.} C13, C14, C8, C6 y C2 reciben el
+tratamiento m\'as extenso por ser los de mayor peso cr\'itico. C11 y C10 est\'an
+esencialmente resueltos y se documentan sin reabrirse.
+
+% ===========================================================================
+\section{Notaci\'on de referencia}\label{sec:notacion}
+% ===========================================================================
+
+Toda respuesta se escribe sobre esta notaci\'on, sin alterarla.
+
+\paragraph{Capa 1 --- balance y saldo tras el choque.}
+\begin{align}
+b + d\,m &= d + E, & m &= \rho + u, \quad u\ge 0, \label{eq:balance}\\
+s &= \begin{cases}
+d(\omega+u), & \text{encaje no utilizable (NU)}\\
+d(\omega+m), & \text{encaje utilizable (U)}
+\end{cases} \label{eq:saldo}
+\end{align}
+
+\paragraph{Capa 2 --- riesgo idiosincr\'atico.} $e_k\sim F_k$ con media cero;
+d\'eficit y excedente esperados
+\begin{equation}
+S^-_k=\E_e\big[(-s_k)^+\big],\qquad S^+_k=\E_e\big[(s_k)^+\big].
+\label{eq:SpSm}
+\end{equation}
+
+\paragraph{Capa 3 --- acceso y racionamiento.}
+\begin{equation}
+\tau_k=1-e^{-\lambda_k},\qquad
+\Psi^-_k=\tau_k\min\!\Big(1,\tfrac{P}{Q}\Big),\qquad
+P=\sum_k\mu_k\tau_k S^+_k,\quad Q=\sum_k\mu_k\tau_k S^-_k.
+\label{eq:interbancario}
+\end{equation}
+
+\paragraph{Capa 4 --- monedas y respaldo.}
+\begin{align}
+\omega^c_k&=\beta_k A^c+e^c_k, &
+A^s&=0,\quad
+A^u=\begin{cases}-\eta,&\text{prob. }p\\ 0,&\text{prob. }1-p\end{cases}
+\label{eq:monedas}\\
+\Delta^c(A)&=\sum_k\mu_k\big(1-\Psi^{-,c}_k(A)\big)S^{c-}_k(A), \label{eq:delta}\\
+F^u&=\mathbf{1}\{\NU\}\,\nu^u_F\,\rho^u D^u+R^D, &
+\varphi(A)&=\min\!\Big(1,\tfrac{F^u}{\Delta^u(A)}\Big). \label{eq:phi}
+\end{align}
+
+\paragraph{Incidencia (objeto central).}
+\begin{equation}
+C^u_k=\E\big[\varphi(A)\,(1-\Psi^{-,u}_k(A))\,S^{u-}_k(A)\big],
+\qquad\text{m\'etrica: } \frac{C^u_k}{d^u_k}\ \text{(utilizaci\'on).}
+\label{eq:incidencia}
+\end{equation}
+
+\paragraph{Colch\'on voluntario end\'ogeno (nota anal\'itica, octubre 2026).}
+El banco elige $u_k$ antes del choque resolviendo
+\begin{equation}
+\min_{u_k\ge 0}\ \mathcal{C}_k(u_k)= c\,u_k+\kappa\,\E\big[(-\varepsilon_k-u_k)^+\big],
+\label{eq:newsvendor}
+\end{equation}
+con condici\'on de primer orden de fractil cr\'itico
+\begin{equation}
+F_k(-u^*_k)=\frac{c}{\kappa}
+\quad\Longleftrightarrow\quad
+\pi^*_k\equiv\Pr(s_k<0)=\frac{c}{\kappa},
+\label{eq:cpo}
+\end{equation}
+y cierre de localizaci\'on--escala $\varepsilon_k=\sigma_k\zeta$, $\zeta\sim G$
+sim\'etrica y de soporte completo:
+\begin{equation}
+u^*_k=\sigma_k\,q,\quad q\equiv G^{-1}\!\Big(1-\frac{c}{\kappa}\Big)>0,
+\qquad D^*_k=\sigma_k\,\mathcal{D}(q),\quad
+\mathcal{D}(q)\equiv\E\big[(\zeta-q)^+\big].
+\label{eq:locscale}
+\end{equation}
+Con acceso heterog\'eneo, el costo marginal \emph{efectivo} del faltante es
+\begin{equation}
+\keff_k=\psi_k\,\rho^{ib}+(1-\psi_k)\,\kappa,
+\qquad
+u^*_k=\sigma_k\,G^{-1}\!\Big(1-\frac{c}{\keff_k}\Big).
+\label{eq:kappaeff}
+\end{equation}
+El equilibrio es el punto fijo del mapa $T:t\mapsto t'$ con
+$t=\min(1,P/Q)$, recorriendo
+$t\to\keff_k\to u^*_k\to (D_k,X_k)\to (P,Q)\to t'$.
+
+\paragraph{Distribuci\'on del choque.} \emph{Baseline} cuantitativo: normal
+est\'andar (opcionalmente truncada por abajo), $F_k(x)=G(x/\sigma_k)$, con
+$\sigma_k$ calibrada a la volatilidad del crecimiento de dep\'ositos (SBS) y
+$G$ com\'un a ambas monedas. La uniforme se conserva solo como caso cerrado de
+la capa base.
+
+% ===========================================================================
+\section{Bloque A. Rigor y fundamentaci\'on de la decisi\'on \'optima}
+% ===========================================================================
+
+\subsection{C1. Exigencia ecuaci\'on por ecuaci\'on}\label{sub:C1}
+
+\begin{jurado}
+``Primero, ser recontra \emph{pickies} con cada ecuaci\'on, as\'i sea la m\'as
+b\'asica.''
+\end{jurado}
+
+\diag{JUSTIFICAR. Las derivaciones existen; lo que falta es exhibirlas con sus
+supuestos, sus casos de borde y sus verificaciones de consistencia.}
+
+\resp
+La respuesta no es defender las ecuaciones sino someterlas a un protocolo
+visible. El Ap\'endice~\ref{sec:derivaciones} deriva, l\'inea por l\'inea, la
+restricci\'on de balance \eqref{eq:balance}, el saldo \eqref{eq:saldo} bajo NU y
+U, los momentos parciales \eqref{eq:SpSm}, la regla de racionamiento
+\eqref{eq:interbancario}, el respaldo \eqref{eq:phi} y la CPO
+\eqref{eq:cpo}. Cada derivaci\'on reporta cuatro cosas: de d\'onde sale la
+ecuaci\'on, qu\'e supuesto usa, qu\'e ocurre en los bordes y qu\'e se pierde al
+escribirla as\'i.
+
+Dos elementos del protocolo merecen anticiparse aqu\'i porque son los que
+convierten la exigencia del jurado en una ventaja.
+
+\paragraph{(i) Identidades de consistencia.} El marco admite verificaciones que
+deben reportarse expl\'icitamente, porque si fallan el modelo est\'a mal escrito.
+Bajo NU y $\E[\varepsilon_k]=0$, por unidad de dep\'osito,
+\begin{equation}
+X_k - D_k = \E[s_k] = u_k
+\qquad\Longrightarrow\qquad X_k = D_k + u_k,
+\label{eq:identidad1}
+\end{equation}
+de modo que excedente y d\'eficit esperados no son objetos libres: su diferencia
+es el colch\'on. En el interbancario, la regla proporcional satisface
+\begin{equation}
+\sum_k \mu_k \Psi^-_k S^-_k
+= \min\!\Big(1,\tfrac{P}{Q}\Big)\sum_k\mu_k\tau_k S^-_k
+= \min(P,Q),
+\label{eq:identidad2}
+\end{equation}
+es decir, lo efectivamente transferido nunca excede la oferta y agota la
+demanda cuando hay recursos suficientes. Y en el respaldo,
+\begin{equation}
+\sum_k\mu_k C^u_k=\E\big[\varphi(A)\,\Delta^u(A)\big]
+=\E\big[\min\big(F^u,\Delta^u(A)\big)\big]\le F^u,
+\label{eq:identidad3}
+\end{equation}
+que es la condici\'on de que el fondo no reparte m\'as de lo que tiene. Estas
+tres identidades deben aparecer en el IE2 como \emph{checks} num\'ericos de la
+soluci\'on, no solo como \'algebra.
+
+\paragraph{(ii) Convenciones de borde.} Los operadores $(\cdot)^+$ y $\min$
+introducen quiebres. El cuadro siguiente fija el tratamiento y, sobre todo,
+declara que ninguna convenci\'on altera asignaciones efectivas.
+
+\begin{center}
+\begin{tabular}{@{}p{3.2cm}p{3.6cm}p{7.4cm}@{}}
+\toprule
+\textbf{Caso} & \textbf{Convenci\'on} & \textbf{Justificaci\'on} \\
+\midrule
+$Q^c(A)=0$ & $\psi^c_k(A)=0$ & No hay demanda que cubrir; el cociente $P/Q$ es
+indeterminado pero la asignaci\'on es cero por ambas v\'ias. \\
+$\Delta^u(A)=0$ & $\varphi(A)=1$ & No hay faltante residual; $\varphi$ multiplica
+a cero en \eqref{eq:incidencia}. \\
+$c/\kappa\ge F_k(0)$ & $u^*_k=0$ & Soluci\'on de esquina de \eqref{eq:newsvendor};
+con $G$ sim\'etrica, $F_k(0)=1/2$, luego el colch\'on es interior si y solo si
+$c<\kappa/2$. \\
+$P/Q>1$ & $\Psi^-_k=\tau_k$ & El racionamiento no muerde; el \'unico l\'imite es
+el contacto. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\lit
+No hay literatura que ``apruebe'' una derivaci\'on, pero s\'i la hay que muestra
+que las ecuaciones b\'asicas del marco son contabilidad est\'andar de la firma
+bancaria y no construcciones \emph{ad hoc}: \citet{baltensperger1980} sistematiza
+la elecci\'on conjunta de cartera y colch\'on bajo la restricci\'on de balance, y
+\citet{poole1968} plantea la gesti\'on de reservas como un problema de inventario
+estoc\'astico con \'optimo de fractil cr\'itico, que es exactamente la estructura
+de \eqref{eq:newsvendor}--\eqref{eq:cpo}, sesenta a\~nos antes de este trabajo.
+
+\begin{ie2}
+\textbf{Entra:} un ap\'endice de derivaciones paso a paso; las tres identidades
+\eqref{eq:identidad1}--\eqref{eq:identidad3} reportadas como verificaciones
+num\'ericas de la soluci\'on; el cuadro de convenciones de borde.
+\textbf{Queda fuera:} demostraciones de existencia y unicidad en generalidad
+m\'axima; la unicidad del punto fijo se verifica num\'ericamente sobre la grilla
+de calibraci\'on y se reporta como tal.
+\end{ie2}
+
+\subsection{C13. ``Las capas parecen forzar las hip\'otesis''}\label{sub:C13}
+
+\begin{jurado}
+``Las capas suenan bastante l\'ogicas, como si estuvieran tratando de forzar las
+hip\'otesis.''
+\end{jurado}
+
+\diag{JUSTIFICAR. Es el comentario de mayor peso y admite una respuesta
+demostrativa, no ret\'orica.}
+
+\resp
+La objeci\'on tiene una forma precisa: si cada capa se introduce para que
+aparezca el resultado que se quiere, el modelo no prueba nada. Hay tres
+respuestas, y la tercera es la que cierra el punto.
+
+\paragraph{(1) Las capas son una secuencia expositiva de un \emph{solo} modelo.}
+El objeto de an\'alisis es la capa~4; las capas 1--3 son restricciones de ese
+mismo modelo. Formalmente: la capa~1 es el caso $K=1$, $\sigma_k=\sigma$,
+$\tau_k=1$, $c\in\{s\}$; la capa~2 relaja $K=1$; la capa~3 relaja $\tau_k=1$;
+la capa~4 relaja la moneda \'unica. No hay par\'ametros nuevos entre capas que no
+est\'en en la capa~4. Esto es verificable: la lista de par\'ametros del modelo
+completo es $\{\rho^c,\ \sigma_k,\ \lambda_k,\ w_k,\ \mu_k,\ \beta_k,\ p,\ \eta,\
+\nu^u_F,\ R^D,\ c,\ \rho^{ib},\ r_W,\ \bar\kappa\}$ y cada capa usa un
+subconjunto.
+
+\paragraph{(2) Cada dimensi\'on se disciplina con un momento observable, no con
+un grado de libertad.} $\rho^c$ se observa (BCRPData); $w_k$ se observa (SBS);
+$\sigma_k$ se calibra a la volatilidad del crecimiento de dep\'ositos por clase
+(SBS); $c$, $\rho^{ib}$ y $r_W$ se anclan al corredor de tasas
+(Secci\'on~\ref{sub:C3}); $\lambda_k$ no es observable y se recorre en grilla, lo
+que el PT ya declara. Los par\'ametros genuinamente libres son \emph{tres}:
+$\nu^u_F$ y $R^D$ ---la fracci\'on movilizable del fondo y el respaldo adicional en
+d\'olares--- y el costo de liquidaci\'on $\bar\kappa$. Los tres se reportan con
+bandas de sensibilidad. Un modelo con tres grados de libertad declarados, y con
+una dimensi\'on ($\lambda_k$) recorrida en grilla en lugar de ajustada, no es un
+modelo que ``acomoda''.
+
+\paragraph{(3) El modelo puede refutar su propia conjetura.} Este es el
+argumento decisivo. Con heterogeneidad \emph{solo} en exposici\'on, el cierre de
+localizaci\'on--escala \eqref{eq:locscale} da $u^*_k=\sigma_k q$ con $q$ com\'un y
+$D^*_k=\sigma_k\mathcal{D}(q)$: el autoseguro reescala pero no invierte el
+ordenamiento por $\sigma_k$. El resultado de incidencia ingenuo sobrevive. Pero
+basta activar la capa~3 para que deje de sobrevivir. Con acceso heterog\'eneo,
+\eqref{eq:kappaeff} implica
+\begin{equation}
+\lambda_k\downarrow\ \Longrightarrow\ \tau_k\downarrow\ \Longrightarrow\
+\psi_k\downarrow\ \Longrightarrow\ \keff_k\uparrow\ \Longrightarrow\
+q_k\equiv G^{-1}\!\Big(1-\frac{c}{\keff_k}\Big)\uparrow\ \Longrightarrow\
+u^*_k\uparrow,\quad D^*_k=\sigma_k\mathcal{D}(q_k)\downarrow,
+\label{eq:cadena}
+\end{equation}
+puesto que $\mathcal{D}'(q)=-\big(1-G(q)\big)<0$. La utilizaci\'on esperada del
+tipo $k$ por unidad de dep\'osito se mueve entonces por dos fuerzas de signo
+opuesto:
+\begin{equation}
+\frac{C^u_k}{d^u_k}\ \propto\
+\underbrace{\big(1-\Psi^{-,u}_k\big)}_{\text{peor acceso}\ \Rightarrow\ \uparrow}
+\times
+\underbrace{\sigma_k\,\mathcal{D}(q_k)}_{\text{peor acceso}\ \Rightarrow\ \downarrow}.
+\label{eq:ambiguedad}
+\end{equation}
+El signo neto es una cuesti\'on cuantitativa, no te\'orica. Es decir: \emph{el
+modelo con colch\'on end\'ogeno puede producir el ordenamiento contrario al que la
+hip\'otesis H2 sugiere}. Un marco construido para forzar sus hip\'otesis no
+exhibe esta propiedad.
+
+Lo mismo vale para H1. El canal asegurador en d\'olares opera a trav\'es de
+$\kappa^{u,\mathrm{eff}}>\kappa^{s,\mathrm{eff}}$, que a su vez depende de que
+$\varphi$ sea menos el\'astica en d\'olares. Si el respaldo cubriera todos los
+estados relevantes aun con $\rho^u=0$, entonces $\varphi\equiv 1$,
+$\kappa^{u,\mathrm{eff}}\to\rho^{ib}$ y el motivo asegurador desaparece. H1 tiene
+por tanto una condici\'on de refutaci\'on expl\'icita y calibrable: si al calibrar
+resulta $\kappa^{u,\mathrm{eff}}\le\kappa^{s,\mathrm{eff}}$, H1 cae.
+
+\begin{obs}
+Conviene presentar \eqref{eq:ambiguedad} en la sustentaci\'on como el resultado
+principal del avance desde el IE1, no como una complicaci\'on t\'ecnica. Es la
+prueba de que las capas disciplinan en lugar de decorar.
+\end{obs}
+
+\lit
+Tres apoyos. \citet{poole1968} y \citet{baltensperger1980} muestran que la
+estructura de decisi\'on usada no se dise\~n\'o para este resultado: es la forma
+can\'onica del problema de reservas. \citet{bianchibigio2022} microfundan el
+trade-off entre el costo de mantener liquidez y el de conseguirla tras el choque,
+que es el par $(c,\kappa)$ de \eqref{eq:newsvendor}. Y
+\citet{bonhomme2022} dan el criterio formal por el cual una partici\'on en $K$
+tipos es una aproximaci\'on con error acotado, no una elecci\'on libre
+(Secci\'on~\ref{sub:C9}).
+
+\begin{ie2}
+\textbf{Entra:} la derivaci\'on \eqref{eq:cadena}--\eqref{eq:ambiguedad} como
+resultado del cap\'itulo de modelo; la lista expl\'icita de par\'ametros con su
+estatus (observado / calibrado / libre); las dos condiciones de refutaci\'on (de
+H1 y de H2) enunciadas antes de los resultados num\'ericos.
+\textbf{Queda fuera:} un argumento de identificaci\'on causal del encaje
+hist\'orico, que el trabajo no reclama.
+\end{ie2}
+
+\subsection{C16 y C17. Decisi\'on \'optima de cartera y encaje legal por moneda}
+\label{sub:C16}
+
+\begin{jurado}
+``Decisi\'on \'optima del portafolio (omega sub k).''\\[1mm]
+``Yo hago una elecci\'on \'optima del omega tomando en cuenta que el encaje legal
+es diferente y bas\'andose en funciones de utilidad.''
+\end{jurado}
+
+\diag{MODELAR, precedido de una desambiguaci\'on de notaci\'on que el IE2 debe
+hacer en la primera p\'agina del cap\'itulo de modelo.}
+
+\resp
+
+\paragraph{Desambiguaci\'on.} En \eqref{eq:monedas}, $\omega^c_k$ es el
+\emph{choque} de retiros, no una variable de decisi\'on: el banco no elige cu\'anto
+le retiran. La notaci\'on invita al malentendido y debe corregirse en el IE2
+(propuesta: renombrar el choque como $\xi^c_k$ y reservar $\omega$ para
+ponderadores de cartera, o bien decir expl\'icitamente en el texto que $\omega$ es
+exógeno). El comentario del jurado es, le\'ido correctamente, un pedido
+leg\'itimo: \emph{d\'onde est\'a la decisi\'on \'optima de cartera}.
+
+\paragraph{La decisi\'on de cartera es la decisi\'on de colch\'on.} De
+\eqref{eq:balance}, dados $d^c_k$ y $E^c_k$,
+\begin{equation}
+b^c_k = d^c_k\big(1-\rho^c-u^c_k\big)+E^c_k,
+\label{eq:cartera}
+\end{equation}
+de modo que elegir $u^c_k$ \emph{es} elegir $b^c_k$: la composici\'on de la cartera
+entre cr\'edito y liquidez tiene un solo grado de libertad por moneda. No hay una
+decisi\'on de portafolio adicional escondida.
+
+\paragraph{De la funci\'on de utilidad a la CPO newsvendor.} El jurado pide que
+esa elecci\'on venga de un problema de utilidad. Escr\'ibase el beneficio esperado
+del banco del tipo $k$, por moneda, con $r^c_L$ el retorno del cr\'edito, $r^c_R$
+la remuneraci\'on del encaje, $r^c_0$ el retorno del colch\'on voluntario y
+$r^c_D$ el costo de los dep\'ositos:
+\begin{equation}
+\Pi^c_k=r^c_L b^c_k+r^c_R\rho^c d^c_k+r^c_0 u^c_k d^c_k-r^c_D d^c_k
+-\keff_k\,d^c_k\,\E\big[(-\varepsilon^c_k-u^c_k)^+\big].
+\label{eq:utilidad}
+\end{equation}
+Sustituyendo \eqref{eq:cartera} y derivando respecto de $u^c_k$, los t\'erminos
+que no dependen del colch\'on desaparecen y queda, por unidad de dep\'osito,
+\begin{equation}
+\max_{u^c_k\ge0}\ \Pi^c_k
+\quad\Longleftrightarrow\quad
+\min_{u^c_k\ge0}\ \underbrace{(r^c_L-r^c_0)}_{\textstyle \equiv\, c^c}u^c_k
++\keff_k\,\E\big[(-\varepsilon^c_k-u^c_k)^+\big],
+\label{eq:equivalencia}
+\end{equation}
+que es exactamente \eqref{eq:newsvendor}. \textbf{Este es el punto central de la
+respuesta a C17:} el problema newsvendor no es una forma reducida impuesta, es
+la consecuencia de maximizar beneficio sujeto a la restricci\'on de balance, y
+$c$ tiene una lectura expl\'icita --- el margen de colocaci\'on neto sacrificado
+por mantener liquidez ociosa.
+
+\paragraph{D\'onde entra el encaje legal diferenciado.} El par\'ametro $\rho^c$
+entra por dos v\'ias, y conviene separarlas porque tienen implicancias distintas.
+
+\emph{(a) V\'ia de cantidad (siempre activa).} En \eqref{eq:cartera}, un $\rho^c$
+mayor desplaza cr\'edito uno a uno. Como $\rho^u\gg\rho^s$ en el Per\'u
+(35{,}37\,\% frente a 5{,}56\,\% en julio de 2026), el desplazamiento es un orden
+de magnitud mayor en d\'olares. Pero esta v\'ia no toca $u^{*c}_k$: bajo NU,
+$\rho^c$ no aparece en \eqref{eq:equivalencia}.
+
+\emph{(b) V\'ia de sustituci\'on (solo bajo U).} Bajo encaje utilizable,
+$m^c_k=\rho^c+u^c_k$ y la restricci\'on $u^c_k\ge0$ se convierte en
+$m^c_k\ge\rho^c$. El \'optimo es entonces
+\begin{equation}
+m^{*c}_k=\max\Big\{\rho^c,\ \sigma^c_k\,G^{-1}\!\Big(1-\frac{c^c}{\keff_k}\Big)\Big\},
+\label{eq:umbral}
+\end{equation}
+es decir, el requerimiento legal \emph{muerde} si y solo si excede la liquidez
+que el banco habr\'ia elegido por s\'i mismo. Esto genera tres predicciones
+contrastables y, de paso, deriva como resultado el ``umbral de encaje'' que el
+Anexo~IV del PT listaba como resultado secundario:
+\begin{enumerate}[leftmargin=*,itemsep=1pt]
+\item Dado que $\rho^u\gg\rho^s$, el requerimiento en d\'olares es mucho m\'as
+probablemente vinculante y el de soles m\'as probablemente holgado; la liquidez
+voluntaria observada deber\'ia concentrarse en soles.
+\item El encaje vinculante sustituye liquidez voluntaria y reduce
+mec\'anicamente la probabilidad de faltante por debajo de $c/\keff_k$: la
+``prima'' deja de ser elegida por el banco.
+\item Los bancos con $\sigma_k$ alto son los menos afectados por el
+requerimiento, porque su \'optimo privado ya est\'a por encima; la incidencia del
+encaje como restricci\'on recae en los bancos de bajo riesgo de fondeo --- un
+resultado distributivo distinto al de la incidencia del seguro, y que conviene
+no mezclar con \'el.
+\end{enumerate}
+
+\paragraph{Aversi\'on al riesgo (extensi\'on acotada).} Si en lugar de beneficio
+esperado se maximiza $\E[\,\mathcal{U}(\Pi^c_k)\,]$ con $\mathcal{U}$ c\'oncava, la
+CPO \eqref{eq:cpo} se convierte en una condici\'on de fractil \emph{ponderada por
+utilidad marginal}:
+\begin{equation}
+F_k(-u^*_k)=\frac{c}{\kappa}\cdot
+\frac{\E[\mathcal{U}'(\Pi_k)\mid s_k\ge0]}{\E[\mathcal{U}'(\Pi_k)\mid s_k<0]}
+\ <\ \frac{c}{\kappa},
+\label{eq:aversion}
+\end{equation}
+porque la utilidad marginal es mayor en los estados de faltante. La aversi\'on al
+riesgo eleva el colch\'on \'optimo y, lo que importa para la incidencia, rompe la
+igualdad de $\pi^*_k$ entre tipos si los tipos difieren en capitalizaci\'on. Se
+propone enunciar \eqref{eq:aversion} y dejar la cuantificaci\'on fuera del IE2.
+
+\lit
+\citet{baltensperger1980} y \citet{poole1968} para la equivalencia entre elecci\'on
+de cartera y gesti\'on de reservas bajo la restricci\'on de balance;
+\citet{bianchibigio2022} para la versi\'on moderna con costos de fondeo ex post;
+\citet{froot1993} para la l\'ogica por la cual el objetivo relevante es convexo en
+el faltante de fondos internos, que es lo que justifica \eqref{eq:aversion}.
+
+\begin{ie2}
+\textbf{Entra:} la desambiguaci\'on notacional de $\omega$; la derivaci\'on
+\eqref{eq:utilidad}--\eqref{eq:equivalencia} como secci\'on del cap\'itulo de
+modelo; el resultado \eqref{eq:umbral} con sus tres predicciones.
+\textbf{Queda fuera:} la calibraci\'on del caso con aversi\'on al riesgo
+\eqref{eq:aversion}; se enuncia y se deja como extensi\'on.
+\end{ie2}
+
+\subsection{C18. Elecci\'on te\'orica de los tipos $k$}\label{sub:C18}
+
+\begin{jurado}
+``Elecciones \'optimas de $k$ (teor\'ia).''
+\end{jurado}
+
+\diag{JUSTIFICAR. Hay un criterio formal de qu\'e hace que un tipo sea un tipo, y
+el IE2 debe enunciarlo antes de proponer ninguna partici\'on emp\'irica.}
+
+\resp
+En el modelo, un banco entra solo a trav\'es de cuatro objetos:
+$(\sigma_k,\lambda_k,w_k)$ y su masa $\mu_k$. Esto permite un criterio exacto.
+
+\begin{prop}[Tipos informativos]
+Sea $H$ la distribuci\'on conjunta de $(\sigma,\lambda,w)$ en la poblaci\'on de
+bancos, ponderada por dep\'ositos. Todos los objetos de equilibrio del modelo
+---$P$, $Q$, $t=\min(1,P/Q)$, $\Delta^c(A)$, $\varphi(A)$ y el perfil de
+incidencia $\{C^u_k/d^u_k\}$--- son funcionales de $H$ \'unicamente. En
+consecuencia, dos bancos son \emph{model-equivalentes} si y solo si comparten
+$(\sigma,\lambda,w)$, y una partici\'on en $K$ clases es \emph{informativa} si y
+solo si altera el funcional, esto es, si cambia $t$ o el perfil
+$\{C^u_k/d^u_k\}$ m\'as all\'a de la banda de sensibilidad reportada.
+\end{prop}
+
+\noindent El contenido pr\'actico de la proposici\'on es doble. Primero, variables
+que no entran en $(\sigma,\lambda,w)$ ---tama\~no por s\'i mismo, propiedad del
+banco, origen del capital--- no definen tipos: definen tipos solo en la medida
+en que \emph{predicen} esos tres momentos. Esto responde directamente a la
+sospecha de que las categor\'ias se imponen: la categor\'ia no es un supuesto
+primitivo, es un resumen de momentos. Segundo, el criterio de parada es
+operativo y se puede reportar: se subdivide mientras subdividir mueva el
+funcional.
+
+Formalmente, elegir $K$ es discretizar $H$. \citet{bonhomme2022} muestran que el
+sesgo de aproximaci\'on de reemplazar una distribuci\'on continua de
+heterogeneidad por $K$ puntos de soporte decrece con $K$ a una tasa conocida
+bajo suavidad, mientras que el ruido de estimaci\'on de los momentos de cada
+clase crece al repartir la muestra; existe por tanto un $K$ interior \'optimo y no
+una preferencia por ``m\'as tipos''. Es el argumento que falta en el PT y el que
+el jurado especializado en agentes heterog\'eneos va a buscar.
+
+\lit
+\citet{bonhomme2022} para la formalizaci\'on del trade-off de discretizaci\'on;
+\citet{bonhommemanresa2015} para la posibilidad de \emph{estimar} los grupos del
+panel en lugar de imponerlos (v\'ease Secci\'on~\ref{sub:C9});
+\citet{acharya2017systemic} para la l\'ogica de que la contribuci\'on relevante de
+una instituci\'on se mide por su aporte al d\'eficit esperado del sistema, que es
+justamente el funcional de inter\'es.
+
+\begin{ie2}
+\textbf{Entra:} la Proposici\'on~1 enunciada en el cap\'itulo de modelo; el criterio
+de parada; la justificaci\'on formal de $K$ por referencia a
+\citet{bonhomme2022}.
+\textbf{Queda fuera:} una demostraci\'on de la tasa de convergencia en este marco
+espec\'ifico; se invoca el resultado general.
+\end{ie2}
+
+% ===========================================================================
+\section{Bloque B. Est\'atico frente a din\'amico}
+% ===========================================================================
+
+\subsection{C5. Justificaci\'on del marco est\'atico}\label{sub:C5}
+
+\begin{jurado}
+``Justificar el ser est\'atico vs din\'amico.''
+\end{jurado}
+
+\diag{JUSTIFICAR, con reconocimiento expl\'icito de lo que el marco est\'atico no
+puede contestar.}
+
+\resp
+Tres argumentos, en orden de fuerza.
+
+\paragraph{(1) La pregunta es de reparto, no de trayectoria.} El objeto central
+es \eqref{eq:incidencia}: qui\'en utiliza la cobertura por unidad de dep\'osito.
+Esa es una pregunta de secci\'on transversal condicional a un estado agregado. Un
+modelo din\'amico responder\'ia una pregunta distinta ---c\'omo evoluciona la
+utilizaci\'on tras un choque--- que no es la que se formula.
+
+\paragraph{(2) La estructura aseguradora es intr\'insecamente de un disparo.} Un
+seguro tiene un momento ex ante (se decide la cobertura sin conocer el
+siniestro) y uno ex post (se eval\'ua el siniestro). El marco reproduce
+exactamente esa secuencia: $u_k$ se elige antes de $\varepsilon_k$ y de $A$;
+$\Psi_k$ y $\varphi$ se resuelven despu\'es. A\~nadir per\'iodos no agrega
+estructura aseguradora: agrega reconstituci\'on del colch\'on, que es otro
+fen\'omeno. La l\'ogica es la misma por la cual el modelo can\'onico de liquidez
+bancaria opera con tres fechas y no con horizonte infinito
+\citep{diamonddybvig1983,holmstromtirole1998}.
+
+\paragraph{(3) Tractabilidad e identificaci\'on.} El modelo ya combina
+heterogeneidad en dos dimensiones, un estado agregado, un mercado OTC con
+racionamiento y una restricci\'on de respaldo finito. Un an\'alogo din\'amico
+exigir\'ia una distribuci\'on de estados como objeto de equilibrio y har\'ia que
+los resultados dependieran de condiciones iniciales no observadas. El costo no
+es solo computacional: es de comunicaci\'on de los mecanismos, que es lo que el
+trabajo busca aislar.
+
+\paragraph{Lo que el marco est\'atico no puede decir.} Debe decirse sin rodeos:
+(i) no puede calcular transferencias netas, porque el aporte al fondo y el uso
+de la cobertura ocurren en el mismo instante (ver C4); (ii) no puede hablar de
+reconstituci\'on del colch\'on ni de persistencia de la tensi\'on; (iii) no puede
+distinguir iliquidez transitoria de insolvencia. Las tres limitaciones ya est\'an
+en el alcance declarado del PT y deben repetirse en el IE2.
+
+\lit
+\citet{diamonddybvig1983} y \citet{holmstromtirole1998} para la tradici\'on de
+modelos de liquidez con pocas fechas;
+\citet{allencarlettigale2009} para el caso en que la intervenci\'on del banco
+central se analiza en un marco de horizonte corto sin perder el mecanismo.
+
+\begin{ie2}
+\textbf{Entra:} una subsecci\'on expl\'icita ``\'ambito temporal del marco'' con los
+tres argumentos y las tres limitaciones.
+\textbf{Queda fuera:} cualquier afirmaci\'on sobre din\'amica de ajuste.
+\end{ie2}
+
+\subsection{C4. La decisi\'on de cr\'edito y dep\'ositos es din\'amica}
+\label{sub:C4}
+
+\begin{jurado}
+``La decisi\'on de los bancos es m\'as din\'amica con respecto al cr\'edito y los
+dep\'ositos, c\'omo explicar eso en el modelo.''
+\end{jurado}
+
+\diag{MODELAR. El l\'imite es real y la extensi\'on m\'inima que lo atiende es,
+adem\'as, la que habilita el salto de utilizaci\'on a transferencia neta.}
+
+\resp
+Hoy la cartera $(b,d,u)$ es fija ex ante y los dep\'ositos son exógenos. La
+extensi\'on m\'inima no es un modelo din\'amico completo: es un modelo de
+\textbf{dos per\'iodos} que separa el momento del aporte al fondo del momento del
+uso de la cobertura.
+
+\paragraph{Estructura propuesta.}
+\begin{itemize}[leftmargin=*,itemsep=1pt]
+\item $t=0$: el banco elige $(b^c_k,u^c_k)$ sujeto a \eqref{eq:balance} y
+constituye el encaje $\rho^c d^c_k$. El costo de oportunidad del aporte es
+$(r^c_L-r^c_R)\rho^c d^c_k$.
+\item $t=1$: se realizan $A$ y $\varepsilon^c_k$; operan el interbancario
+\eqref{eq:interbancario} y el respaldo \eqref{eq:phi}; el banco recibe
+cobertura $C^u_k$.
+\item $t=2$: se repaga la asistencia recibida a un costo $r_F$ y el cr\'edito
+ajusta: $b^c_{k,2}=b^c_{k,1}-\theta\,C^u_k$, con $\theta\ge0$ el grado en que la
+asistencia debe devolverse contrayendo activos.
+\end{itemize}
+
+\paragraph{Lo que esto permite calcular.} Con esa estructura, la transferencia
+neta esperada del tipo $k$ deja de ser indefinible:
+\begin{equation}
+T^u_k \;=\; \underbrace{\E\big[\varphi(A)(1-\Psi^{-,u}_k)S^{u-}_k\big]}_{\text{cobertura recibida}}
+\;-\;\underbrace{(r^u_L-r^u_R)\rho^u d^u_k}_{\text{costo del aporte}}
+\;-\;\underbrace{r_F\,\E\big[\varphi(A)(1-\Psi^{-,u}_k)S^{u-}_k\big]}_{\text{repago}}.
+\label{eq:transferencia}
+\end{equation}
+N\'otese que \eqref{eq:transferencia} exige exactamente las tres piezas
+contractuales que el PT declara pendientes: propiedad del fondo (qui\'en recibe
+$r^u_R$), remuneraci\'on ($r^u_R$) y repago ($r_F$, $\theta$). Es decir, el
+modelo de dos per\'iodos no agrega realismo decorativo: agrega el m\'inimo
+necesario para que la palabra ``subsidio'' tenga referente. Mientras esas tres
+piezas no se fijen, el trabajo debe seguir reportando $C^u_k/d^u_k$ y no $T^u_k$.
+
+\paragraph{Qu\'e no se promete.} Dep\'ositos end\'ogenos exigen una curva de oferta
+de dep\'ositos por banco (y, con ella, competencia bancaria), lo que cambia la
+naturaleza del trabajo. En IE2 $d^c_k$ permanece exógeno, calibrado a SBS.
+
+\lit
+\citet{holmstromtirole1998} para la separaci\'on entre provisi\'on ex ante de
+liquidez y su uso ex post, que es exactamente la estructura de dos fechas
+propuesta; \citet{bianchibigio2022} para la versi\'on din\'amica completa de
+gesti\'on de liquidez bancaria, \'util como contraste de qu\'e se gana y qu\'e se
+pierde; \citet{allencarlettigale2009} para el papel de la intervenci\'on del banco
+central cuando el mercado interbancario es incompleto.
+
+\begin{ie2}
+\textbf{Entra:} la especificaci\'on del modelo de dos per\'iodos y la f\'ormula
+\eqref{eq:transferencia} como \emph{agenda declarada}, con la discusi\'on de qu\'e
+supuestos contractuales exige.
+\textbf{Queda fuera:} la resoluci\'on num\'erica del modelo de dos per\'iodos y los
+dep\'ositos end\'ogenos. El IE2 reporta utilizaci\'on, no transferencias netas.
+\end{ie2}
+
+% ===========================================================================
+\section{Bloque C. Microestructura del mercado interbancario}
+% ===========================================================================
+
+\subsection{C2. Interbancario frente a ventanilla dada la tasa overnight}
+\label{sub:C2}
+
+\begin{jurado}
+``Modelar la din\'amica de decisi\'on del banco entre decidir ir al interbancario
+o irse a la ventanilla del BCRP dada la tasa overnight (SOFR).''
+\end{jurado}
+
+\diag{MODELAR. La cascada ya existe impl\'icita en $\rho^{ib}<\kappa$; lo que falta
+es escribirla como regla de decisi\'on y anclar cada tasa a un observable.}
+
+\resp
+
+\paragraph{La cascada como comparaci\'on de costos marginales.} Ante un faltante
+de una unidad, el banco enfrenta tres fuentes, ordenadas por costo:
+\begin{equation}
+\rho^{ib,c}\ \ <\ \ r^{c}_{W}\ \ <\ \ \bar\kappa^{c},
+\label{eq:cascada}
+\end{equation}
+donde $\rho^{ib,c}$ es el costo de fondearse en el interbancario, $r^c_W$ el de
+la ventanilla o respaldo del banco central, y $\bar\kappa^c$ el costo de liquidar
+activos. El banco acude al interbancario siempre que logre contraparte, lo que
+ocurre con probabilidad $\psi_k=\tau_k\min(1,P/Q)$; en caso contrario recurre a
+la ventanilla, y solo si esta no cubre, liquida activos. El costo marginal
+\emph{esperado} del faltante es entonces, exactamente,
+\begin{equation}
+\keff_k=\psi_k\,\rho^{ib,c}+(1-\psi_k)\,\kappa^c,
+\qquad
+\kappa^c=\underbrace{\varphi^c\,r^c_W+(1-\varphi^c)\,\bar\kappa^c}_{\text{la ventanilla puede no cubrir}},
+\label{eq:cascada2}
+\end{equation}
+que es \eqref{eq:kappaeff} con el segundo escal\'on abierto. Esta es la
+contribuci\'on formal que responde a C2: la decisi\'on interbancario--ventanilla
+no se modela como una elecci\'on discreta adicional, sino como la esperanza de
+una cascada cuyo \'unico elemento estoc\'astico es el acceso.
+
+\paragraph{Y aqu\'i aparece H1, derivada en lugar de supuesta.} En soles,
+$\varphi^s\simeq1$ (ventanilla suficientemente el\'astica) y por tanto
+$\kappa^s\simeq r^s_W$. En d\'olares, $\varphi^u=\min(1,F^u/\Delta^u)<1$ en los
+estados malos, de modo que $\kappa^u=\varphi^u r^u_W+(1-\varphi^u)\bar\kappa^u
+>r^u_W$. Luego $\kappa^{u,\mathrm{eff}}>\kappa^{s,\mathrm{eff}}$ a igual
+$\sigma$, lo que por \eqref{eq:cpo} reduce la probabilidad de faltante tolerada
+en d\'olares y eleva el valor marginal de la reserva requerida como seguro. H1 no
+es un supuesto sobre la elasticidad del respaldo: es la consecuencia de
+\eqref{eq:cascada2} dada la finitud de $F^u$.
+
+\paragraph{Anclaje de cada tasa a un observable.}
+\begin{center}
+\begin{tabular}{@{}p{2.2cm}p{5.2cm}p{6.6cm}@{}}
+\toprule
+\textbf{Objeto} & \textbf{Soles} & \textbf{D\'olares} \\
+\midrule
+$\rho^{ib,c}$ & Tasa interbancaria overnight MN (BCRPData), dentro del corredor
+& Tasa interbancaria overnight ME local; referencia externa: SOFR
+\citep{nyfedsofr} m\'as un \emph{spread} de fondeo en d\'olares \\
+$r^c_W$ & Tasa de la ventanilla de cr\'edito de regulaci\'on monetaria (techo del
+corredor) & Costo de las operaciones de provisi\'on de liquidez en ME del BCRP
+(repos de moneda, \emph{swaps}) \\
+$c^c=r^c_L-r^c_0$ & Margen de colocaci\'on neto en MN & Margen de colocaci\'on neto
+en ME \\
+$\bar\kappa^c$ & Costo de liquidaci\'on de activos (banda de sensibilidad) &
+\'Idem, m\'as alto por menor profundidad del mercado en ME \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Una precisi\'on institucional que conviene hacer expl\'icita.} La SOFR
+es una tasa \emph{colateralizada} administrada por el Federal Reserve Bank of
+New York sobre el mercado de repos de Treasuries \citep{nyfedsofr}. No es el
+costo de fondeo en d\'olares de un banco peruano: es el ancla del tramo libre de
+riesgo. Usarla sin \emph{spread} subestimar\'ia $\rho^{ib,u}$. M\'as importante
+a\'un: en d\'olares el BCRP \emph{no} es emisor, de modo que su ventanilla en ME es
+una facilidad con recursos acotados, no un prestamista de \'ultima instancia
+el\'astico. Esa asimetr\'ia es el supuesto institucional que sostiene $F^u$ finito
+y debe citarse con respaldo (Secci\'on~\ref{sub:C15}).
+
+\lit
+\citet{armenterlester2017} para la estructura formal del corredor de tasas y de
+c\'omo el acceso desigual a las facilidades del banco central determina d\'onde se
+ubica la tasa overnight dentro del corredor; \citet{bechklee2011} para la
+evidencia de que, cuando los participantes enfrentan opciones externas
+distintas, el mercado overnight se segmenta y el precio efectivo difiere por
+participante --- lo que justifica tratar $\rho^{ib}$ como banda y no como punto;
+\citet{afonso2015} para la microfundaci\'on de b\'usqueda y negociaci\'on bilateral;
+\citet{bianchibigioengel2021} para la demanda precautoria de liquidez en d\'olares
+y el rendimiento de conveniencia del d\'olar, que es la contraparte internacional
+de $\kappa^{u,\mathrm{eff}}>\kappa^{s,\mathrm{eff}}$.
+
+\begin{ie2}
+\textbf{Entra:} la cascada \eqref{eq:cascada}--\eqref{eq:cascada2} con el
+segundo escal\'on abierto; la tabla de anclaje de tasas; la derivaci\'on de H1 a
+partir de la cascada; la calibraci\'on de $\rho^{ib,c}$ y $r^c_W$ a BCRPData, con
+SOFR como referencia externa del tramo en d\'olares.
+\textbf{Queda fuera:} un modelo de b\'usqueda y negociaci\'on a lo
+\citet{afonso2015}; el trabajo usa una regla reducida de asignaci\'on y lo
+declara.
+\end{ie2}
+
+\subsection{C3. Tasa de inter\'es real en soles}\label{sub:C3}
+
+\begin{jurado}
+``Buscar c\'omo meter la tasa de inter\'es real en soles para la decisi\'on de
+acceder al interbancario o no.''
+\end{jurado}
+
+\diag{MODELAR/\allowbreak CALIBRAR, con una precisi\'on que conviene no omitir porque es
+justamente el tipo de rigor que pide C1.}
+
+\resp
+
+\paragraph{Una observaci\'on exacta antes de la calibraci\'on.} La decisi\'on de
+colch\'on depende de la \emph{raz\'on} $c/\keff_k$, no de los niveles. Si todas las
+tasas de una misma moneda se deflactan por el mismo factor $(1+\pi^c)$, la
+raz\'on es invariante y el fractil \eqref{eq:cpo} no se mueve. En otras palabras:
+\emph{dentro} de una moneda, trabajar en t\'erminos nominales o reales no cambia
+ning\'un resultado del modelo, porque todos los objetos relevantes son
+\emph{spreads} ($c=r_L-r_0$) o razones de costos. Decir esto expl\'icitamente es
+la respuesta rigurosa, y evita el error de presentar como sustantivo un cambio
+de unidades.
+
+\paragraph{D\'onde s\'i importa el t\'ermino real.} La tasa real s\'i es
+indispensable en el \'unico lugar donde se comparan \emph{dos} monedas: el
+contraste $\kappa^{u,\mathrm{eff}}$ contra $\kappa^{s,\mathrm{eff}}$, que es el
+contenido de H1. All\'i, pasar los costos en d\'olares a unidades comparables
+exige la depreciaci\'on esperada:
+\begin{equation}
+\kappa^{u,\mathrm{eff}}_{\text{(en soles)}}
+\;\simeq\; \kappa^{u,\mathrm{eff}}+\E[\hat e],
+\qquad
+\pi^{*u}_k=\frac{c^u}{\kappa^{u,\mathrm{eff}}},\quad
+\pi^{*s}_k=\frac{c^s}{\kappa^{s,\mathrm{eff}}},
+\label{eq:real}
+\end{equation}
+con $\hat e$ la tasa de depreciaci\'on. Es decir: \textbf{C3 y C8 son el mismo
+comentario visto desde dos lados}. La comparabilidad entre monedas introduce el
+tipo de cambio, y por tanto la pregunta de qu\'e pasa con el descalce
+(Secci\'on~\ref{sub:C8}). Presentarlos as\'i, unidos, es m\'as fuerte que responder
+cada uno por separado.
+
+\paragraph{Procedimiento concreto para IE2.}
+\begin{enumerate}[leftmargin=*,itemsep=1pt]
+\item Construir el corredor de tasas en MN a partir de BCRPData
+\citep{bcrpdata}: tasa de referencia, tasa de la ventanilla de cr\'edito (techo) y
+de los dep\'ositos overnight (piso); tomar $\rho^{ib,s}$ como la interbancaria
+overnight observada.
+\item Deflactar por expectativas de inflaci\'on a 12 meses (encuesta del BCRP)
+para \emph{reportar} el corredor real; documentar que la deflactaci\'on no mueve
+$\pi^{*s}_k$.
+\item Para la comparaci\'on entre monedas, expresar $\kappa^{u,\mathrm{eff}}$ en
+soles seg\'un \eqref{eq:real} y reportar la sensibilidad de H1 al supuesto sobre
+$\E[\hat e]$, que es un par\'ametro con incertidumbre genuina.
+\end{enumerate}
+
+\lit
+\citet{armas2014} para el funcionamiento conjunto del encaje y la tasa de
+referencia dentro del esquema de metas de inflaci\'on peruano, que es el anclaje
+institucional del corredor; \citet{armenterlester2017} y \citet{bechklee2011}
+para la estructura del corredor y la segmentaci\'on.
+
+\begin{ie2}
+\textbf{Entra:} la observaci\'on de invarianza al deflactor com\'un (explicitada
+como resultado, no omitida); la calibraci\'on del corredor en MN a BCRPData; la
+conversi\'on \eqref{eq:real} para la comparaci\'on entre monedas con banda de
+sensibilidad sobre $\E[\hat e]$.
+\textbf{Queda fuera:} modelar la formaci\'on de expectativas de depreciaci\'on;
+$\E[\hat e]$ entra como par\'ametro con rango.
+\end{ie2}
+
+\subsection{C7. Entrada y no entrada al mercado interbancario}\label{sub:C7}
+
+\begin{jurado}
+``Modelar en el interbancario las posibilidades de entrada como de no entrada de
+los bancos.''
+\end{jurado}
+
+\diag{MODELAR. Hoy $\tau_k=1-e^{-\lambda_k}$ es contacto probabil\'istico, no
+participaci\'on decidida; falta el margen extensivo.}
+
+\resp
+
+\paragraph{Qu\'e es hoy $\tau_k$ y qu\'e no es.} En \eqref{eq:interbancario},
+$\tau_k=1-e^{-\lambda_k}$ es la probabilidad de \emph{al menos un contacto} bajo
+un proceso de encuentros de intensidad $\lambda_k$ (derivaci\'on en el
+Ap\'endice~\ref{sec:derivaciones}). Es un margen intensivo mec\'anico: el banco
+siempre quiere entrar, y a veces no encuentra con qui\'en. El comentario del
+jurado se\~nala que falta la decisi\'on previa: participar tiene costos
+---l\'ineas de cr\'edito, l\'imites de contraparte, colateral, infraestructura
+operativa--- que algunos bancos no cubren.
+
+\paragraph{Extensi\'on propuesta.} Sea $\chi_k\ge0$ el costo fijo de participar.
+El banco compara dos configuraciones: dentro del mercado, con
+$\psi_k=\tau_k t$ y colch\'on $u^{\mathrm{in}}_k$ de \eqref{eq:kappaeff}; fuera,
+con $\psi_k=0$, $\keff_k=\kappa$ y colch\'on $u^{\mathrm{out}}_k>u^{\mathrm{in}}_k$.
+La ganancia de participar tiene dos componentes:
+\begin{equation}
+G_k(t)=\underbrace{(\kappa-\rho^{ib})\,\tau_k\,t\,D_k\big(u^{\mathrm{in}}_k\big)}_{\text{cobertura m\'as barata}}
+\;+\;\underbrace{c\,\big(u^{\mathrm{out}}_k-u^{\mathrm{in}}_k\big)}_{\text{ahorro de colch\'on}},
+\qquad
+\text{entra}\iff G_k(t)\ge\chi_k.
+\label{eq:entrada}
+\end{equation}
+El segundo t\'ermino suele olvidarse y es importante: participar no solo abarata
+cubrir el faltante, tambi\'en permite cargar menos liquidez ociosa. Ignorarlo
+subestima el valor del acceso y, con ello, sobreestima cu\'antos bancos quedan
+fuera.
+
+\paragraph{Consecuencia no trivial: complementariedad estrat\'egica.} La decisi\'on
+de entrar depende de $t=\min(1,P/Q)$, que a su vez depende de qui\'enes entran.
+Cuando el mercado est\'a racionado ($P<Q$), la entrada de un banco excedentario
+eleva $P$ y por tanto $t$, aumentando $G_j(t)$ para todos los dem\'as: la
+participaci\'on es un complemento estrat\'egico. Esto abre la posibilidad de
+equilibrios m\'ultiples ---un equilibrio de mercado delgado y uno de mercado
+profundo--- y conecta directamente con C14: un mercado que depende de la
+participaci\'on de todos es un mercado que puede apagarse por coordinaci\'on, no
+solo por escasez.
+
+\paragraph{Implicancia emp\'irica.} Si $\chi_k$ se correlaciona negativamente con
+el tama\~no, el margen extensivo reproduce la estructura n\'ucleo--periferia
+documentada en la literatura \citep{craigvonpeter2014} y es coherente con el
+hecho estilizado 2 del Anexo~III del PT (correlaci\'on $-0{,}468$ entre tama\~no y
+volatilidad). Permite adem\'as un contraste: los bancos fuera del mercado deben
+mostrar liquidez contable sistem\'aticamente mayor, que es precisamente
+$u^{\mathrm{out}}_k>u^{\mathrm{in}}_k$.
+
+\lit
+\citet{craigvonpeter2014} para la estructura n\'ucleo--periferia como resultado de
+equilibrio y no como accidente de los datos;
+\citet{afonso2014trading} y \citet{afonso2011stressed} para la evidencia de que
+las relaciones de contraparte condicionan el acceso, y de que en tensi\'on el
+ajuste ocurre sobre todo en \emph{con qui\'en} se negocia;
+\citet{afonso2015} para la microfundaci\'on de b\'usqueda;
+\citet{cuba2020} para la estructura de interconexiones del sistema peruano.
+
+\begin{ie2}
+\textbf{Entra:} la condici\'on de entrada \eqref{eq:entrada}; la discusi\'on de
+complementariedad estrat\'egica; el ejercicio de sensibilidad sobre $\chi_k$ en
+una grilla, mostrando el efecto sobre $t$ y sobre el perfil de incidencia.
+\textbf{Queda fuera:} la selecci\'on entre equilibrios m\'ultiples; se reporta su
+existencia y se eval\'ua cada rama por separado.
+\end{ie2}
+
+\subsection{C14. Sin tasa objetivo: expectativas heterog\'eneas y acaparamiento}
+\label{sub:C14}
+
+\begin{jurado}
+``Hay una demanda y una oferta, los fondos son de un tipo; yo tomo la expectativa
+diferente que un banco peque\~no, porque no hay una tasa de inter\'es objetivo
+interbancaria.''
+\end{jurado}
+
+\diag{MODELAR. Es la cr\'itica m\'as profunda al tratamiento actual del
+interbancario y, bien respondida, \emph{refuerza} la tesis del trabajo.}
+
+\resp
+
+\paragraph{Qu\'e supone hoy la regla proporcional.} En \eqref{eq:interbancario},
+$P=\sum_k\mu_k\tau_k S^+_k$ asume tres cosas: (i) todo banco excedentario presta
+\emph{todo} su excedente; (ii) hay un precio \'unico impl\'icito; (iii) nadie
+anticipa nada sobre $A$. Las tres son falsas en el sentido que el jurado
+se\~nala, y la tercera es la decisiva.
+
+\paragraph{Paso 1: oferta end\'ogena con valor de opci\'on.} Sea $\ell_k\le X_k$ lo
+que un banco excedentario efectivamente presta. Retener liquidez tiene valor
+porque el propio banco puede necesitarla. Prestar es \'optimo si el precio cubre
+el costo esperado de quedarse sin ella:
+\begin{equation}
+\ell_k>0 \iff \rho^{ib}\ \ge\ \keff_k\cdot\Pr{}_k\big(\text{faltante propio}\mid \mathcal{I}_k\big),
+\qquad
+P=\sum_k\mu_k\tau_k\,\ell_k\big(\rho^{ib};\mathcal{I}_k\big),
+\label{eq:oferta}
+\end{equation}
+donde $\mathcal{I}_k$ es el conjunto de informaci\'on del banco $k$. La regla
+actual es el caso particular $\ell_k=X_k$, que corresponde a
+$\Pr_k(\cdot)\to0$.
+
+\paragraph{Paso 2: expectativas heterog\'eneas --- el punto de Joao.} Si el banco
+grande intermedia la mayor parte del flujo cambiario, observa una se\~nal
+informativa sobre $A^u$ que el banco peque\~no no observa:
+$\Pr_{\text{grande}}(A^u=-\eta\mid\mathcal{I})\neq\Pr_{\text{peque\~no}}(\cdot)$.
+Por \eqref{eq:oferta}, el banco informado retira oferta \emph{precisamente} en
+el estado en que $Q$ es mayor. El resultado es que la tensi\'on
+\begin{equation}
+t(A)=\min\!\Big(1,\frac{P(A)}{Q(A)}\Big)
+\label{eq:tension}
+\end{equation}
+cae m\'as r\'apido con la severidad de $A$ de lo que el modelo actual predice, y
+puede caer a cero de forma discontinua cuando la se\~nal cruza un umbral. El
+coaseguro se autodestruye justo cuando se necesita.
+
+\paragraph{Paso 3: la implicancia que conviene subrayar en la sustentaci\'on.}
+Este mecanismo \textbf{no debilita la tesis del trabajo: la refuerza}. Si el
+coaseguro privado se apaga end\'ogenamente en los estados malos, entonces el
+reaseguro p\'ublico ---el respaldo $F^u$--- no es redundante con el interbancario
+sino complementario, y su valor marginal es m\'aximo exactamente donde el
+mercado falla. Formalmente, $\partial\Delta^u/\partial(\text{severidad})$ se
+vuelve m\'as pronunciada, y por \eqref{eq:phi} $\varphi$ cae m\'as, de modo que
+$\kappa^{u,\mathrm{eff}}$ sube: H1 se fortalece. El comentario de Joao, llevado
+al modelo, produce evidencia a favor de la hip\'otesis que \'el cuestiona.
+
+\paragraph{Paso 4: la indeterminaci\'on del precio, tratada con honestidad.} Sin
+tasa objetivo, $\rho^{ib}$ no est\'a fijada por pol\'itica. En los modelos de
+b\'usqueda es el resultado de una negociaci\'on bilateral y exhibe dispersi\'on
+\citep{afonso2015}; emp\'iricamente se observa dispersi\'on y segmentaci\'on
+\citep{afonso2011stressed,bechklee2011,ashcraft2011}. La decisi\'on de modelaci\'on
+que se propone para el IE2 es \emph{no} fingir un precio de equilibrio \'unico:
+tratar $\rho^{ib}$ como una banda contenida en el corredor de tasas y reportar
+los resultados sobre toda la banda. Es menos elegante y mucho m\'as defendible.
+
+\paragraph{Un matiz que conviene traer antes que el jurado.} La evidencia no
+respalda un colapso total: \citet{afonso2011stressed} muestran que tras Lehman el
+mercado de fondos federales no se congel\'o, sino que se reprici\'o y se reorden\'o
+por relaciones. Es decir, el mecanismo correcto no es ``el mercado desaparece''
+sino ``el mercado se vuelve caro y selectivo''. En el marco, eso se traduce en
+que $t(A)$ cae \emph{y} la asignaci\'on dentro del mercado deja de ser
+proporcional: los bancos con relaciones conservan acceso. Reconocer esto evita
+sobrevender el mecanismo de acaparamiento.
+
+\lit
+\citet{acharyaskeie2011} para el modelo can\'onico de acaparamiento de liquidez por
+bancos apalancados con riesgo de refinanciamiento, que en el extremo congela el
+mercado; \citet{heider2015} para el mecanismo m\'as cercano al comentario del
+jurado: informaci\'on privada sobre el riesgo de contraparte, selecci\'on adversa y
+tres reg\'imenes (normal, tensi\'on con spreads altos, quiebre con acaparamiento);
+\citet{galeyorulmazer2013} para el resultado de que el equilibrio de mercado es
+ineficiente restringido, con demasiada poca liquidez y acaparamiento ineficiente
+---que es exactamente el argumento a favor del respaldo p\'ublico---;
+\citet{diamondrajan2011} y \citet{brunnermeierpedersen2009} para el canal de temor
+a ventas forzadas y espirales de liquidez;
+\citet{allencarlettigale2009} para la justificaci\'on de la intervenci\'on del banco
+central cuando el interbancario es incompleto;
+\citet{bhattacharya1987} para el argumento, anterior y m\'as b\'asico, de que cuando
+la liquidez es compartible aparecen incentivos a aprovechar la de los dem\'as, de
+modo que el mecanismo colectivo no es gratuito;
+\citet{afonso2011stressed} y \citet{ashcraft2011} para el matiz emp\'irico.
+
+\begin{ie2}
+\textbf{Entra:} la oferta end\'ogena \eqref{eq:oferta} con un umbral de
+acaparamiento dependiente de la se\~nal; la tensi\'on $t(A)$ como objeto
+end\'ogeno \eqref{eq:tension}; el tratamiento de $\rho^{ib}$ como banda dentro del
+corredor; la discusi\'on expl\'icita de por qu\'e esto refuerza H1.
+\textbf{Queda fuera:} un juego de informaci\'on completo con equilibrio bayesiano;
+el IE2 implementa la versi\'on de umbral con se\~nal ex\'ogena y reporta
+sensibilidad a su precisi\'on.
+\end{ie2}
+
+\subsection{C12. El pool de recursos: qu\'e est\'a dentro y qu\'e falta}
+\label{sub:C12}
+
+\begin{jurado}
+``Dado el pool de recursos del sistema bancario, c\'omo piensan modelar todo eso
+que no est\'a a\'un en el modelo.''
+\end{jurado}
+
+\diag{MODELAR, en forma de mapa. $P$ y $Q$ \emph{son} el pool; la respuesta \'util
+es decir qu\'e captura y en qu\'e direcci\'on se equivoca.}
+
+\resp
+
+\paragraph{Mapa expl\'icito.}
+\begin{center}
+\begin{tabular}{@{}p{4.3cm}p{4.6cm}p{5.6cm}@{}}
+\toprule
+\textbf{Pieza} & \textbf{Estatus actual} & \textbf{C\'omo entrar\'ia} \\
+\midrule
+Excedentes y d\'eficits & Dentro: $P,Q$ en \eqref{eq:interbancario} & --- \\
+Racionamiento & Dentro: $\min(1,P/Q)$ proporcional & --- \\
+Respaldo finito & Dentro: $\varphi$ en \eqref{eq:phi} & --- \\
+Autoseguro end\'ogeno & Dentro: \eqref{eq:kappaeff} y punto fijo & --- \\
+Participaci\'on end\'ogena & Fuera & $\ell_k$, $\chi_k$ en \eqref{eq:entrada} (C7) \\
+Acaparamiento estrat\'egico & Fuera & $\ell_k(A;\mathcal{I}_k)$ en \eqref{eq:oferta} (C14) \\
+Riesgo de contraparte & Fuera & Oferta efectiva $(1-h_{kj})X_k$ con \emph{haircut} por par \\
+Colateral & Fuera & Restricci\'on $\ell_k\le \text{colateral disponible}_k$ \\
+Red y \emph{tiering} & Fuera (pool \'unico) & Matriz de acceso $a_{kj}$ en lugar de $\tau_k$ \\
+Din\'amica & Fuera & Dos per\'iodos (C4) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Un resultado que conviene tener a mano.} La simplificaci\'on del pool
+no es neutral: se equivoca en una direcci\'on conocida.
+
+\begin{prop}[La regla de pool es una cota superior del coaseguro]
+Con acceso heterog\'eneo, la reasignaci\'on factible de liquidez entre bancos es un
+problema de flujo m\'aximo sobre el grafo bipartito excedentarios--deficitarios.
+La regla proporcional \eqref{eq:interbancario} asigna $\min(P,Q)$, que es el flujo
+m\'aximo del grafo \emph{completo}. Como cualquier grafo con menos aristas tiene
+flujo m\'aximo no mayor, se sigue que para toda estructura de red
+$\sum_k\mu_k\Psi^-_k S^-_k\le\min(P,Q)$. En consecuencia, el marco actual
+\textbf{sobreestima} el coaseguro y por tanto \textbf{subestima} el faltante
+residual $\Delta^c(A)$ y la utilizaci\'on del respaldo $C^u_k$.
+\end{prop}
+
+\noindent La utilidad de esta proposici\'on es doble. Primero, convierte una
+limitaci\'on en una cota: los resultados cuantitativos sobre uso del respaldo son
+conservadores. Segundo, da un criterio para decidir si vale la pena modelar la
+red: si con la cota superior del coaseguro el respaldo ya se agota en los estados
+malos, modelarla solo refuerza la conclusi\'on.
+
+\paragraph{Un contrapunto emp\'irico que el jurado puede plantear.}
+\citet{cuba2020} encuentran, para el sistema peruano entre 2006 y 2018, que el
+riesgo sistémico de liquidez cae en moneda nacional y que no aparece riesgo
+significativo en moneda extranjera. Conviene anticiparlo y responderlo: ese
+resultado mide contagio realizado de fondeo en la muestra observada, no la
+capacidad de respaldo contingente ante un evento agregado $A^u=-\eta$, que por
+construcci\'on es poco frecuente. Los dos resultados son compatibles; decirlo
+antes de que lo pregunten es mejor que decirlo despu\'es.
+
+\lit
+\citet{craigvonpeter2014} para la estructura de red del interbancario;
+\citet{rochettirole1996} para la distinci\'on entre el beneficio de coaseguro y el
+costo de exposici\'on cruzada; \citet{allen2000contagion} para el resultado de que
+las conexiones que comparten riesgo tambi\'en propagan perturbaciones;
+\citet{cuba2020} y \citet{carrera2014} para la evidencia y el tratamiento
+prudencial del sistema peruano como econom\'ia abierta peque\~na.
+
+\begin{ie2}
+\textbf{Entra:} el mapa completo; la Proposici\'on~2 con su implicancia de signo;
+la discusi\'on del resultado de \citet{cuba2020}.
+\textbf{Queda fuera:} la implementaci\'on de una matriz de acceso $a_{kj}$ y de
+riesgo de contraparte; se declaran como agenda y se argumenta por qu\'e la cota
+permite postergarlos.
+\end{ie2}
+
+% ===========================================================================
+\section{Bloque D. Fricciones adicionales en el problema del banco}
+% ===========================================================================
+
+\subsection{C6. Costo de financial distress en la minimizaci\'on}\label{sub:C6}
+
+\begin{jurado}
+``Al proceso de minimizaci\'on imponerle el costo de \emph{financial distress}.''
+\end{jurado}
+
+\diag{MODELAR. No es una adici\'on decorativa: rompe la igualdad
+$\pi^*_k=c/\kappa$ entre tipos, que es el supuesto que sostiene la
+proporcionalidad del autoseguro.}
+
+\resp
+
+\paragraph{Por qu\'e importa exactamente.} En \eqref{eq:newsvendor} el costo del
+faltante es lineal con pendiente $\kappa$. Esa linealidad es lo que produce
+\eqref{eq:cpo} con un fractil $c/\kappa$ \emph{com\'un a todos los tipos}, y de
+ah\'i $u^*_k\propto\sigma_k$ y $D^*_k\propto\sigma_k$. Si el costo del faltante es
+no lineal y su severidad difiere por banco, la proporcionalidad se rompe y el
+ordenamiento de incidencia deja de estar determinado por $\sigma_k$. C6 es, en
+ese sentido, el segundo mecanismo ---junto con C7 y C14--- capaz de refutar la
+conjetura ingenua, y conviene presentarlo as\'i.
+
+\paragraph{Especificaci\'on.} Agr\'eguese un t\'ermino de distress
+\begin{equation}
+\min_{u_k\ge0}\ \mathcal{C}_k(u_k)=c\,u_k+\kappa\,\E\big[(-\varepsilon_k-u_k)^+\big]
++\Xi_k(u_k),
+\qquad
+\Xi_k(u_k)=\E\Big[\Lambda_k\big((-\varepsilon_k-u_k)^+\big)\Big],
+\label{eq:distress}
+\end{equation}
+con $\Lambda_k(0)=0$, $\Lambda_k'\ge0$. Dos especificaciones de $\Lambda_k$ dan
+resultados cualitativamente distintos y ambas deben discutirse.
+
+\paragraph{Caso (a): distress convexo (ventas forzadas).} Si $\Lambda_k''\ge0$,
+el objetivo sigue siendo convexo y la CPO es
+\begin{equation}
+c=\int_{-\infty}^{-u_k}\big[\kappa+\Lambda_k'(-\varepsilon-u_k)\big]\,dF_k(\varepsilon)
+\;>\;\kappa\,F_k(-u_k)
+\quad\Longrightarrow\quad
+F_k(-u^*_k)<\frac{c}{\kappa}.
+\label{eq:cpodistress}
+\end{equation}
+La probabilidad de faltante tolerada \emph{cae} y el colch\'on \'optimo
+\emph{sube}. Si adem\'as $\Lambda_k$ difiere entre tipos ---por valor de
+franquicia, por composici\'on de activos, por capitalizaci\'on---, entonces
+$\pi^*_k$ ya no es com\'un y $u^*_k$ deja de ser proporcional a $\sigma_k$:
+\begin{equation}
+u^*_k=\sigma_k\,q_k,\qquad q_k=q\big(c,\kappa,\Lambda_k\big)\ \text{dependiente del tipo.}
+\label{eq:qk}
+\end{equation}
+El cierre de localizaci\'on--escala sobrevive en la forma, pero $q$ deja de ser
+com\'un, que era la propiedad que preservaba el ordenamiento.
+
+\paragraph{Caso (b): distress escalonado (corrida o p\'erdida de franquicia).} Si
+$\Lambda_k(x)=L_k\mathbf{1}\{x>\theta_k\}$, el objetivo \emph{deja de ser convexo}
+y la CPO incorpora un t\'ermino de densidad:
+\begin{equation}
+c=\kappa F_k(-u_k)+L_k\,f_k(-u_k-\theta_k).
+\label{eq:cpoescalon}
+\end{equation}
+Pueden existir \'optimos locales m\'ultiples y, al variar $L_k$, el \'optimo global
+salta de forma discontinua: el banco o bien mantiene un colch\'on peque\~no y
+acepta el riesgo de distress, o bien salta a un colch\'on que cubre $\theta_k$. Es
+una predicci\'on econ\'omicamente interesante ---no hay autoseguro ``intermedio''
+contra la corrida--- y debe reportarse como tal, con la advertencia de que exige
+resolver \eqref{eq:distress} por b\'usqueda en grilla y no por CPO.
+
+\paragraph{Interacci\'on con el encaje (y con la lectura macroprudencial).}
+Obs\'ervese que $\kappa$ ya era una forma reducida del costo de quedarse corto.
+Hacer expl\'icito $\Lambda_k$ separa dos cosas que el PT mantiene unidas: el costo
+de \emph{cubrir} el faltante y el costo de \emph{sufrirlo}. Esa separaci\'on le da
+al encaje un valor adicional al asegurador: bajo encaje utilizable, elevar
+$\rho^c$ sube $m_k$ y reduce $\Pr(\text{distress})$, que es el canal
+macroprudencial que el trabajo deliberadamente deja fuera. Conviene nombrarlo y
+declararlo fuera de alcance, no ignorarlo.
+
+\lit
+\citet{froot1993} para la microfundaci\'on can\'onica: cuando el financiamiento
+externo es m\'as caro que el interno, el objetivo es convexo en el faltante de
+fondos internos ---es exactamente $\Lambda_k$ convexo---;
+\citet{shleifervishny2011} y \citet{diamondrajan2011} para la no linealidad por
+ventas forzadas y b\'usqueda de iliquidez;
+\citet{brunnermeierpedersen2009} para las espirales entre liquidez de mercado y de
+fondeo que generan convexidad;
+\citet{acharyaskeie2011} para el canal de apalancamiento y riesgo de
+refinanciamiento que hace que $L_k$ var\'ie entre bancos.
+
+\begin{ie2}
+\textbf{Entra:} la especificaci\'on \eqref{eq:distress}; el caso convexo con su
+CPO \eqref{eq:cpodistress} y el resultado \eqref{eq:qk} de ruptura de la
+proporcionalidad; el enunciado del caso escalonado con su advertencia de no
+convexidad; la menci\'on expl\'icita del canal macroprudencial como fuera de
+alcance.
+\textbf{Queda fuera:} la calibraci\'on de $L_k$ y $\theta_k$ a datos peruanos, que
+no tiene contraparte observable directa; el caso escalonado se explora solo como
+ejercicio de sensibilidad.
+\end{ie2}
+
+\subsection{C11. Funciones de optimizaci\'on para el encaje voluntario}
+\label{sub:C11}
+
+\begin{jurado}
+``Buscar funciones de optimizaci\'on para el encaje voluntario (hecho
+parcialmente).''
+\end{jurado}
+
+\diag{MODELAR --- \textbf{resuelto}. Corresponde documentar, no reabrir.}
+
+\resp
+La nota anal\'itica de octubre de 2026 cierra esta decisi\'on abierta del Anexo~IV
+del PT. El contenido a documentar en el IE2 es:
+
+\begin{enumerate}[leftmargin=*,itemsep=2pt]
+\item \textbf{El problema.} \eqref{eq:newsvendor}: el banco equilibra el costo de
+cargar liquidez ociosa contra el costo esperado de quedarse corto.
+\item \textbf{La CPO.} \eqref{eq:cpo}: regla de fractil cr\'itico. Como
+$\partial_u\E[(-\varepsilon-u)^+]=-F_k(-u)$, el objetivo es convexo y la
+condici\'on es necesaria y suficiente. Lectura econ\'omica: en el \'optimo el banco
+tolera una probabilidad de faltante $\pi^*_k=c/\kappa$, id\'entica entre tipos
+mientras $\kappa$ sea com\'un.
+\item \textbf{El cierre.} \eqref{eq:locscale}: con familia de
+localizaci\'on--escala, $u^*_k=\sigma_k q$ y $D^*_k=\sigma_k\mathcal{D}(q)$. Dos
+implicancias: el colch\'on es proporcional al riesgo de fondeo ---lo que
+racionaliza el hecho estilizado 3 del Anexo~III como \emph{equilibrio} y no como
+supuesto--- y la exposici\'on residual tambi\'en lo es, de modo que el autoseguro
+reescala pero no invierte el ordenamiento por $\sigma_k$.
+\item \textbf{Formas cerradas.} Normal: $u^*_k=\sigma_k z_{1-c/\kappa}$,
+$D^*_k=\sigma_k[\phi(q)-q\,c/\kappa]$. Log\'istica:
+$u^*_k=b_k\ln(\kappa/c-1)$, $D^*_k=b_k\ln\!\big(\kappa/(\kappa-c)\big)$ con
+$b_k=\sqrt3\,\sigma_k/\pi$. Uniforme: $u^*_k=a_k(1-2c/\kappa)$,
+$D^*_k=a_k(c/\kappa)^2$ con $a_k=\sqrt3\,\sigma_k$.
+\item \textbf{Acceso dentro del autoseguro.} \eqref{eq:kappaeff}: peor acceso
+eleva $\keff_k$ y por tanto el colch\'on. Es el canal por el cual la dimensi\'on de
+acceso ---y no solo la de exposici\'on--- diferencia a los tipos, y el origen del
+argumento de refutabilidad de la Secci\'on~\ref{sub:C13}.
+\item \textbf{Equilibrio.} Punto fijo del mapa $T:t\mapsto t'$. Los colchones son
+acotados, $T$ es un automapa continuo de $[0,1]$ en s\'i mismo, luego existe punto
+fijo por Brouwer. La unicidad no est\'a garantizada y se verifica num\'ericamente
+sobre la grilla de calibraci\'on.
+\item \textbf{Capa de monedas.} La probabilidad de faltante ex ante en d\'olares
+es la mezcla $(1-p)G(-u/\sigma^u_k)+p\,G\big((-u+\beta_k\eta)/\sigma^u_k\big)$,
+que no colapsa a un cuantil \'unico; el \'optimo interior es \'unico mientras
+$c^u<\kappa^{u,\mathrm{eff}}\Pr(\omega^u_k<0)$ y se resuelve num\'ericamente. El
+soporte completo de $G$ es lo que mantiene la mezcla suave; con soporte acotado
+la CPO desarrolla tramos planos cuando $\beta_k\eta>2a_k$, raz\'on adicional por
+la cual la uniforme es inadecuada aqu\'i.
+\end{enumerate}
+
+\noindent \textbf{Lo \'unico pendiente} es la calibraci\'on de $(c,\kappa,\rho^{ib})$
+al corredor de tasas (Secci\'on~\ref{sub:C3}), de $R^D$ y de la fracci\'on
+movilizable $\nu^u_F$.
+
+\lit
+\citet{poole1968} para el antecedente can\'onico de fractil cr\'itico en gesti\'on de
+reservas; \citet{baltensperger1980} para la integraci\'on con la elecci\'on de
+cartera; \citet{bianchibigio2022} para la microfundaci\'on del par $(c,\kappa)$.
+
+\begin{ie2}
+\textbf{Entra:} los siete puntos anteriores como secci\'on del cap\'itulo de modelo,
+con la derivaci\'on en el Ap\'endice~\ref{sec:derivaciones}.
+\textbf{Queda fuera:} nada de lo resuelto se reabre. La calibraci\'on de
+$(c,\kappa,\rho^{ib},R^D,\nu^u_F)$ se reporta con bandas.
+\end{ie2}
+
+% ===========================================================================
+\section{Bloque E. Dimensi\'on cambiaria}
+% ===========================================================================
+
+\subsection{C8. Tipo de cambio real y descalce cambiario}\label{sub:C8}
+
+\begin{jurado}
+``El tipo de cambio real y tratar el descalce cambiario.''
+\end{jurado}
+
+\diag{MODELAR. La respuesta honesta empieza por reconocer que el descalce no
+est\'a impl\'icito en el marco: est\'a \emph{ausente por construcci\'on}.}
+
+\resp
+
+\paragraph{Qu\'e hay hoy, con precisi\'on.} En \eqref{eq:monedas} soles y d\'olares
+son circuitos separados: cada moneda tiene su balance
+$b^c_k+d^c_k m^c_k=d^c_k+E^c_k$, de modo que \emph{por construcci\'on no hay
+descalce}: los activos y pasivos de cada moneda est\'an calzados dentro de su
+circuito. Adem\'as no existe tecnolog\'ia de conversi\'on dentro del per\'iodo: el
+banco no puede transformar soles en d\'olares, que es justamente lo que hace que
+la restricci\'on finita $F^u$ muerda. El tipo de cambio aparece solo de forma
+impl\'icita, en la interpretaci\'on del evento $A^u=-\eta$ como salida de
+dep\'ositos en ME gatillada por una depreciaci\'on.
+
+Decir esto abiertamente es preferible a sugerir que el TCR est\'a ``incorporado''.
+Lo que s\'i puede defenderse es que la ausencia es deliberada: el trabajo aisla el
+canal de \emph{cantidad} (liquidez) del canal de \emph{precio} (valuaci\'on), y la
+literatura trata el segundo extensamente \citep{cespedes2004,bocolalorenzoni2020}.
+
+\paragraph{Tres extensiones, ordenadas por costo.}
+
+\emph{(E1) Canal de valuaci\'on, versi\'on m\'inima (entra al IE2).} Hacer el evento
+agregado expl\'icitamente cambiario: $A^u=-\eta(\hat e)$, con la probabilidad $p$
+calibrada a la frecuencia de episodios de depreciaci\'on acompa\~nados de salida de
+dep\'ositos en ME, y $\eta$ a su magnitud. No endogeniza el tipo de cambio, pero
+le da a $(p,\eta)$ una contraparte emp\'irica en lugar de dejarlos como
+par\'ametros libres --- lo que atiende tambi\'en a C13 y C15.
+
+\emph{(E2) El descalce en forma reducida (entra al IE2).} Este es el punto m\'as
+\'util y el menos obvio: \textbf{$\beta_k$ ya es, en forma reducida, la exposici\'on
+al descalce}. En \eqref{eq:monedas}, $\beta_k$ mide cu\'anto del evento agregado
+en d\'olares carga el banco $k$. Un banco con mayor posici\'on neta en ME sufre m\'as
+el evento. Luego $\beta_k$ es calibrable con un observable que la SBS publica:
+la posici\'on global de cambio por entidad. Esto convierte un par\'ametro que
+parec\'ia arbitrario en un momento observado, y responde al jurado con un dato en
+lugar de con una promesa.
+
+\emph{(E3) Descalce de balance propiamente dicho (fuera del IE2).} Permitir una
+posici\'on neta $x_k=d^u_k-b^u_k\neq0$ y que una depreciaci\'on altere el
+patrimonio, $\Delta E_k\simeq -x_k\,\hat e$ expresado en soles. Entonces el choque
+de liquidez y el de solvencia se vuelven correlacionados, y el valor asegurador
+de $\rho^u$ cambia de signo para bancos largos en d\'olares. Esta es la versi\'on
+completa de lo que pide el jurado y conecta el canal de cantidad con el de
+precio; tambi\'en cambia la naturaleza del trabajo, porque introduce insolvencia,
+que el PT excluye expl\'icitamente de su alcance. Se propone como extensi\'on de
+tesis, no de IE2.
+
+\emph{(E4) Mercado de conversi\'on (menci\'on).} Si se permitiera convertir soles en
+d\'olares a un costo $\xi$ (spread del \emph{swap} cambiario), $\varphi$ ser\'ia
+menos vinculante. Pero $\xi$ sube precisamente en el estado malo: la predicci\'on
+del modelo ser\'ia que el valor asegurador de $\rho^u$ aumenta cuando el mercado
+de \emph{swaps} se deteriora, que es el fen\'omeno de ``scramble for dollars''
+documentado por \citet{bianchibigioengel2021}. Vale la pena mencionarlo como
+mecanismo coherente aunque no se implemente.
+
+\lit
+\citet{cespedes2004} para el canal de hoja de balance y descalce en econom\'ias
+abiertas peque\~nas; \citet{bocolalorenzoni2020} para el prestamista de \'ultima
+instancia con recursos limitados en moneda extranjera y para el origen asegurador
+de la dolarizaci\'on de pasivos; \citet{dalgic2024} para la lectura del cr\'edito en
+ME como arreglo de seguro, que es el contrapunto directo a una lectura puramente
+prudencial; \citet{bianchibigioengel2021} para la demanda precautoria de liquidez
+en d\'olares; \citet{levyyeyati2008} e \citet{izelevyyeyati2005} para el l\'imite del
+prestamista de \'ultima instancia en una econom\'ia dolarizada;
+\citet{jeanneranciere2011} para la analog\'ia con las reservas internacionales como
+seguro ante interrupciones del financiamiento externo, con la salvedad ---que el
+PT ya hace--- de que las reservas soberanas no equivalen al encaje bancario ni
+est\'an autom\'aticamente disponibles para cada intermediario.
+
+\begin{ie2}
+\textbf{Entra:} el reconocimiento expl\'icito de que no hay descalce en el marco
+actual; (E1) la interpretaci\'on cambiaria calibrada de $(p,\eta)$; (E2) la
+calibraci\'on de $\beta_k$ a la posici\'on global de cambio por banco (SBS).
+\textbf{Queda fuera:} (E3) el descalce de balance con efecto patrimonial y (E4)
+el mercado de conversi\'on; se enuncian como agenda de tesis con su mecanismo
+esperado.
+\end{ie2}
+
+\subsection{C15. Las diferencias que introduce la capa de monedas}
+\label{sub:C15}
+
+\begin{jurado}
+``Cuando introducen capas, en la de monedas hay mucho que es diferente y debe
+sustentarse.''
+\end{jurado}
+
+\diag{JUSTIFICAR. La respuesta debe ser exhaustiva: cada diferencia, su
+justificaci\'on institucional, su contraparte emp\'irica y qu\'e pasa si se relaja.}
+
+\resp
+
+\begin{longtable}{@{}p{3.5cm}p{4.4cm}p{3.0cm}p{3.6cm}@{}}
+\toprule
+\textbf{Supuesto} & \textbf{Justificaci\'on} & \textbf{Contraparte emp\'irica} &
+\textbf{Si se relaja} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Supuesto} & \textbf{Justificaci\'on} & \textbf{Contraparte emp\'irica} &
+\textbf{Si se relaja} \\
+\midrule
+\endhead
+(i) $A^s=0$ y $A^u=-\eta$ con prob. $p$ &
+El BCRP emite soles y no d\'olares: un evento agregado de escasez es posible en ME
+y no en MN &
+Episodios de salida de dep\'ositos en ME; calibraci\'on de $(p,\eta)$ (C8, E1) &
+Un choque agregado en soles ser\'ia absorbido por la ventanilla el\'astica; a\~nade
+ruido, no mecanismo \\
+(ii) $F^u$ finito, respaldo en soles el\'astico &
+No hay prestamista de \'ultima instancia en d\'olares; la capacidad en ME depende de
+reservas, no de emisi\'on &
+\citet{levyyeyati2008}; \citet{bocolalorenzoni2020} &
+\textbf{Es la condici\'on de refutaci\'on de H1}: si $F^u\to\infty$, $\varphi\equiv1$,
+$\kappa^{u,\mathrm{eff}}\to\rho^{ib}$ y el motivo asegurador desaparece \\
+(iii) $w_k$ fija &
+Endogenizarla mezclar\'ia el canal de desdolarizaci\'on con el asegurador &
+Dispersi\'on por era, de $\sim$1\,\% a $>$85\,\% (Figura A1 del PT);
+\citet{castillo2016} documenta que $w$ responde a pol\'itica &
+El encaje diferenciado inducir\'ia sustituci\'on de monedas y el efecto medido
+ser\'ia una mezcla de dos canales \\
+(iv) $G$ com\'un entre monedas &
+La volatilidad idiosincr\'atica de dep\'ositos es aproximadamente sim\'etrica entre
+monedas; la asimetr\'ia es agregada y la carga $A^u$ &
+\textbf{Contrastable}: comparar $\sigma$ del crecimiento de dep\'ositos MN vs ME
+por banco (SBS) &
+Si la comparaci\'on rechaza simetr\'ia, se usan $G^s\neq G^u$; los resultados
+centrales dependen de simetr\'ia y localizaci\'on--escala, no de normalidad \\
+(v) $\rho^c$ uniforme dentro de moneda &
+Es el hecho institucional que define la pregunta: el seguro se financia con una
+tasa uniforme &
+5{,}56\,\% MN y 35{,}37\,\% ME en julio de 2026 (BCRPData);
+\citet{cantu2024} halla que los encajes uniformes tienen efecto m\'as fuerte que
+los diferenciados &
+Con $\rho$ por banco la pregunta distributiva cambia de objeto \\
+(vi) $\beta_k$ heterog\'eneo &
+No todos los bancos sufren igual el evento agregado; es el descalce en forma
+reducida &
+Posici\'on global de cambio por entidad (SBS) &
+Con $\beta_k$ com\'un, la capa 4 no a\~nade incidencia y solo desplaza el nivel \\
+\bottomrule
+\end{longtable}
+
+\paragraph{La cuenta de grados de libertad (argumento central).} La capa~4
+introduce $\{p,\eta,\beta_k,w_k,\nu^u_F,R^D\}$. De ellos: $w_k$ se observa (SBS);
+$\beta_k$ se observa v\'ia posici\'on de cambio (SBS); $(p,\eta)$ se calibran a
+episodios documentados. Quedan \textbf{dos} par\'ametros genuinamente libres,
+$\nu^u_F$ y $R^D$, y son exactamente los dos sobre los que el trabajo reporta
+bandas de sensibilidad. Una capa que a\~nade seis objetos y solo dos grados de
+libertad no es una capa que ``acomoda''; presentarlo con esta aritm\'etica es la
+forma m\'as econ\'omica de responder simult\'aneamente a C15 y a C13.
+
+\lit
+\citet{levyyeyati2008} para el l\'imite del prestamista de \'ultima instancia en una
+econom\'ia financieramente dolarizada y la propuesta de requerimientos
+descentralizados de liquidez ---el antecedente m\'as directo de leer el encaje en
+ME como fondo de seguro---; \citet{bocolalorenzoni2020} para la versi\'on moderna
+con recursos limitados en ME; \citet{izelevyyeyati2005} para los determinantes de
+la composici\'on monetaria; \citet{castillo2016} para la evidencia peruana de que
+$w$ responde a la pol\'itica de encajes; \citet{cantu2024} para el resultado de que
+los encajes uniformes tienen efecto m\'as fuerte que los diferenciados;
+\citet{dalgic2024} para el contrapunto asegurador. Para la lectura alternativa del
+encaje ---la que este trabajo complementa en lugar de disputar---,
+\citet{montoromoreno2011} documentan su uso contrac\'iclico en Am\'erica Latina,
+\citet{brei2018} lo vinculan a la gesti\'on de flujos de capital y
+\citet{glockertowbin2012} condicionan su efectividad a la presencia de fricciones
+financieras.
+
+\begin{ie2}
+\textbf{Entra:} la tabla completa de supuestos de la capa 4; la cuenta de grados
+de libertad; el contraste emp\'irico de simetr\'ia entre monedas del supuesto (iv).
+\textbf{Queda fuera:} endogenizar $w_k$, que es un trabajo distinto (y es
+exactamente el de \citet{castillo2016}).
+\end{ie2}
+
+% ===========================================================================
+\section{Bloque F. Heterogeneidad y distribuci\'on}
+% ===========================================================================
+
+\subsection{C9. Imponer categor\'ias y definir $K$}\label{sub:C9}
+
+\begin{jurado}
+``Justificar la decisi\'on de imponerle una categor\'ia, y c\'omo definir el $K$ de
+categor\'ia.''
+\end{jurado}
+
+\diag{JUSTIFICAR y CALIBRAR. La Proposici\'on~1 (Secci\'on~\ref{sub:C18}) da el
+criterio te\'orico; aqu\'i corresponde el procedimiento emp\'irico.}
+
+\resp
+
+\paragraph{El trade-off, enunciado formalmente.} Elegir $K$ es discretizar la
+distribuci\'on $H$ de $(\sigma,\lambda,w)$. Al aumentar $K$: el sesgo de
+aproximaci\'on cae ---a una tasa conocida bajo suavidad
+\citep{bonhomme2022}---, pero cada clase se estima con menos bancos y el ruido
+de sus momentos crece como $1/\sqrt{n_k}$. Existe por tanto un $K$ interior, y la
+pregunta ``\,¿por qu\'e no m\'as tipos?\,'' tiene una respuesta t\'ecnica y no una
+excusa.
+
+\paragraph{Procedimiento propuesto.}
+\begin{enumerate}[leftmargin=*,itemsep=2pt]
+\item \textbf{Teor\'ia: $K=2$.} Dos tipos bastan para expresar el mecanismo y
+firmar las est\'aticas comparativas. El cap\'itulo de modelo se escribe con
+$k\in\{L,S\}$.
+\item \textbf{Cuantitativo: $K\in\{2,3,4\}$.} La base de agrupaci\'on son las eras
+bancarias de la SBS \citep{sbs} ---segmentaci\'on del propio regulador, lo que evita que la
+partici\'on sea una elecci\'on de los autores---, con cortes donde se quiebran las
+distribuciones de $(\sigma_k,\text{tama\~no},w_k)$.
+\item \textbf{Alternativa disciplinada por datos.} En lugar de imponer los
+cortes, estimarlos: los \emph{grouped fixed effects} de
+\citet{bonhommemanresa2015} recuperan del panel la partici\'on que mejor explica
+la heterogeneidad observada. Reportar ambas y comparar es una respuesta mucho m\'as
+fuerte que defender una partici\'on \'unica.
+\item \textbf{Criterio de parada.} Subdividir mientras cambie el funcional:
+mientras $t=\min(1,P/Q)$ o el perfil $\{C^u_k/d^u_k\}$ se muevan m\'as que la
+banda de sensibilidad de $(\nu^u_F,R^D)$. Cuando subdividir no mueva nada, parar.
+\item \textbf{Reportar la estabilidad en $K$ como resultado.} Mostrar el perfil
+de incidencia para $K=2,3,4$. Si el ordenamiento es estable, eso \emph{es}
+evidencia de que el resultado no es un artefacto de la partici\'on; si no lo es,
+hay que decirlo.
+\end{enumerate}
+
+\paragraph{Lo que no se puede defender.} No se puede afirmar que la
+clasificaci\'on por eras SBS identifique tipos econ\'omicos estructurales. Es una
+agrupaci\'on administrativa que resulta conveniente porque es exógena a los
+autores. El Anexo~III del PT ya advierte que las medias por era se calculan sobre
+ventanas desiguales y no prueban persistencia individual; esa advertencia debe
+repetirse aqu\'i.
+
+\lit
+\citet{bonhomme2022} para el trade-off formal de discretizaci\'on;
+\citet{bonhommemanresa2015} para la estimaci\'on de los grupos a partir del panel;
+\citet{salinas2024} como referencia metodol\'ogica local de calibraci\'on de un
+modelo de agentes heterog\'eneos a momentos de la econom\'ia peruana.
+
+\begin{ie2}
+\textbf{Entra:} el procedimiento de cinco pasos; los resultados para $K=2,3,4$;
+la comparaci\'on entre partici\'on por eras SBS y partici\'on estimada.
+\textbf{Queda fuera:} inferencia sobre el n\'umero de grupos con contrastes
+formales; se usa el criterio de estabilidad del funcional.
+\end{ie2}
+
+\subsection{C10. Elecci\'on de $F$ por tipo}\label{sub:C10}
+
+\begin{jurado}
+``Las elecciones de la funci\'on $F$ por tipo de categor\'ia: por qu\'e asumimos una
+uniforme para ambos y no diferentes.''
+\end{jurado}
+
+\diag{JUSTIFICAR --- \textbf{resuelto}. Corresponde documentar la decisi\'on
+revisada.}
+
+\resp
+La premisa del comentario ya no describe al modelo, y conviene decirlo primero:
+\textbf{no se asumen distribuciones distintas por tipo, ni se mantiene la
+uniforme como \emph{baseline}}. La especificaci\'on revisada es una familia de
+localizaci\'on--escala,
+\begin{equation}
+F_k(x)=G\!\left(\frac{x}{\sigma_k}\right),
+\label{eq:locscale2}
+\end{equation}
+con $G$ est\'andar, sim\'etrica, suave y de soporte completo, \emph{com\'un a todos
+los tipos y a ambas monedas}, y $\sigma_k$ calibrada a la volatilidad del
+crecimiento de dep\'ositos de cada clase. Es decir, los tipos difieren en escala,
+no en forma. Cuatro aclaraciones:
+
+\begin{enumerate}[leftmargin=*,itemsep=2pt]
+\item \textbf{Por qu\'e la uniforme sal\'io del \emph{baseline}.} Su soporte acotado
+permite que el autoseguro lleve el faltante exactamente a cero y genera quiebres
+cuando la capa de monedas desplaza la media: si $\beta_k\eta>2a_k$, la CPO
+desarrolla tramos planos. Se conserva solo como caso cerrado de la capa base.
+\item \textbf{Por qu\'e normal.} Entrega el mapeo directo de $\sigma_k$ al dise\~no
+de mezcla de normales truncadas y la suavidad que hace que $D^c_k(A)$,
+$X^c_k(A)$, $\psi^c_k(A)$ y $\varphi(A)$ se comporten bien en los ejercicios de
+sensibilidad. Opcionalmente truncada por abajo, porque un drenaje no puede
+exceder los dep\'ositos; la truncaci\'on reemplaza $\phi,\Phi$ por momentos
+parciales de normal truncada y es inocua para las volatilidades observadas.
+\item \textbf{Por qu\'e $G$ com\'un entre monedas.} Porque la volatilidad
+idiosincr\'atica de dep\'ositos es aproximadamente sim\'etrica entre monedas; la cola
+agregada m\'as gruesa en d\'olares la carga el t\'ermino de evento $A^u$, no el
+$\varepsilon$ idiosincr\'atico. Este supuesto es contrastable y el contraste est\'a
+comprometido en la Secci\'on~\ref{sub:C15}, supuesto (iv).
+\item \textbf{Robustez.} Reemplazar $G$ por una ley sim\'etrica de cola m\'as pesada
+($t$ de Student o Laplace) a varianza igualada. Los resultados centrales
+---preservaci\'on del ordenamiento por $\sigma_k$ en la exposici\'on residual y el
+canal de H1--- dependen solo de simetr\'ia y de la propiedad de
+localizaci\'on--escala, y son por tanto independientes de la distribuci\'on.
+\end{enumerate}
+
+\lit
+\citet{poole1968} y \citet{baltensperger1980} para la tradici\'on en la cual la ley
+del choque se mantiene general y la forma cerrada es solo instrumental;
+\citet{bonhomme2022} para la l\'ogica paralela de aproximar heterogeneidad con una
+estructura disciplinada en lugar de una forma funcional por grupo.
+
+\begin{ie2}
+\textbf{Entra:} la especificaci\'on \eqref{eq:locscale2} con $G$ normal como
+\emph{baseline}; la uniforme como caso cerrado de la capa base; la robustez a
+$t$/Laplace; el contraste de simetr\'ia entre monedas.
+\textbf{Queda fuera:} estimar $G$ no param\'etricamente por clase; la muestra de
+eras bancarias no lo sostiene.
+\end{ie2}
+
+% ===========================================================================
+\appendix
+\section{Derivaciones paso a paso (respuesta a C1)}\label{sec:derivaciones}
+% ===========================================================================
+
+Este ap\'endice deriva, con sus supuestos expl\'icitos, cada ecuaci\'on del marco.
+
+\subsection*{A.1 Restricci\'on de balance}
+Los activos del banco son cr\'edito $b$ y reservas $d\,m$; los pasivos son
+dep\'ositos $d$ y patrimonio $E$. La identidad contable da
+\eqref{eq:balance}: $b+d\,m=d+E$. Despejando,
+$b=d(1-m)+E$. \emph{Supuesto:} no hay otras fuentes de fondeo (deuda mayorista,
+adeudados), lo que en el caso peruano omite el fondeo externo de algunos bancos
+---limitaci\'on que debe declararse---. \emph{Borde:} $m\le1+E/d$, de modo que el
+cr\'edito no puede ser negativo.
+
+\subsection*{A.2 Descomposici\'on de las reservas y saldo tras el choque}
+Por definici\'on $m=\rho+u$ con $u\ge0$: el encaje exigible m\'as el colch\'on
+voluntario. Tras el choque, los dep\'ositos pasan a $d(1+\omega)$, de modo que la
+salida de caja es $-d\,\omega$ cuando $\omega<0$. Los recursos l\'iquidos
+disponibles para atenderla dependen de la convenci\'on:
+\begin{align*}
+\text{NU:}&\quad \text{disponible}=d\,u
+&\Longrightarrow&\quad s=d\,u+d\,\omega=d(\omega+u),\\
+\text{U:}&\quad \text{disponible}=d\,m
+&\Longrightarrow&\quad s=d\,m+d\,\omega=d(\omega+m),
+\end{align*}
+que es \eqref{eq:saldo}. \emph{Interpretaci\'on:} $s<0$ es faltante, $s>0$
+excedente. \emph{Supuesto:} el cr\'edito $b$ no es liquidable dentro del per\'iodo
+---si lo fuera, su costo de liquidaci\'on es $\bar\kappa$ y entra por
+\eqref{eq:cascada}, no por aqu\'i.
+
+\subsection*{A.3 Momentos parciales y su identidad}
+Con $D\equiv\E[(-s)^+]$ y $X\equiv\E[(s)^+]$ y la identidad
+$(x)^+-(-x)^+=x$,
+\[
+X-D=\E[s]=d\big(\E[\omega]+u\big)=d\,u
+\]
+bajo NU y $\E[\omega]=0$, que es \eqref{eq:identidad1}. \emph{Uso:} verificaci\'on
+num\'erica obligatoria de la soluci\'on. \emph{Borde:} si $u=0$ y la distribuci\'on
+es sim\'etrica, $X=D$.
+
+\subsection*{A.4 Probabilidad de acceso}
+Si los encuentros con contrapartes siguen un proceso de Poisson de intensidad
+$\lambda_k$ durante el per\'iodo, la probabilidad de \emph{ning\'un} encuentro es
+$e^{-\lambda_k}$ y la de al menos uno es $\tau_k=1-e^{-\lambda_k}$.
+\emph{Supuesto:} un solo encuentro basta para operar; no hay capacidad limitada
+por contraparte. \emph{Borde:} $\lambda_k\to\infty\Rightarrow\tau_k\to1$ (acceso
+perfecto); $\lambda_k=0\Rightarrow\tau_k=0$ (banco fuera del mercado, que es el
+caso l\'imite de la no participaci\'on de C7).
+
+\subsection*{A.5 Regla de asignaci\'on y su factibilidad}
+Con $P=\sum_k\mu_k\tau_k S^+_k$ y $Q=\sum_k\mu_k\tau_k S^-_k$, la regla
+$\Psi^-_k=\tau_k\min(1,P/Q)$ transfiere en total
+\[
+\sum_k\mu_k\Psi^-_k S^-_k=\min\!\Big(1,\frac{P}{Q}\Big)\,Q=\min(P,Q),
+\]
+que es \eqref{eq:identidad2}: nunca excede la oferta y agota la demanda cuando
+$P\ge Q$. \emph{Supuesto:} el racionamiento es proporcional a $\tau_k S^-_k$;
+es una construcci\'on propia, motivada por la literatura de gesti\'on de liquidez,
+\textbf{no} tomada de \citet{bianchibigio2022} ni de \citet{afonso2015}.
+\emph{Borde:} $Q=0\Rightarrow\psi_k=0$ por convenci\'on. \emph{Sesgo conocido:}
+por la Proposici\'on~2, la regla es una cota superior del coaseguro factible.
+
+\subsection*{A.6 Respaldo y adding-up}
+Con $\Delta^u(A)$ de \eqref{eq:delta} y $\varphi(A)=\min(1,F^u/\Delta^u(A))$,
+\[
+\sum_k\mu_k C^u_k=\E\big[\varphi(A)\Delta^u(A)\big]
+=\E\big[\min(F^u,\Delta^u(A))\big]\le F^u,
+\]
+que es \eqref{eq:identidad3}. \emph{Supuesto:} el reparto del fondo es
+proporcional al faltante residual de cada tipo. \emph{Borde:}
+$\Delta^u=0\Rightarrow\varphi=1$ por convenci\'on, sin efecto porque multiplica a
+cero. \emph{Nota contable:} bajo encaje utilizable, el principal ya usado por el
+banco no vuelve a contarse en el fondo --- de ah\'i el indicador
+$\mathbf{1}\{\NU\}$ en \eqref{eq:phi}.
+
+\subsection*{A.7 Convexidad y CPO del colch\'on}
+Sea $D_k(u)=\E[(-\varepsilon_k-u)^+]$. Entonces
+\[
+\frac{\partial D_k}{\partial u}=-F_k(-u),
+\qquad
+\frac{\partial^2 D_k}{\partial u^2}=f_k(-u)\ \ge 0,
+\]
+de modo que $\mathcal{C}_k(u)=c\,u+\kappa D_k(u)$ es convexa y la CPO
+$c-\kappa F_k(-u)=0$ es necesaria y suficiente, lo que da \eqref{eq:cpo}.
+\emph{Borde:} soluci\'on interior si y solo si $c/\kappa<F_k(0)$; con $G$
+sim\'etrica, $F_k(0)=1/2$ y la condici\'on es $c<\kappa/2$. En otro caso
+$u^*_k=0$. \emph{Est\'aticas comparativas:} de \eqref{eq:locscale},
+$\partial u^*_k/\partial\sigma_k=q>0$ y
+$\partial u^*_k/\partial(c/\kappa)<0$.
+
+\subsection*{A.8 Cierre de localizaci\'on--escala}
+Con $\varepsilon_k=\sigma_k\zeta$ y $\zeta\sim G$ sim\'etrica,
+$F_k(-u)=G(-u/\sigma_k)$, de modo que \eqref{eq:cpo} da
+$-u^*_k/\sigma_k=G^{-1}(c/\kappa)$, es decir
+$u^*_k=\sigma_k G^{-1}(1-c/\kappa)=\sigma_k q$ usando simetr\'ia. Adem\'as
+\[
+D^*_k=\E\big[(-\sigma_k\zeta-\sigma_k q)^+\big]
+=\sigma_k\,\E\big[(-\zeta-q)^+\big]
+=\sigma_k\,\E\big[(\zeta-q)^+\big]=\sigma_k\mathcal{D}(q),
+\]
+donde la \'ultima igualdad usa simetr\'ia de $G$. Y
+$\mathcal{D}'(q)=-(1-G(q))<0$, que es la derivada usada en
+\eqref{eq:cadena}.
+
+\subsection*{A.9 Existencia del punto fijo}
+Sea $t\in[0,1]$ la tensi\'on conjeturada. El mapa recorre
+$t\mapsto\psi_k=\tau_k t\mapsto\keff_k$ de \eqref{eq:kappaeff}
+$\mapsto u^*_k$ de \eqref{eq:locscale} $\mapsto(D_k,X_k)\mapsto(P,Q)\mapsto
+t'=\min(1,P/Q)$. Cada eslab\'on es continuo: $\keff_k$ es af\'in en $\psi_k$;
+$u^*_k$ es continuo en $\keff_k$ porque $G^{-1}$ lo es en el interior;
+$D_k$ y $X_k$ son continuos en $u_k$; y $\min(1,\cdot)$ es continuo. Los
+colchones son acotados, luego $T$ es un automapa continuo de $[0,1]$ en s\'i
+mismo y por el teorema de Brouwer tiene punto fijo. \emph{Lo que no se
+demuestra:} unicidad. Se verifica num\'ericamente iterando desde m\'ultiples
+condiciones iniciales sobre la grilla de calibraci\'on, y se reporta el resultado.
+
+\subsection*{A.10 Capa de monedas: la mezcla}
+En d\'olares, $\omega^u_k=\beta_k A^u+\varepsilon^u_k$ con $A^u=-\eta$ con
+probabilidad $p$. Luego
+\[
+\Pr(\omega^u_k<-u)=(1-p)\,G\!\left(\frac{-u}{\sigma^u_k}\right)
++p\,G\!\left(\frac{-u+\beta_k\eta}{\sigma^u_k}\right),
+\]
+y la CPO es $c^u=\kappa^{u,\mathrm{eff}}\Pr(\omega^u_k<-u^{u*}_k)$. El lado
+derecho es estrictamente decreciente en $u$, de modo que el \'optimo interior es
+\'unico siempre que $c^u<\kappa^{u,\mathrm{eff}}\Pr(\omega^u_k<0)$; no se reduce a
+un cuantil \'unico y se resuelve num\'ericamente. \emph{Por qu\'e importa el soporte
+completo:} mantiene las dos componentes de la mezcla solapadas de forma suave;
+con soporte acotado la CPO desarrolla tramos planos cuando $\beta_k\eta>2a_k$
+---la raz\'on t\'ecnica por la cual la uniforme es inadecuada en esta capa (C10).
+
+% ===========================================================================
+\section{Estado de verificaci\'on de las referencias}\label{sec:verificacion}
+% ===========================================================================
+
+Toda referencia citada en el cuerpo fue cotejada contra su registro editorial
+(revista, volumen, p\'aginas, DOI o serie) en octubre de 2026. El archivo
+\texttt{referencias.bib} documenta, entrada por entrada, la fuente del cotejo y
+una l\'inea con el hallazgo relevante. Se reportan aqu\'i las excepciones, porque
+callarlas ser\'ia el tipo de error que este documento busca evitar.
+
+\paragraph{No verificables, no citadas en el cuerpo.}
+\begin{itemize}[leftmargin=*,itemsep=2pt]
+\item \textbf{Hern\'andez Calder\'on (2026), \emph{Journal of Economic Dynamics and
+Control}.} La b\'usqueda no encontr\'o ning\'un art\'iculo de este autor en esa revista
+sobre deuda en moneda extranjera y motivo asegurador. S\'i consta una tesis
+doctoral, \emph{Essays in International Macroeconomics and Sovereign Default}
+(Washington University in St.\ Louis), cuya defensa figura anunciada para abril
+de 2025, con un cap\'itulo titulado ``Partial Default and Exogenous Exchange Rate
+Shocks'' listado en SSRN. \textbf{Recomendaci\'on:} pedir la referencia exacta al
+propio jurado antes de la sustentaci\'on. Citar el trabajo de un miembro del
+jurado con datos equivocados es peor que no citarlo. Para la discusi\'on del
+motivo asegurador de la dolarizaci\'on, el documento usa en su lugar
+\citet{bocolalorenzoni2020} y \citet{dalgic2024}, que son verificables y cubren
+exactamente ese debate.
+\end{itemize}
+
+\paragraph{Verificadas con una salvedad.}
+\begin{itemize}[leftmargin=*,itemsep=2pt]
+\item \textbf{\citet{ortiz2026}.} No verificable en l\'inea. Se conserva porque
+figura en la bibliograf\'ia del PT, es la premisa declarada de H1 y su autor es el
+asesor del trabajo, de modo que los autores tienen acceso directo al manuscrito.
+Confirmar t\'itulo, a\~no y estatus antes de la entrega.
+\item \textbf{\citet{heider2015}.} P\'aginas (336--354) y DOI verificados; volumen
+y n\'umero no confirmados en el cotejo, por lo que se omiten en la entrada
+bibliogr\'afica en lugar de arriesgar un dato falso.
+\item \textbf{\citet{castillo2016}.} RePEc y el Reporte de Inflaci\'on del BCRP
+listan cuatro autores; la ficha del sitio del BCRP lista tres. Se usa la versi\'on
+de cuatro; confirmar con la car\'atula del PDF.
+\item \textbf{\citet{bianchibigioengel2021}.} Al cotejo de octubre de 2026 no
+consta publicaci\'on en revista; se cita como documento de trabajo del NBER
+(n.\,\textordmasculine\ 29457, revisado en marzo de 2023).
+\item \textbf{\citet{baltensperger1980}.} La mayor\'ia de cat\'alogos indican
+p\'aginas 1--37; una fuente indica 1--38.
+\end{itemize}
+
+\paragraph{Atribuci\'on que debe mantenerse.} La regla proporcional
+$\tau_k\min(1,P/Q)$ de \eqref{eq:interbancario} es una construcci\'on propia,
+motivada por la literatura de gesti\'on de liquidez, y \textbf{no} est\'a tomada de
+\citet{bianchibigio2022} ni de \citet{afonso2015}. Esta atribuci\'on debe
+mantenerse expl\'icita en el IE2, como ya lo hace el PT.
+
+\bibliography{referencias}
+
+\end{document}

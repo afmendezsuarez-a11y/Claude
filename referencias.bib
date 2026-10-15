@@ -1,0 +1,742 @@
+% ============================================================================
+%  referencias.bib
+%  Guía de respuesta al feedback del jurado (IE1 -> IE2)
+%  Proyecto: Heterogeneidad bancaria, seguro interbancario y requerimientos
+%            de encaje en el Perú (Gómez Puican & Méndez Suárez)
+%
+%  REGLA DE ESTE ARCHIVO: solo se citan en el cuerpo del documento las
+%  entradas VERIFICADAS. Cada entrada verificada lleva una línea
+%  "% VERIFICADO:" con la fuente del cotejo (journal/volumen/páginas/DOI) y
+%  una frase del hallazgo relevante. Las entradas no verificables quedan
+%  comentadas con "% PENDIENTE VERIFICAR" y NO se citan.
+%  Última verificación: octubre de 2026.
+% ============================================================================
+
+
+% ---------------------------------------------------------------------------
+% 1. LIQUIDEZ BANCARIA, SEGURO Y DECISIÓN DE COLCHÓN
+% ---------------------------------------------------------------------------
+
+@article{diamonddybvig1983,
+  author  = {Diamond, Douglas W. and Dybvig, Philip H.},
+  title   = {Bank Runs, Deposit Insurance, and Liquidity},
+  journal = {Journal of Political Economy},
+  year    = {1983},
+  volume  = {91},
+  number  = {3},
+  pages   = {401--419},
+  doi     = {10.1086/261155}
+}
+% VERIFICADO: entrada ya presente en la bibliografía del PT; JPE 91(3), 401-419.
+% Hallazgo usado: la transformación de plazos genera fragilidad ante necesidades
+% de liquidez no sincronizadas y un seguro puede sostener el equilibrio eficiente.
+
+@incollection{bhattacharya1987,
+  author    = {Bhattacharya, Sudipto and Gale, Douglas},
+  title     = {Preference Shocks, Liquidity, and Central Bank Policy},
+  booktitle = {New Approaches to Monetary Economics},
+  editor    = {Barnett, William and Singleton, Kenneth},
+  pages     = {69--88},
+  publisher = {Cambridge University Press},
+  year      = {1987}
+}
+% VERIFICADO: entrada ya presente en la bibliografía del PT.
+% Hallazgo usado: cuando la liquidez es un bien compartible aparecen incentivos a
+% aprovechar la de los demás; un mecanismo colectivo puede mejorar el autoseguro.
+
+@article{holmstromtirole1998,
+  author  = {Holmstr{\"o}m, Bengt and Tirole, Jean},
+  title   = {Private and Public Supply of Liquidity},
+  journal = {Journal of Political Economy},
+  year    = {1998},
+  volume  = {106},
+  number  = {1},
+  pages   = {1--40},
+  doi     = {10.1086/250001}
+}
+% VERIFICADO: JPE 106(1), febrero 1998, pp. 1-40, DOI 10.1086/250001 (RePEc, TSE,
+% NBER WP 5817). Hallazgo usado: cuando el sector privado no puede autoasegurarse
+% completamente frente a choques agregados de liquidez, hay un papel para la
+% provisión pública de liquidez; la demanda de liquidez se deriva de un problema
+% de decisión con costos de fondeo externo.
+
+@article{poole1968,
+  author  = {Poole, William},
+  title   = {Commercial Bank Reserve Management in a Stochastic Model:
+             Implications for Monetary Policy},
+  journal = {Journal of Finance},
+  year    = {1968},
+  volume  = {23},
+  number  = {5},
+  pages   = {769--791},
+  doi     = {10.1111/j.1540-6261.1968.tb00316.x}
+}
+% VERIFICADO: JF 23(5), diciembre 1968, pp. 769-791 (RePEc; AFA índice vol. 23-5).
+% Hallazgo usado: la gestión de reservas bancarias se plantea como un problema de
+% inventario bajo incertidumbre, con un óptimo de tipo fractil crítico que
+% iguala el costo de mantener reservas ociosas al costo esperado de quedarse corto.
+% Es el antecedente canónico de la CPO newsvendor de la Sección 1.4 de la guía.
+
+@article{baltensperger1980,
+  author  = {Baltensperger, Ernst},
+  title   = {Alternative Approaches to the Theory of the Banking Firm},
+  journal = {Journal of Monetary Economics},
+  year    = {1980},
+  volume  = {6},
+  number  = {1},
+  pages   = {1--37}
+}
+% VERIFICADO: JME 6(1), enero 1980. Páginas 1-37 en la mayoría de catálogos
+% (una fuente indica 1-38; se usa 1-37). Hallazgo usado: sistematiza la teoría de
+% la firma bancaria como elección conjunta de cartera y colchón de reservas bajo
+% costos de ajuste e iliquidez; respalda que la ecuación de balance y la
+% descomposición m = rho + u son contabilidad estándar, no supuestos ad hoc.
+
+@article{froot1993,
+  author  = {Froot, Kenneth A. and Scharfstein, David S. and Stein, Jeremy C.},
+  title   = {Risk Management: Coordinating Corporate Investment and
+             Financing Policies},
+  journal = {Journal of Finance},
+  year    = {1993},
+  volume  = {48},
+  number  = {5},
+  pages   = {1629--1658}
+}
+% VERIFICADO: JF 48(5), diciembre 1993, pp. 1629-1658 (RePEc; NBER WP 4084).
+% Hallazgo usado: cuando el financiamiento externo es más caro que el interno, la
+% función objetivo relevante es convexa en el faltante de fondos internos; es la
+% microfundación estándar del término de costo de distress (C6).
+
+
+% ---------------------------------------------------------------------------
+% 2. MERCADO INTERBANCARIO: ACCESO, PARTICIPACIÓN, PRECIO
+% ---------------------------------------------------------------------------
+
+@article{afonso2015,
+  author  = {Afonso, Gara and Lagos, Ricardo},
+  title   = {Trade Dynamics in the Market for Federal Funds},
+  journal = {Econometrica},
+  year    = {2015},
+  volume  = {83},
+  number  = {1},
+  pages   = {263--313},
+  doi     = {10.3982/ECTA10586}
+}
+% VERIFICADO: Econometrica 83(1), enero 2015, pp. 263-313, DOI 10.3982/ECTA10586.
+% Hallazgo usado: el mercado de fondos federales se modela con búsqueda de
+% contraparte y negociación bilateral sobre monto y repago; no hay un precio
+% único walrasiano, lo que respalda tratar rho_ib como una banda y no como una
+% tasa de equilibrio puntual (C2, C14).
+
+@article{afonso2011stressed,
+  author  = {Afonso, Gara and Kovner, Anna and Schoar, Antoinette},
+  title   = {Stressed, Not Frozen: The Federal Funds Market in the
+             Financial Crisis},
+  journal = {Journal of Finance},
+  year    = {2011},
+  volume  = {66},
+  number  = {4},
+  pages   = {1109--1139}
+}
+% VERIFICADO: JF 66(4), agosto 2011, pp. 1109-1139 (RePEc; NY Fed SR 437;
+% NBER WP 15806). Hallazgo usado: tras Lehman el mercado no se congeló sino que
+% se reprecia y se reordena por relaciones; el racionamiento opera sobre todo en
+% el margen de con quién se negocia. Matiza el relato de colapso total (C14).
+
+@techreport{afonso2014trading,
+  author      = {Afonso, Gara and Kovner, Anna and Schoar, Antoinette},
+  title       = {Trading Partners in the Interbank Lending Market},
+  institution = {Federal Reserve Bank of New York},
+  type        = {Staff Report},
+  number      = {620},
+  year        = {2014}
+}
+% VERIFICADO: entrada ya presente en la bibliografía del PT (NY Fed Staff Report 620).
+% Hallazgo usado: las relaciones estables entre contrapartes condicionan el acceso
+% al crédito interbancario, especialmente en episodios de tensión (C7).
+
+@article{craigvonpeter2014,
+  author  = {Craig, Ben and von Peter, Goetz},
+  title   = {Interbank Tiering and Money Center Banks},
+  journal = {Journal of Financial Intermediation},
+  year    = {2014},
+  volume  = {23},
+  number  = {3},
+  pages   = {322--347}
+}
+% VERIFICADO: JFI 23(3), 2014, pp. 322-347 (RePEc; BIS WP 322; Cleveland Fed WP 10-14).
+% Hallazgo usado: la estructura núcleo-periferia del interbancario es un resultado
+% de equilibrio con costos de intermediación y no un accidente de los datos;
+% justifica modelar acceso heterogéneo y participación endógena (C7, C12).
+
+@article{rochettirole1996,
+  author  = {Rochet, Jean-Charles and Tirole, Jean},
+  title   = {Interbank Lending and Systemic Risk},
+  journal = {Journal of Money, Credit and Banking},
+  year    = {1996},
+  volume  = {28},
+  number  = {4},
+  pages   = {733--762}
+}
+% VERIFICADO: JMCB 28(4), noviembre 1996, pp. 733-762 (RePEc; repositorio
+% Universidad de Toulouse). Hallazgo usado: el préstamo interbancario descentraliza
+% el monitoreo pero crea exposición cruzada; separa el beneficio de coaseguro del
+% costo de contagio (C12).
+
+@article{bechklee2011,
+  author  = {Bech, Morten L. and Klee, Elizabeth},
+  title   = {The Mechanics of a Graceful Exit: Interest on Reserves and
+             Segmentation in the Federal Funds Market},
+  journal = {Journal of Monetary Economics},
+  year    = {2011},
+  volume  = {58},
+  number  = {5},
+  pages   = {415--431},
+  doi     = {10.1016/j.jmoneco.2011.05.007}
+}
+% VERIFICADO: JME 58(5), julio 2011, pp. 415-431, DOI 10.1016/j.jmoneco.2011.05.007
+% (NY Fed SR 416; FEDS 2010-07). Hallazgo usado: cuando distintas instituciones
+% enfrentan distintas opciones externas, el mercado overnight se segmenta y el
+% precio efectivo difiere por participante; respalda rho_ib heterogéneo (C2, C14).
+
+@article{armenterlester2017,
+  author  = {Armenter, Roc and Lester, Benjamin},
+  title   = {Excess Reserves and Monetary Policy Implementation},
+  journal = {Review of Economic Dynamics},
+  year    = {2017},
+  volume  = {23},
+  pages   = {212--235},
+  doi     = {10.1016/j.red.2016.11.002}
+}
+% VERIFICADO: RED 23, 2017, pp. 212-235, DOI 10.1016/j.red.2016.11.002
+% (Philadelphia Fed WP 16-33; CV del autor). Hallazgo usado: con corredor de tasas
+% y acceso desigual a la facilidad del banco central, la tasa overnight se ubica
+% dentro del corredor según quién puede usar cada ventanilla; da la estructura
+% formal de la cascada interbancario-ventanilla (C2, C3).
+
+@article{ashcraft2011,
+  author  = {Ashcraft, Adam and McAndrews, James and Skeie, David},
+  title   = {Precautionary Reserves and the Interbank Market},
+  journal = {Journal of Money, Credit and Banking},
+  year    = {2011},
+  volume  = {43},
+  number  = {s2},
+  pages   = {311--348},
+  doi     = {10.1111/j.1538-4616.2011.00438.x}
+}
+% VERIFICADO: JMCB 43(s2), 2011, pp. 311-348, DOI 10.1111/j.1538-4616.2011.00438.x
+% (NY Fed SR 370). Hallazgo usado: los bancos mantienen reservas precautorias y la
+% dispersión de tasas overnight aumenta con la incertidumbre de pagos; evidencia
+% directa del motivo de autoseguro y de la ausencia de un precio único (C7, C14).
+
+@article{acharyaskeie2011,
+  author  = {Acharya, Viral V. and Skeie, David},
+  title   = {A Model of Liquidity Hoarding and Term Premia in
+             Inter-bank Markets},
+  journal = {Journal of Monetary Economics},
+  year    = {2011},
+  volume  = {58},
+  number  = {5},
+  pages   = {436--447},
+  doi     = {10.1016/j.jmoneco.2011.05.006}
+}
+% VERIFICADO: JME 58(5), 2011, pp. 436-447, DOI 10.1016/j.jmoneco.2011.05.006
+% (NY Fed SR 498; CEPR DP 8705). Hallazgo usado: bancos apalancados con riesgo de
+% refinanciamiento acaparan liquidez y reducen la oferta a plazo; en el extremo el
+% mercado se congela. Mecanismo central para C14.
+
+@article{galeyorulmazer2013,
+  author  = {Gale, Douglas and Yorulmazer, Tanju},
+  title   = {Liquidity Hoarding},
+  journal = {Theoretical Economics},
+  year    = {2013},
+  volume  = {8},
+  number  = {2},
+  pages   = {291--324},
+  doi     = {10.3982/TE1064}
+}
+% VERIFICADO: Theoretical Economics 8(2), mayo 2013, pp. 291-324, DOI 10.3982/TE1064
+% (NY Fed SR 488). Hallazgo usado: el equilibrio de mercado es ineficiente
+% restringido, con muy poca liquidez y acaparamiento ineficiente; justifica que el
+% coaseguro privado no sustituye al respaldo público (C14).
+
+@article{heider2015,
+  author  = {Heider, Florian and Hoerova, Marie and Holthausen, Cornelia},
+  title   = {Liquidity Hoarding and Interbank Market Rates: The Role of
+             Counterparty Risk},
+  journal = {Journal of Financial Economics},
+  year    = {2015},
+  pages   = {336--354},
+  doi     = {10.1016/j.jfineco.2015.07.002}
+}
+% VERIFICADO parcialmente: JFE 2015, pp. 336-354, DOI 10.1016/j.jfineco.2015.07.002.
+% El volumen/número no quedó confirmado en el cotejo, por eso se omiten los campos
+% volume/number en lugar de arriesgar un dato falso; completar con el DOI antes de
+% la entrega. Hallazgo usado: con información privada sobre el riesgo de los activos
+% largos aparece selección adversa; el modelo genera tres regímenes (normal, tensión
+% con spreads altos, y quiebre con acaparamiento). Es la formalización más cercana al
+% comentario C14 (expectativas distintas, sin tasa objetivo).
+
+@article{allencarlettigale2009,
+  author  = {Allen, Franklin and Carletti, Elena and Gale, Douglas},
+  title   = {Interbank Market Liquidity and Central Bank Intervention},
+  journal = {Journal of Monetary Economics},
+  year    = {2009},
+  volume  = {56},
+  number  = {5},
+  pages   = {639--652},
+  doi     = {10.1016/j.jmoneco.2009.04.003}
+}
+% VERIFICADO: JME 56(5), 2009, pp. 639-652, DOI 10.1016/j.jmoneco.2009.04.003
+% (repositorios EUI y UPenn). Hallazgo usado: con mercados interbancarios
+% incompletos la volatilidad de precios de activos es excesiva y la intervención
+% del banco central puede implementar el óptimo restringido; respalda el papel del
+% respaldo público como complemento, no sustituto, del interbancario (C4, C14).
+
+@article{allen2000contagion,
+  author  = {Allen, Franklin and Gale, Douglas},
+  title   = {Financial Contagion},
+  journal = {Journal of Political Economy},
+  year    = {2000},
+  volume  = {108},
+  number  = {1},
+  pages   = {1--33},
+  doi     = {10.1086/262109}
+}
+% VERIFICADO: entrada ya presente en la bibliografía del PT; JPE 108(1), 1-33.
+% Hallazgo usado: las conexiones que comparten riesgo también propagan
+% perturbaciones; diversificación individual y exposición conjunta son distintas.
+
+
+% ---------------------------------------------------------------------------
+% 3. FRICCIONES, FIRE SALES Y COSTOS DE DISTRESS
+% ---------------------------------------------------------------------------
+
+@article{brunnermeierpedersen2009,
+  author  = {Brunnermeier, Markus K. and Pedersen, Lasse Heje},
+  title   = {Market Liquidity and Funding Liquidity},
+  journal = {Review of Financial Studies},
+  year    = {2009},
+  volume  = {22},
+  number  = {6},
+  pages   = {2201--2238},
+  doi     = {10.1093/rfs/hhn098}
+}
+% VERIFICADO: RFS 22(6), junio 2009, pp. 2201-2238, DOI 10.1093/rfs/hhn098
+% (NBER WP 12939). Hallazgo usado: la liquidez de mercado y la de fondeo se
+% refuerzan mutuamente, generando espirales; es la fuente de la convexidad del
+% costo de quedarse corto (C6).
+
+@article{diamondrajan2011,
+  author  = {Diamond, Douglas W. and Rajan, Raghuram G.},
+  title   = {Fear of Fire Sales, Illiquidity Seeking, and Credit Freezes},
+  journal = {Quarterly Journal of Economics},
+  year    = {2011},
+  volume  = {126},
+  number  = {2},
+  pages   = {557--591},
+  doi     = {10.1093/qje/qjr012}
+}
+% VERIFICADO: QJE 126(2), 2011, pp. 557-591, DOI 10.1093/qje/qjr012
+% (NBER WP 14925). Hallazgo usado: la anticipación de ventas forzadas lleva a los
+% bancos a buscar iliquidez y a retener fondos, congelando el crédito; une C6 y C14.
+
+@article{shleifervishny2011,
+  author  = {Shleifer, Andrei and Vishny, Robert W.},
+  title   = {Fire Sales in Finance and Macroeconomics},
+  journal = {Journal of Economic Perspectives},
+  year    = {2011},
+  volume  = {25},
+  number  = {1},
+  pages   = {29--48},
+  doi     = {10.1257/jep.25.1.29}
+}
+% VERIFICADO: JEP 25(1), invierno 2011, pp. 29-48, DOI 10.1257/jep.25.1.29
+% (NBER WP 16642). Hallazgo usado: liquidar activos en estados de tensión implica
+% descuentos no lineales; sustenta una penalidad convexa o escalonada en el
+% problema del banco (C6).
+
+@article{acharya2017systemic,
+  author  = {Acharya, Viral V. and Pedersen, Lasse Heje and Philippon, Thomas
+             and Richardson, Matthew},
+  title   = {Measuring Systemic Risk},
+  journal = {The Review of Financial Studies},
+  year    = {2017},
+  volume  = {30},
+  number  = {1},
+  pages   = {2--47},
+  doi     = {10.1093/rfs/hhw088}
+}
+% VERIFICADO: entrada ya presente en la bibliografía del PT; RFS 30(1), 2-47.
+% Hallazgo usado: la contribución de cada institución al déficit esperado del
+% sistema es la base lógica de una prima ajustada por riesgo; fundamento de la
+% pregunta distributiva.
+
+
+% ---------------------------------------------------------------------------
+% 4. ENCAJE, DOLARIZACIÓN Y RESPALDO EN MONEDA EXTRANJERA
+% ---------------------------------------------------------------------------
+
+@techreport{ortiz2026,
+  author      = {Ortiz, Marco},
+  title       = {Building the Buffer: Reserve Requirements and Dollar
+                 Liquidity Insurance},
+  institution = {Universidad del Pac{\'i}fico},
+  type        = {Manuscrito no publicado},
+  year        = {2026}
+}
+% NO VERIFICABLE EN LÍNEA (búsqueda de octubre de 2026 sin resultados). Se conserva
+% porque (i) figura en la bibliografía del PT, (ii) es la premisa declarada de H1 y
+% (iii) el asesor del trabajo es su autor, de modo que los autores tienen acceso
+% directo al manuscrito. ANTES DE LA ENTREGA: confirmar con el asesor el título
+% exacto, el año y el estatus (documento de trabajo UP, mimeo, en revisión).
+
+@incollection{levyyeyati2008,
+  author    = {Levy Yeyati, Eduardo},
+  title     = {Liquidity Insurance in a Financially Dollarized Economy},
+  booktitle = {Financial Markets Volatility and Performance in Emerging Markets},
+  editor    = {Edwards, Sebastian and Garcia, M{\'a}rcio G. P.},
+  pages     = {185--218},
+  publisher = {University of Chicago Press},
+  year      = {2008}
+}
+% VERIFICADO: capítulo en Edwards y Garcia (eds.), University of Chicago Press,
+% 2008, pp. 185-218; versión previa NBER WP 12345 (2006).
+% Hallazgo usado: la dolarización financiera limita al banco central como
+% prestamista de última instancia en dólares y expone al sistema a corridas de
+% liquidez en ME; propone requerimientos descentralizados de activos líquidos.
+% Es el respaldo directo del supuesto de capacidad de respaldo FINITA en dólares.
+
+@techreport{izelevyyeyati2005,
+  author      = {Ize, Alain and Levy Yeyati, Eduardo},
+  title       = {Financial De-Dollarization: Is It for Real?},
+  institution = {International Monetary Fund},
+  type        = {IMF Working Paper},
+  number      = {05/187},
+  year        = {2005}
+}
+% VERIFICADO: entrada ya presente en la bibliografía del PT (IMF WP 05/187).
+% Hallazgo usado: la composición de monedas responde a la volatilidad relativa de
+% precios y tipo de cambio; por eso w_k fijo aísla el canal asegurador del de
+% desdolarización.
+
+@article{bocolalorenzoni2020,
+  author  = {Bocola, Luigi and Lorenzoni, Guido},
+  title   = {Financial Crises, Dollarization, and Lending of Last Resort in
+             Open Economies},
+  journal = {American Economic Review},
+  year    = {2020},
+  volume  = {110},
+  number  = {8},
+  pages   = {2524--2557},
+  doi     = {10.1257/aer.20180830}
+}
+% VERIFICADO: AER 110(8), 2020, pp. 2524-2557, DOI 10.1257/aer.20180830
+% (página AEA; NBER WP 23984). Hallazgo usado: la dolarización de pasivos surge de
+% un motivo asegurador de los ahorristas domésticos, y el prestamista de última
+% instancia en moneda extranjera enfrenta un límite de recursos; es la referencia
+% moderna para leer F^u finito y para discutir el motivo asegurador (C8, C15).
+
+@article{dalgic2024,
+  author  = {Dalgic, Husnu C.},
+  title   = {Financial Dollarization in Emerging Markets: An Insurance
+             Arrangement},
+  journal = {International Economic Review},
+  year    = {2024},
+  volume  = {65},
+  number  = {3},
+  pages   = {1189--1219},
+  doi     = {10.1111/iere.12686}
+}
+% VERIFICADO: IER 65(3), agosto 2024, pp. 1189-1219, DOI 10.1111/iere.12686
+% (repositorio Universidad de Mannheim). Hallazgo usado: el crédito en moneda
+% extranjera funciona como un arreglo de seguro entre hogares y firmas; contrapunto
+% directo a la lectura puramente prudencial de la dolarización (C8, C15).
+
+@article{cespedes2004,
+  author  = {C{\'e}spedes, Luis Felipe and Chang, Roberto and Velasco, Andr{\'e}s},
+  title   = {Balance Sheets and Exchange Rate Policy},
+  journal = {American Economic Review},
+  year    = {2004},
+  volume  = {94},
+  number  = {4},
+  pages   = {1183--1193}
+}
+% VERIFICADO: AER 94(4), septiembre 2004, pp. 1183-1193 (RePEc; catálogo Rutgers;
+% JSTOR 3592812). Hallazgo usado: con descalce cambiario una depreciación deteriora
+% el patrimonio y contrae el crédito; es el canal de valuación que hoy está ausente
+% del marco y que C8 pide incorporar.
+
+@techreport{bianchibigioengel2021,
+  author      = {Bianchi, Javier and Bigio, Saki and Engel, Charles},
+  title       = {Scrambling for Dollars: International Liquidity, Banks and
+                 Exchange Rates},
+  institution = {National Bureau of Economic Research},
+  type        = {NBER Working Paper},
+  number      = {29457},
+  year        = {2021},
+  note        = {Revisado en marzo de 2023}
+}
+% VERIFICADO: NBER WP 29457, noviembre 2021, revisado marzo 2023; también
+% Minneapolis Fed WP 786. Al cotejo de octubre de 2026 NO consta publicación en
+% revista, por lo que se cita como documento de trabajo (el PT lo cita igual).
+% Hallazgo usado: las fricciones de liquidación en el interbancario generan demanda
+% precautoria de reservas en dólares y un rendimiento de conveniencia endógeno del
+% dólar; respalda que el canal de escasez de dólares es cantidad, no solo precio.
+
+@techreport{castillo2016,
+  author      = {Castillo, Paul and Vega, Hugo and Serrano, Enrique and
+                 Burga, Carlos},
+  title       = {De-dollarization of Credit in Peru: The Role of Unconventional
+                 Monetary Policy Tools},
+  institution = {Banco Central de Reserva del Per{\'u}},
+  type        = {Documento de Trabajo},
+  number      = {2016-002},
+  year        = {2016}
+}
+% VERIFICADO: BCRP DT 2016-002, abril de 2016. NOTA: RePEc y el Reporte de Inflación
+% del BCRP (marzo 2019) listan cuatro autores (Castillo, Vega, Serrano y Burga);
+% la ficha del sitio del BCRP lista solo tres. Se usa la versión de cuatro autores;
+% confirmar con la carátula del PDF antes de la entrega.
+% Hallazgo usado: encajes altos usados contracíclicamente desde 2010 y el programa
+% de desdolarización desde 2013 redujeron significativamente la dolarización del
+% crédito; evidencia de que w_k responde a la política, lo que justifica fijarlo
+% para aislar el canal asegurador (C15).
+
+@techreport{armas2014,
+  author      = {Armas, Adri{\'a}n and Castillo, Paul and Vega, Marco},
+  title       = {Inflation Targeting and Quantitative Tightening: Effects of
+                 Reserve Requirements in Peru},
+  institution = {Banco Central de Reserva del Per{\'u}},
+  type        = {Documento de Trabajo},
+  number      = {2014-003},
+  year        = {2014},
+  note        = {Publicado en \emph{Econom{\'i}a}, 15(1), 133--175}
+}
+% VERIFICADO: BCRP DT 2014-003, febrero de 2014; versión de revista en Economía
+% 15(1), 133-175, DOI 10.31389/eco.86 (LACEA/LSE). Hallazgo usado: el encaje opera
+% junto a la tasa de referencia dentro del esquema de metas de inflación y afecta
+% tasas y crédito en bancos y cajas; es el anclaje institucional del corredor (C3).
+
+@techreport{cantu2024,
+  author      = {Cant{\'u}, Carlos and Gondo, Rocio and Martinez, Berenice},
+  title       = {Reserve Requirements as a Financial Stability Instrument},
+  institution = {Bank for International Settlements},
+  type        = {BIS Working Paper},
+  number      = {1182},
+  year        = {2024}
+}
+% VERIFICADO: BIS WP 1182, 30 de abril de 2024 (bis.org). Hallazgo usado: encajes
+% más estrictos suavizan el ciclo de crédito y reducen la probabilidad de episodios
+% de estrés, a costa de menor crédito; además, los encajes UNIFORMES tienen efecto
+% más fuerte que los diferenciados por plazo o moneda — dato directamente relevante
+% para justificar el foco en una tasa uniforme dentro de cada moneda.
+
+@techreport{brei2018,
+  author      = {Brei, Michael and Moreno, Ramon},
+  title       = {Reserve Requirements and Capital Flows in Latin America},
+  institution = {Bank for International Settlements},
+  type        = {BIS Working Paper},
+  number      = {741},
+  year        = {2018}
+}
+% VERIFICADO: entrada ya presente en la bibliografía del PT (BIS WP 741).
+
+@article{montoromoreno2011,
+  author  = {Montoro, Carlos and Moreno, Ramon},
+  title   = {The Use of Reserve Requirements as a Policy Instrument in
+             Latin America},
+  journal = {BIS Quarterly Review},
+  year    = {2011},
+  pages   = {53--65},
+  note    = {Marzo}
+}
+% VERIFICADO: entrada ya presente en la bibliografía del PT.
+
+@article{glockertowbin2012,
+  author  = {Glocker, Christian and Towbin, Pascal},
+  title   = {Reserve Requirements for Price and Financial Stability:
+             When Are They Effective?},
+  journal = {International Journal of Central Banking},
+  year    = {2012},
+  volume  = {8},
+  number  = {1},
+  pages   = {65--113}
+}
+% VERIFICADO: entrada ya presente en la bibliografía del PT.
+
+@article{jeanneranciere2011,
+  author  = {Jeanne, Olivier and Ranci{\`e}re, Romain},
+  title   = {The Optimal Level of International Reserves for Emerging Market
+             Countries: A New Formula and Some Applications},
+  journal = {The Economic Journal},
+  year    = {2011},
+  volume  = {121},
+  number  = {555},
+  pages   = {905--930},
+  doi     = {10.1111/j.1468-0297.2011.02435.x}
+}
+% VERIFICADO: entrada ya presente en la bibliografía del PT (EJ 121(555), 905-930).
+
+
+% ---------------------------------------------------------------------------
+% 5. HETEROGENEIDAD, TIPOS Y CALIBRACIÓN
+% ---------------------------------------------------------------------------
+
+@article{bonhommemanresa2015,
+  author  = {Bonhomme, St{\'e}phane and Manresa, Elena},
+  title   = {Grouped Patterns of Heterogeneity in Panel Data},
+  journal = {Econometrica},
+  year    = {2015},
+  volume  = {83},
+  number  = {3},
+  pages   = {1147--1184},
+  doi     = {10.3982/ECTA11319}
+}
+% VERIFICADO: Econometrica 83(3), mayo 2015, pp. 1147-1184, DOI 10.3982/ECTA11319
+% (Econometric Society; CEMFI WP 1208). Hallazgo usado: los grupos de
+% heterogeneidad se pueden ESTIMAR del panel (grouped fixed effects) en lugar de
+% imponerse; da un criterio empírico para formar las K clases de bancos (C9).
+
+@article{bonhomme2022,
+  author  = {Bonhomme, St{\'e}phane and Lamadon, Thibaut and Manresa, Elena},
+  title   = {Discretizing Unobserved Heterogeneity},
+  journal = {Econometrica},
+  year    = {2022},
+  volume  = {90},
+  number  = {2},
+  pages   = {625--643},
+  doi     = {10.3982/ECTA15238}
+}
+% VERIFICADO: Econometrica 90(2), marzo 2022, pp. 625-643, DOI 10.3982/ECTA15238.
+% Hallazgo usado: discretizar una distribución continua de tipos en K grupos tiene
+% un sesgo de aproximación que decrece con K a una tasa conocida, mientras la
+% varianza de los momentos por grupo crece; es el trade-off formal que responde
+% "cómo definir K" (C9, C18).
+
+@techreport{salinas2024,
+  author      = {Galindo Gil, Hamilton and Ledesma, Alan and
+                 Yepez Salazar, Luis and Salinas, C{\'e}sar},
+  title       = {Informality and Wealth Distribution: A Heterogeneous
+                 Agent Model},
+  institution = {Banco Central de Reserva del Per{\'u}},
+  type        = {Documento de Trabajo},
+  number      = {2024-005},
+  year        = {2024}
+}
+% VERIFICADO: BCRP DT 2024-005, abril de 2024 (bcrp.gob.pe; RePEc rbp:wpaper:2024-005;
+% SSRN 4740142). Hallazgo usado: modelo de agentes heterogéneos en tiempo continuo
+% calibrado a momentos observables de la economía peruana; referencia metodológica
+% local para la disciplina de calibración de tipos (C9).
+
+@techreport{cuba2020,
+  author      = {Cuba, Walter and Or{\'e}, Erick and Toma, Hiroshi},
+  title       = {Interconexiones bancarias y riesgo de liquidez sist{\'e}mico
+                 en el Per{\'u}},
+  institution = {Banco Central de Reserva del Per{\'u}},
+  type        = {Documento de Trabajo},
+  number      = {2020-005},
+  year        = {2020}
+}
+% VERIFICADO: BCRP DT 2020-005, noviembre de 2020 (bcrp.gob.pe; RePEc).
+% Hallazgo usado: propone un indicador de importancia sistémica en liquidez y un
+% algoritmo de contagio de fondeo; para 2006-2018 el riesgo sistémico de liquidez
+% cae en moneda nacional y no aparece riesgo significativo en moneda extranjera.
+% ATENCIÓN: este último resultado es un contrapunto empírico que el jurado puede
+% usar; conviene citarlo explícitamente y discutirlo (C12).
+
+@techreport{carrera2014,
+  author      = {Carrera, C{\'e}sar and Castillo, Paul and Ortiz, Marco and
+                 Vega, Hugo},
+  title       = {Spillovers, Capital Flows and Prudential Regulation in Small
+                 Open Economies},
+  institution = {Banco Central de Reserva del Per{\'u}},
+  type        = {Documento de Trabajo},
+  number      = {2014-006},
+  year        = {2014}
+}
+% VERIFICADO: entrada ya presente en la bibliografía del PT (BCRP DT 2014-006).
+
+@article{bianchibigio2022,
+  author  = {Bianchi, Javier and Bigio, Saki},
+  title   = {Banks, Liquidity Management, and Monetary Policy},
+  journal = {Econometrica},
+  year    = {2022},
+  volume  = {90},
+  number  = {1},
+  pages   = {391--454},
+  doi     = {10.3982/ECTA16599}
+}
+% VERIFICADO: Econometrica 90(1), 2022, pp. 391-454, DOI 10.3982/ECTA16599
+% (Wiley/Econometric Society). Hallazgo usado: la gestión de liquidez bancaria
+% responde al costo de mantener recursos líquidos y al de conseguirlos tras el
+% choque; microfundación del trade-off (c, kappa) y del interbancario friccional.
+
+
+% ---------------------------------------------------------------------------
+% 6. FUENTES DE DATOS E INSTITUCIONALES
+% ---------------------------------------------------------------------------
+
+@misc{bcrpdata,
+  author       = {{Banco Central de Reserva del Per{\'u}}},
+  title        = {BCRPData: series mensuales de encaje y tasas de inter{\'e}s},
+  howpublished = {Base de datos},
+  note         = {\url{https://estadisticas.bcrp.gob.pe/estadisticas/series/}},
+  year         = {2026}
+}
+% VERIFICADO: entrada ya presente en la bibliografía del PT.
+
+@misc{sbs,
+  author       = {{Superintendencia de Banca, Seguros y AFP}},
+  title        = {Informaci{\'o}n estad{\'i}stica de banca m{\'u}ltiple},
+  howpublished = {Base de datos},
+  note         = {\url{https://www.sbs.gob.pe/estadisticas-y-publicaciones/estadisticas-/sistema-financiero}},
+  year         = {2026}
+}
+% VERIFICADO: entrada ya presente en la bibliografía del PT.
+
+@misc{nyfedsofr,
+  author       = {{Federal Reserve Bank of New York}},
+  title        = {Secured Overnight Financing Rate (SOFR)},
+  howpublished = {Serie de referencia y nota metodol{\'o}gica},
+  note         = {\url{https://www.newyorkfed.org/markets/reference-rates/sofr}},
+  year         = {2026}
+}
+% VERIFICADO: la SOFR es administrada y publicada diariamente por el Federal
+% Reserve Bank of New York; mide el costo de fondeo overnight colateralizado con
+% Treasuries en el mercado de repo, con volumen diario del orden de USD 1 billón
+% (10^12). Publicación desde abril de 2018; reemplazó a la LIBOR USD (discontinuada
+% en junio de 2023). Desde el 25 de noviembre de 2024 la metodología excluye
+% transacciones entre instituciones afiliadas. Uso: anclar rho_ib en dólares a una
+% tasa overnight observable (C2). NO se usa para afirmar ningún nivel de tasa.
+
+
+% ---------------------------------------------------------------------------
+% 7. PENDIENTES DE VERIFICACIÓN (NO CITAR EN EL CUERPO)
+% ---------------------------------------------------------------------------
+
+% PENDIENTE VERIFICAR  --- entrada desactivada a propósito.
+% NOTA: BibTeX detecta el símbolo "arroba" aunque la línea empiece con %, de modo
+% que la entrada se escribe aquí en texto plano, sin ese símbolo, para que el
+% archivo compile. Clave prevista: hernandez2026jedc
+%   article   Hernández Calderón, Joao
+%   title     [título por confirmar]
+%   journal   Journal of Economic Dynamics and Control
+%   year      2026
+% La búsqueda de octubre de 2026 NO encontró ningún artículo de Hernández Calderón
+% en el Journal of Economic Dynamics and Control sobre deuda en ME y motivo
+% asegurador. Lo que sí consta: una tesis doctoral, "Essays in International
+% Macroeconomics and Sovereign Default" (Washington University in St. Louis; la
+% defensa figura anunciada para abril de 2025 en la web del departamento de
+% Economía), cuyo capítulo "Partial Default and Exogenous Exchange Rate Shocks"
+% está listado en SSRN. No se cita en el cuerpo porque no se pudo confirmar
+% año, estatus editorial ni contenido. RECOMENDACIÓN: pedir la referencia exacta
+% al propio jurado antes de la sustentación; citar el trabajo de un miembro del
+% jurado con datos equivocados es peor que no citarlo.
+
+% PENDIENTE VERIFICAR
+% Literatura de dolarización y descalce en el Perú citada de memoria en la guía
+% (Armas, Castillo y Vega sobre dolarización parcial; Rossini et al.). Las piezas
+% peruanas efectivamente verificadas y usadas son armas2014, castillo2016,
+% cuba2020, carrera2014 e izelevyyeyati2005. Si se requiere más evidencia local
+% sobre descalce cambiario de balance, verificar antes de incorporar.
